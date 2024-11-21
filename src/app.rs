@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use crate::theme::Theme;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Track {
@@ -136,21 +137,25 @@ pub struct App {
     pub songs: Vec<Track>,
     pub playlist: Vec<Track>,
     pub current_track_index: Option<usize>,
-    pub current_track: Option<Track>,  // Keep track of currently playing song
+    pub current_track: Option<Track>,
     pub playback_state: PlaybackState,
     pub volume: u8,
     pub selected_song_index: usize,
     pub selected_playlist_index: usize,
     pub filesystem: FileSystem,
     pub focus: Focus,
-    pub show_menu: bool,  // New field for menu visibility
-    pub playback_position: u64,  // Current position in seconds
+    pub show_menu: bool,
+    pub playback_position: u64,
+    pub theme: Theme,
 }
 
 impl Default for App {
     fn default() -> Self {
         // Start in the parent directory
         let current_dir = PathBuf::from("..").canonicalize().unwrap_or_else(|_| PathBuf::from("."));
+        
+        // Load theme
+        let theme = Theme::load().expect("Failed to load theme");
 
         Self {
             songs: Vec::new(),
@@ -163,8 +168,9 @@ impl Default for App {
             selected_playlist_index: 0,
             filesystem: FileSystem::new(current_dir),
             focus: Focus::Browser,
-            show_menu: false,  // Initialize menu as hidden
+            show_menu: false,
             playback_position: 0,
+            theme,
         }
     }
 }

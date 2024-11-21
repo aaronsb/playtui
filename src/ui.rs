@@ -1,7 +1,7 @@
 use crate::app::{App, PlaybackState, Focus};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect, Alignment},
-    style::{Color, Modifier, Style},
+    style::Style,
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Paragraph, Clear, Gauge},
     Frame,
@@ -43,11 +43,11 @@ pub fn draw(frame: &mut Frame, app: &App) {
 
     // Draw menu if it's visible
     if app.show_menu {
-        draw_menu(frame);
+        draw_menu(frame, app);
     }
 }
 
-fn draw_menu(frame: &mut Frame) {
+fn draw_menu(frame: &mut Frame, app: &App) {
     let area = frame.size();
     
     // Calculate menu size (80% of screen)
@@ -65,11 +65,11 @@ fn draw_menu(frame: &mut Frame) {
     let menu = Paragraph::new("Menu\n\nPress 'm' or Esc to close")
         .block(Block::default()
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(Color::White))
+            .border_style(app.theme.menu_border_style())
             .title(" Menu ")
             .title_alignment(Alignment::Center))
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::White));
+        .style(app.theme.menu_style());
 
     frame.render_widget(menu, menu_area);
 }
@@ -109,8 +109,8 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
         .block(Block::default()
             .borders(Borders::ALL)
             .title(" Now Playing ")
-            .border_style(Style::default().fg(Color::Cyan)))
-        .style(Style::default().fg(Color::White));
+            .border_style(app.theme.now_playing_border_style()))
+        .style(app.theme.now_playing_style());
 
     frame.render_widget(now_playing, chunks[0]);
 
@@ -131,8 +131,8 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
                 .block(Block::default()
                     .borders(Borders::ALL)
                     .title(title)
-                    .border_style(Style::default().fg(Color::Cyan)))
-                .gauge_style(Style::default().fg(Color::Green))
+                    .border_style(app.theme.progress_gauge_border_style()))
+                .gauge_style(app.theme.progress_gauge_style())
                 .ratio(ratio)
                 .label(label)
                 .use_unicode(true);
@@ -143,9 +143,9 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
                 .block(Block::default()
                     .borders(Borders::ALL)
                     .title(" Progress ")
-                    .border_style(Style::default().fg(Color::Cyan)))
+                    .border_style(app.theme.progress_text_border_style()))
                 .alignment(Alignment::Center)
-                .style(Style::default().fg(Color::White));
+                .style(app.theme.progress_text_style());
 
             frame.render_widget(progress, chunks[1]);
         }
@@ -154,9 +154,9 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
             .block(Block::default()
                 .borders(Borders::ALL)
                 .title(" Progress ")
-                .border_style(Style::default().fg(Color::Cyan)))
+                .border_style(app.theme.progress_text_border_style()))
             .alignment(Alignment::Center)
-            .style(Style::default().fg(Color::White));
+            .style(app.theme.progress_text_style());
 
         frame.render_widget(progress, chunks[1]);
     }
@@ -172,12 +172,6 @@ fn draw_browser(frame: &mut Frame, app: &App, area: Rect) {
         })
         .collect();
 
-    let border_style = if app.focus == Focus::Browser {
-        Style::default().fg(Color::Yellow)
-    } else {
-        Style::default().fg(Color::Cyan)
-    };
-
     let current_dir = app.filesystem.get_current_dir_display();
     let title = format!(" Browser [{}] ", current_dir);
 
@@ -185,13 +179,9 @@ fn draw_browser(frame: &mut Frame, app: &App, area: Rect) {
         .block(Block::default()
             .borders(Borders::ALL)
             .title(title)
-            .border_style(border_style))
-        .highlight_style(
-            Style::default()
-                .bg(Color::DarkGray)
-                .add_modifier(Modifier::BOLD),
-        )
-        .highlight_symbol("► ");
+            .border_style(app.theme.browser_border_style(app.focus == Focus::Browser)))
+        .highlight_style(app.theme.browser_highlight_style())
+        .highlight_symbol(app.theme.browser_highlight_symbol());
 
     frame.render_stateful_widget(
         browser,
@@ -211,7 +201,7 @@ fn draw_songs(frame: &mut Frame, app: &App, area: Rect) {
             let content = format!("{} - {}", format_title(title), artist);
             
             let style = if app.focus == Focus::Songs && app.current_track.as_ref() == Some(track) && app.playback_state != PlaybackState::Stopped {
-                Style::default().fg(Color::Green)
+                app.theme.songs_playing_style()
             } else {
                 Style::default()
             };
@@ -222,23 +212,13 @@ fn draw_songs(frame: &mut Frame, app: &App, area: Rect) {
         })
         .collect();
 
-    let border_style = if app.focus == Focus::Songs {
-        Style::default().fg(Color::Yellow)
-    } else {
-        Style::default().fg(Color::Cyan)
-    };
-
     let songs = List::new(items)
         .block(Block::default()
             .borders(Borders::ALL)
             .title(" Songs ")
-            .border_style(border_style))
-        .highlight_style(
-            Style::default()
-                .bg(Color::DarkGray)
-                .add_modifier(Modifier::BOLD),
-        )
-        .highlight_symbol("► ");
+            .border_style(app.theme.songs_border_style(app.focus == Focus::Songs)))
+        .highlight_style(app.theme.songs_highlight_style())
+        .highlight_symbol(app.theme.songs_highlight_symbol());
 
     frame.render_stateful_widget(
         songs,
@@ -258,7 +238,7 @@ fn draw_playlist(frame: &mut Frame, app: &App, area: Rect) {
             let content = format!("{} - {}", format_title(title), artist);
             
             let style = if app.focus == Focus::Playlist && app.current_track.as_ref() == Some(track) && app.playback_state != PlaybackState::Stopped {
-                Style::default().fg(Color::Green)
+                app.theme.playlist_playing_style()
             } else {
                 Style::default()
             };
@@ -269,23 +249,13 @@ fn draw_playlist(frame: &mut Frame, app: &App, area: Rect) {
         })
         .collect();
 
-    let border_style = if app.focus == Focus::Playlist {
-        Style::default().fg(Color::Yellow)
-    } else {
-        Style::default().fg(Color::Cyan)
-    };
-
     let playlist = List::new(items)
         .block(Block::default()
             .borders(Borders::ALL)
             .title(" Playlist ")
-            .border_style(border_style))
-        .highlight_style(
-            Style::default()
-                .bg(Color::DarkGray)
-                .add_modifier(Modifier::BOLD),
-        )
-        .highlight_symbol("► ");
+            .border_style(app.theme.playlist_border_style(app.focus == Focus::Playlist)))
+        .highlight_style(app.theme.playlist_highlight_style())
+        .highlight_symbol(app.theme.playlist_highlight_symbol());
 
     frame.render_stateful_widget(
         playlist,
@@ -306,15 +276,15 @@ fn draw_controls(frame: &mut Frame, app: &App, area: Rect) {
         Span::raw("Tab: Switch Focus | "),
         Span::raw("m: Menu | "),
         Span::raw("q: Quit | "),
-        Span::styled(volume, Style::default().fg(Color::Cyan)),
+        Span::styled(volume, app.theme.controls_volume_style()),
     ];
 
     let controls_widget = Paragraph::new(Line::from(controls))
         .block(Block::default()
             .borders(Borders::ALL)
             .title(" Controls ")
-            .border_style(Style::default().fg(Color::Cyan)))
-        .style(Style::default().fg(Color::White));
+            .border_style(app.theme.controls_border_style()))
+        .style(app.theme.controls_style());
 
     frame.render_widget(controls_widget, area);
 }
@@ -341,3 +311,4 @@ fn format_title(title: &str) -> String {
         .trim()
         .to_string()
 }
+
