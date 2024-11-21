@@ -65,12 +65,15 @@ fn run_app<B: Backend>(
                 // Handle menu-specific keys first
                 if app.show_menu {
                     match key.code {
-                        KeyCode::Char('m') | KeyCode::Esc => {
+                        KeyCode::Char('m') | KeyCode::Char('q') => {
                             app.toggle_menu();
-                            continue;
                         }
-                        _ => continue, // Ignore other keys when menu is shown
+                        KeyCode::Tab => {
+                            app.cycle_menu_page();
+                        }
+                        _ => {} // Ignore other keys when menu is shown
                     }
+                    continue;
                 }
 
                 match key.code {

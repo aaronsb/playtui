@@ -1,4 +1,4 @@
-use crate::app::{App, PlaybackState, Focus};
+use crate::app::{App, PlaybackState, Focus, MenuPage};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect, Alignment},
     style::Style,
@@ -61,12 +61,26 @@ fn draw_menu(frame: &mut Frame, app: &App) {
     // Draw a clear widget first to create a blank canvas
     frame.render_widget(Clear, menu_area);
 
+    // Get menu content based on current page
+    let content = match app.menu_page {
+        MenuPage::Preferences => "Preferences Menu\n\nPlaceholder for preferences settings",
+        MenuPage::Looks => "Looks Menu\n\nPlaceholder for appearance settings",
+        MenuPage::About => "About Menu\n\nPlaceholder for app information",
+    };
+
+    // Get menu title based on current page
+    let title = match app.menu_page {
+        MenuPage::Preferences => " Preferences ",
+        MenuPage::Looks => " Looks ",
+        MenuPage::About => " About ",
+    };
+
     // Draw the menu
-    let menu = Paragraph::new("Menu\n\nPress 'm' or Esc to close")
+    let menu = Paragraph::new(format!("{}\n\nPress Tab to switch pages\nPress 'm' or 'q' to close", content))
         .block(Block::default()
             .borders(Borders::ALL)
             .border_style(app.theme.menu_border_style())
-            .title(" Menu ")
+            .title(title)
             .title_alignment(Alignment::Center))
         .alignment(Alignment::Center)
         .style(app.theme.menu_style());
@@ -311,4 +325,3 @@ fn format_title(title: &str) -> String {
         .trim()
         .to_string()
 }
-

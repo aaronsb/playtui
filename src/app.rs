@@ -23,6 +23,13 @@ pub enum Focus {
     Playlist,
 }
 
+#[derive(Debug, PartialEq)]
+pub enum MenuPage {
+    Preferences,
+    Looks,
+    About,
+}
+
 #[derive(Debug)]
 pub struct FileSystem {
     pub current_dir: PathBuf,
@@ -43,11 +50,6 @@ impl FileSystem {
 
     pub fn refresh_entries(&mut self) {
         let mut entries = Vec::new();
-
-        // Add parent directory (..) if not at root
-        if let Some(parent) = self.current_dir.parent() {
-            entries.push(parent.to_path_buf());
-        }
 
         // Add immediate subdirectories only
         if let Ok(read_dir) = std::fs::read_dir(&self.current_dir) {
@@ -112,12 +114,6 @@ impl FileSystem {
 
     pub fn get_entry_name(&self, index: usize) -> String {
         if let Some(path) = self.entries.get(index) {
-            if let Some(parent) = self.current_dir.parent() {
-                if path == parent {
-                    return "..".to_string();
-                }
-            }
-
             if let Some(name) = path.file_name() {
                 if let Some(name_str) = name.to_str() {
                     return name_str.to_string();
@@ -145,6 +141,7 @@ pub struct App {
     pub filesystem: FileSystem,
     pub focus: Focus,
     pub show_menu: bool,
+    pub menu_page: MenuPage,
     pub playback_position: u64,
     pub theme: Theme,
 }
@@ -169,6 +166,7 @@ impl Default for App {
             filesystem: FileSystem::new(current_dir),
             focus: Focus::Browser,
             show_menu: false,
+            menu_page: MenuPage::Preferences,
             playback_position: 0,
             theme,
         }
@@ -182,6 +180,20 @@ impl App {
 
     pub fn toggle_menu(&mut self) {
         self.show_menu = !self.show_menu;
+        if self.show_menu {
+            // Reset to preferences page when opening menu
+            self.menu_page = MenuPage::Preferences;
+        }
+    }
+
+    pub fn cycle_menu_page(&mut self) {
+        if self.show_menu {
+            self.menu_page = match self.menu_page {
+                MenuPage::Preferences => MenuPage::Looks,
+                MenuPage::Looks => MenuPage::About,
+                MenuPage::About => MenuPage::Preferences,
+            };
+        }
     }
 
     pub fn next_track(&mut self) {
