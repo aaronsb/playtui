@@ -1,12 +1,13 @@
 use anyhow::Result;
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
+    event::{self, DisableMouseCapture, EnableMouseCapture},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use playtui::{
-    app::{App, PlaybackState, Focus},
+    app::{App, PlaybackState},
     audio::AudioPlayer,
+    input_handler,
     ui,
 };
 use ratatui::prelude::*;
@@ -61,171 +62,9 @@ fn run_app<B: Backend>(
         terminal.draw(|f| ui::draw(f, app))?;
 
         if event::poll(Duration::from_millis(100))? {
-            if let Event::Key(key) = event::read()? {
-                // Handle menu-specific keys first
-                if app.show_menu {
-                    match key.code {
-                        KeyCode::Char('m') | KeyCode::Char('q') => {
-                            app.toggle_menu();
-                        }
-                        KeyCode::Tab => {
-                            app.cycle_menu_page();
-                        }
-                        _ => {} // Ignore other keys when menu is shown
-                    }
-                    continue;
-                }
-
-                match key.code {
-                    KeyCode::Char('q') => return Ok(()),
-                    KeyCode::Char('m') => app.toggle_menu(),
-                    KeyCode::Tab => {
-                        if key.modifiers.contains(KeyModifiers::SHIFT) {
-                            app.reverse_toggle_focus();
-                        } else {
-                            app.toggle_focus();
-                        }
-                    }
-                    KeyCode::Char(' ') => {
-                        match app.playback_state {
-                            PlaybackState::Playing => {
-                                audio_player.pause();
-                                app.playback_state = PlaybackState::Paused;
-                            }
-                            PlaybackState::Paused => {
-                                // Only resume if we have a current track
-                                if app.current_track.is_some() {
-                                    audio_player.resume();
-                                    app.playback_state = PlaybackState::Playing;
-                                }
-                            }
-                            PlaybackState::Stopped => {
-                                // Try to play the current track if we have one
-                                if let Some(track) = &app.current_track {
-                                    if let Err(e) = audio_player.play(&track.path) {
-                                        eprintln!("Error playing track: {}", e);
-                                        continue;
-                                    }
-                                    app.playback_state = PlaybackState::Playing;
-                                    app.playback_position = 0;
-                                } else {
-                                    // If no current track, try to play from current focus
-                                    let tracks = match app.focus {
-                                        Focus::Songs => &app.songs,
-                                        Focus::Playlist => &app.playlist,
-                                        _ => continue,
-                                    };
-
-                                    if !tracks.is_empty() {
-                                        app.current_track_index = Some(0);
-                                        app.current_track = tracks.first().cloned();
-                                        if let Some(track) = &app.current_track {
-                                            if let Err(e) = audio_player.play(&track.path) {
-                                                eprintln!("Error playing track: {}", e);
-                                                continue;
-                                            }
-                                            app.playback_state = PlaybackState::Playing;
-                                            app.playback_position = 0;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    KeyCode::Char('.') => {
-                        app.next_track();
-                        if let Some(track) = &app.current_track {
-                            if let Err(e) = audio_player.play(&track.path) {
-                                eprintln!("Error playing track: {}", e);
-                                continue;
-                            }
-                            app.playback_state = PlaybackState::Playing;
-                            app.playback_position = 0;
-                        }
-                    }
-                    KeyCode::Char(',') => {
-                        app.previous_track();
-                        if let Some(track) = &app.current_track {
-                            if let Err(e) = audio_player.play(&track.path) {
-                                eprintln!("Error playing track: {}", e);
-                                continue;
-                            }
-                            app.playback_state = PlaybackState::Playing;
-                            app.playback_position = 0;
-                        }
-                    }
-                    KeyCode::Char('+') => {
-                        app.increase_volume();
-                        audio_player.set_volume(app.volume as f32 / 100.0);
-                    }
-                    KeyCode::Char('-') => {
-                        app.decrease_volume();
-                        audio_player.set_volume(app.volume as f32 / 100.0);
-                    }
-                    KeyCode::Up | KeyCode::Char('k') => app.move_selection_up(),
-                    KeyCode::Down | KeyCode::Char('j') => app.move_selection_down(),
-                    KeyCode::Right => {
-                        match app.focus {
-                            Focus::Browser => {
-                                if let Some(path) = app.filesystem.get_selected_path() {
-                                    if path.is_dir() {
-                                        if let Err(e) = app.enter_directory() {
-                                            eprintln!("Error accessing directory: {}", e);
-                                        }
-                                    }
-                                }
-                            }
-                            Focus::Songs => {
-                                if key.modifiers.contains(KeyModifiers::SHIFT) {
-                                    app.add_all_to_playlist();
-                                } else {
-                                    app.add_to_playlist();
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                    KeyCode::Left => {
-                        match app.focus {
-                            Focus::Browser => app.go_to_parent(),
-                            Focus::Songs => app.remove_from_playlist(),
-                            Focus::Playlist => {
-                                if key.modifiers.contains(KeyModifiers::SHIFT) {
-                                    app.clear_playlist();
-                                }
-                            }
-                        }
-                    }
-                    KeyCode::Enter => {
-                        match app.focus {
-                            Focus::Browser => {
-                                if let Some(path) = app.filesystem.get_selected_path() {
-                                    if path.is_dir() {
-                                        if let Err(e) = app.enter_directory() {
-                                            eprintln!("Error accessing directory: {}", e);
-                                        }
-                                    }
-                                }
-                            }
-                            Focus::Songs | Focus::Playlist => {
-                                app.play_selected();
-                                if let Some(track) = &app.current_track {
-                                    if let Err(e) = audio_player.play(&track.path) {
-                                        eprintln!("Error playing track: {}", e);
-                                        continue;
-                                    }
-                                    app.playback_position = 0;
-                                }
-                            }
-                        }
-                    }
-                    KeyCode::Backspace => {
-                        if app.focus == Focus::Browser {
-                            app.go_to_parent();
-                        }
-                    }
-                    _ => {}
-                }
+            let event = event::read()?;
+            if let Some(()) = input_handler::handle_input(event, app, audio_player)? {
+                return Ok(());
             }
         }
 
