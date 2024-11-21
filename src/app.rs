@@ -53,7 +53,7 @@ impl Focus {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum MenuPage {
     Preferences,
     Looks,
@@ -174,6 +174,7 @@ pub struct App {
     pub menu_page: MenuPage,
     pub playback_position: u64,
     pub theme: Theme,
+    pub selected_theme_index: usize,
 }
 
 impl Default for App {
@@ -199,6 +200,7 @@ impl Default for App {
             menu_page: MenuPage::Preferences,
             playback_position: 0,
             theme,
+            selected_theme_index: 0,
         }
     }
 }
@@ -213,6 +215,7 @@ impl App {
         if self.show_menu {
             // Reset to preferences page when opening menu
             self.menu_page = MenuPage::Preferences;
+            self.selected_theme_index = 0;
         }
     }
 
@@ -223,6 +226,56 @@ impl App {
                 MenuPage::Looks => MenuPage::About,
                 MenuPage::About => MenuPage::Preferences,
             };
+            // Reset theme selection when switching to Looks page
+            if self.menu_page == MenuPage::Looks {
+                self.selected_theme_index = 0;
+            }
+        }
+    }
+
+    pub fn apply_selected_theme(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        if self.show_menu && self.menu_page == MenuPage::Looks {
+            if let Ok(themes) = Theme::list_themes() {
+                if let Some(theme_name) = themes.get(self.selected_theme_index) {
+                    self.theme = Theme::load_theme(theme_name)?;
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub fn move_theme_selection(&mut self, direction: ThemeDirection) {
+        if self.show_menu && self.menu_page == MenuPage::Looks {
+            if let Ok(themes) = Theme::list_themes() {
+                let theme_count = themes.len();
+                if theme_count == 0 {
+                    return;
+                }
+
+                let cols = 3;
+                let _rows = (theme_count + cols - 1) / cols;
+                let current_row = self.selected_theme_index / cols;
+                let current_col = self.selected_theme_index % cols;
+
+                self.selected_theme_index = match direction {
+                    ThemeDirection::Up if current_row > 0 => {
+                        let new_index = self.selected_theme_index - cols;
+                        if new_index < theme_count { new_index } else { self.selected_theme_index }
+                    },
+                    ThemeDirection::Down => {
+                        let new_index = self.selected_theme_index + cols;
+                        if new_index < theme_count { new_index } else { self.selected_theme_index }
+                    },
+                    ThemeDirection::Left if current_col > 0 => {
+                        self.selected_theme_index - 1
+                    },
+                    ThemeDirection::Right => {
+                        let new_index = self.selected_theme_index + 1;
+                        if new_index < theme_count && new_index % cols != 0 { new_index } else { self.selected_theme_index }
+                    },
+                    _ => self.selected_theme_index,
+                };
+            }
         }
     }
 
@@ -432,4 +485,12 @@ impl App {
         self.selected_playlist_index = 0;
         // Don't reset current track or playback state when clearing playlist
     }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ThemeDirection {
+    Up,
+    Down,
+    Left,
+    Right,
 }

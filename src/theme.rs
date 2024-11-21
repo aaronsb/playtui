@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use ratatui::style::{Color, Modifier, Style};
 
@@ -32,6 +33,19 @@ pub struct BlockConfig {
 pub struct FocusableBlockConfig {
     pub borders: bool,
     pub border_style: FocusableBorderStyleConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TabStyleConfig {
+    pub selected: StyleConfig,
+    pub unselected: StyleConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MenuTabsConfig {
+    pub preferences: TabStyleConfig,
+    pub looks: TabStyleConfig,
+    pub about: TabStyleConfig,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -87,6 +101,7 @@ pub struct MenuConfig {
     pub name: String,
     pub block: BlockConfig,
     pub style: StyleConfig,
+    pub tabs: MenuTabsConfig,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -113,9 +128,36 @@ pub struct Theme {
 
 impl Theme {
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
-        let content = fs::read_to_string("theme.json")?;
+        Self::load_theme("default")
+    }
+
+    pub fn load_theme(name: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let path = PathBuf::from("themes").join(format!("{}.json", name));
+        let content = fs::read_to_string(path)?;
         let config: Widgets = serde_json::from_str(&content)?;
         Ok(Self { config })
+    }
+
+    pub fn list_themes() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+        let mut themes = Vec::new();
+        let themes_dir = PathBuf::from("themes");
+        
+        if themes_dir.exists() {
+            for entry in fs::read_dir(themes_dir)? {
+                if let Ok(entry) = entry {
+                    if let Some(file_name) = entry.file_name().to_str() {
+                        if file_name.ends_with(".json") {
+                            if let Some(theme_name) = file_name.strip_suffix(".json") {
+                                themes.push(theme_name.to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        themes.sort();
+        Ok(themes)
     }
 
     fn parse_color(color_str: &str) -> Color {
@@ -293,5 +335,19 @@ impl Theme {
 
     pub fn menu_border_style(&self) -> Style {
         Self::border_style_from_config(&self.config.widgets.menu.block.border_style)
+    }
+
+    pub fn menu_tab_style(&self, tab: crate::app::MenuPage, is_selected: bool) -> Style {
+        let tab_config = match tab {
+            crate::app::MenuPage::Preferences => &self.config.widgets.menu.tabs.preferences,
+            crate::app::MenuPage::Looks => &self.config.widgets.menu.tabs.looks,
+            crate::app::MenuPage::About => &self.config.widgets.menu.tabs.about,
+        };
+
+        if is_selected {
+            Self::style_from_config(&tab_config.selected)
+        } else {
+            Self::style_from_config(&tab_config.unselected)
+        }
     }
 }

@@ -1,0 +1,229 @@
+{
+  "theme_info": {
+    "name": "Default Theme",
+    "version": "1.0",
+    "author": "Aaron"
+  },
+  "widgets": {
+    "now_playing": {
+      "name": "Now Playing",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "progress_gauge": {
+      "name": "Progress",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "gauge_style": {
+        "fg": "Green",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "progress_text": {
+      "name": "Progress (No Duration)",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "browser": {
+      "name": "Browser",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "unfocused": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "Yellow",
+            "bg": null,
+            "modifiers": []
+          }
+        }
+      },
+      "list_style": {
+        "fg": null,
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": null,
+        "bg": "DarkGray",
+        "modifiers": ["BOLD"]
+      },
+      "highlight_symbol": "► "
+    },
+    "songs": {
+      "name": "Songs",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "unfocused": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "Yellow",
+            "bg": null,
+            "modifiers": []
+          }
+        }
+      },
+      "list_style": {
+        "fg": null,
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": null,
+        "bg": "DarkGray",
+        "modifiers": ["BOLD"]
+      },
+      "playing_style": {
+        "fg": "Green",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_symbol": "► "
+    },
+    "playlist": {
+      "name": "Playlist",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "unfocused": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "Yellow",
+            "bg": null,
+            "modifiers": []
+          }
+        }
+      },
+      "list_style": {
+        "fg": null,
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": null,
+        "bg": "DarkGray",
+        "modifiers": ["BOLD"]
+      },
+      "playing_style": {
+        "fg": "Green",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_symbol": "► "
+    },
+    "controls": {
+      "name": "Controls",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      },
+      "volume_style": {
+        "fg": "Cyan",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "menu": {
+      "name": "Menu",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "White",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      },
+      "tabs": {
+        "preferences": {
+          "selected": {
+            "fg": "Black",
+            "bg": "Cyan",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          }
+        },
+        "looks": {
+          "selected": {
+            "fg": "Black",
+            "bg": "Green",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "Green",
+            "bg": null,
+            "modifiers": []
+          }
+        },
+        "about": {
+          "selected": {
+            "fg": "Black",
+            "bg": "Magenta",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "Magenta",
+            "bg": null,
+            "modifiers": []
+          }
+        }
+      }
+    }
+  }
+}

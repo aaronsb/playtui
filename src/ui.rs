@@ -1,10 +1,11 @@
 use crate::app::{App, PlaybackState, Focus, MenuPage};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect, Alignment},
-    style::Style,
+    style::{Style, Color},
     text::{Line, Span},
-    widgets::{Block, Borders, List, ListItem, Paragraph, Clear, Gauge},
+    widgets::{Block, Borders, List, ListItem, Paragraph, Clear, Gauge, Tabs, Padding},
     Frame,
+    symbols,
 };
 
 fn format_time(seconds: u64) -> String {
@@ -47,6 +48,90 @@ pub fn draw(frame: &mut Frame, app: &App) {
     }
 }
 
+fn draw_theme_preview(frame: &mut Frame, theme: &crate::theme::Theme, area: Rect, name: &str, is_selected: bool) -> Rect {
+    let border_style = if is_selected {
+        Style::default().fg(Color::Yellow)
+    } else {
+        theme.songs_border_style(false)
+    };
+
+    let preview = Block::default()
+        .borders(Borders::ALL)
+        .border_style(border_style)
+        .title(format!(" {} ", name));
+    
+    let inner = preview.inner(area);
+    frame.render_widget(preview, area);
+
+    // Create a sample song list to show theme styling
+    let items = vec![
+        ListItem::new("► Song Title - Artist"),
+        ListItem::new(Line::from(vec![
+            Span::styled("Now Playing: ", theme.songs_playing_style()),
+            Span::raw("Current Song"),
+        ])),
+        ListItem::new(Line::from(vec![
+            Span::styled("Selected: ", theme.songs_highlight_style()),
+            Span::raw("Selected Song"),
+        ])),
+    ];
+
+    let list = List::new(items)
+        .style(Style::default());
+
+    frame.render_widget(list, inner);
+    inner
+}
+
+fn draw_theme_previews(frame: &mut Frame, app: &App, area: Rect) {
+    // First split vertically into rows
+    let rows = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Ratio(1, 2),  // First row
+            Constraint::Ratio(1, 2),  // Second row
+        ])
+        .split(area);
+
+    // For each row, create 3 columns
+    let row1_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(33),
+            Constraint::Percentage(33),
+            Constraint::Percentage(34),
+        ])
+        .split(rows[0]);
+
+    let row2_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(33),
+            Constraint::Percentage(33),
+            Constraint::Percentage(34),
+        ])
+        .split(rows[1]);
+
+    // Get list of available themes
+    if let Ok(themes) = crate::theme::Theme::list_themes() {
+        for (i, theme_name) in themes.iter().enumerate() {
+            if let Ok(theme) = crate::theme::Theme::load_theme(theme_name) {
+                let chunk = if i < 3 {
+                    // First row
+                    row1_chunks[i]
+                } else if i < 6 {
+                    // Second row
+                    row2_chunks[i - 3]
+                } else {
+                    continue; // Skip additional themes beyond 6
+                };
+                
+                draw_theme_preview(frame, &theme, chunk, theme_name, i == app.selected_theme_index);
+            }
+        }
+    }
+}
+
 fn draw_menu(frame: &mut Frame, app: &App) {
     let area = frame.size();
     
@@ -61,31 +146,72 @@ fn draw_menu(frame: &mut Frame, app: &App) {
     // Draw a clear widget first to create a blank canvas
     frame.render_widget(Clear, menu_area);
 
-    // Get menu content based on current page
-    let content = match app.menu_page {
-        MenuPage::Preferences => "Preferences Menu\n\nPlaceholder for preferences settings",
-        MenuPage::Looks => "Looks Menu\n\nPlaceholder for appearance settings",
-        MenuPage::About => "About Menu\n\nPlaceholder for app information",
-    };
+    // Create vertical layout for tabs and content
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(3),  // Tabs
+            Constraint::Min(0),     // Content
+        ])
+        .split(menu_area);
 
-    // Get menu title based on current page
-    let title = match app.menu_page {
-        MenuPage::Preferences => " Preferences ",
-        MenuPage::Looks => " Looks ",
-        MenuPage::About => " About ",
-    };
+    // Create tab titles with theme-based styling
+    let titles = vec![
+        Line::from(Span::styled("  Preferences  ", app.theme.menu_tab_style(MenuPage::Preferences, app.menu_page == MenuPage::Preferences))),
+        Line::from(Span::styled("  Looks  ", app.theme.menu_tab_style(MenuPage::Looks, app.menu_page == MenuPage::Looks))),
+        Line::from(Span::styled("  About  ", app.theme.menu_tab_style(MenuPage::About, app.menu_page == MenuPage::About))),
+    ];
 
-    // Draw the menu
-    let menu = Paragraph::new(format!("{}\n\nPress Tab to switch pages\nPress 'm' or 'q' to close", content))
+    let selected_tab = match app.menu_page {
+        MenuPage::Preferences => 0,
+        MenuPage::Looks => 1,
+        MenuPage::About => 2,
+    };
+    
+    // Create tabs with proper styling
+    let tabs = Tabs::new(titles)
         .block(Block::default()
             .borders(Borders::ALL)
-            .border_style(app.theme.menu_border_style())
-            .title(title)
-            .title_alignment(Alignment::Center))
-        .alignment(Alignment::Center)
-        .style(app.theme.menu_style());
+            .border_set(symbols::border::THICK)
+            .border_style(app.theme.menu_border_style()))
+        .select(selected_tab)
+        .divider("|");
 
-    frame.render_widget(menu, menu_area);
+    frame.render_widget(tabs, chunks[0]);
+
+    // Get menu content based on current page
+    match app.menu_page {
+        MenuPage::Preferences => {
+            let content = "Preferences Menu\n\nPlaceholder for preferences settings";
+            let border_style = app.theme.menu_tab_style(MenuPage::Preferences, true);
+            let content = Paragraph::new(format!("{}\n\nPress Tab to switch pages\nPress 'm' or 'q' to close", content))
+                .block(Block::default()
+                    .borders(Borders::ALL)
+                    .border_set(symbols::border::THICK)
+                    .padding(Padding::uniform(1))
+                    .border_style(border_style))
+                .alignment(Alignment::Center)
+                .style(app.theme.menu_style());
+            frame.render_widget(content, chunks[1]);
+        }
+        MenuPage::Looks => {
+            // Draw theme previews in the content area
+            draw_theme_previews(frame, app, chunks[1]);
+        }
+        MenuPage::About => {
+            let content = "About Menu\n\nPlaceholder for app information";
+            let border_style = app.theme.menu_tab_style(MenuPage::About, true);
+            let content = Paragraph::new(format!("{}\n\nPress Tab to switch pages\nPress 'm' or 'q' to close", content))
+                .block(Block::default()
+                    .borders(Borders::ALL)
+                    .border_set(symbols::border::THICK)
+                    .padding(Padding::uniform(1))
+                    .border_style(border_style))
+                .alignment(Alignment::Center)
+                .style(app.theme.menu_style());
+            frame.render_widget(content, chunks[1]);
+        }
+    }
 }
 
 fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {

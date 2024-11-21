@@ -1,6 +1,6 @@
 use anyhow::Result;
 use crossterm::event::{Event, KeyCode, KeyModifiers};
-use crate::app::{App, PlaybackState, Focus};
+use crate::app::{App, PlaybackState, Focus, MenuPage, ThemeDirection};
 use crate::audio::AudioPlayer;
 
 pub fn handle_input(
@@ -18,6 +18,23 @@ pub fn handle_input(
                 KeyCode::Tab => {
                     // In menu, tab always cycles forward regardless of shift
                     app.cycle_menu_page();
+                }
+                KeyCode::Up if app.menu_page == MenuPage::Looks => {
+                    app.move_theme_selection(ThemeDirection::Up);
+                }
+                KeyCode::Down if app.menu_page == MenuPage::Looks => {
+                    app.move_theme_selection(ThemeDirection::Down);
+                }
+                KeyCode::Left if app.menu_page == MenuPage::Looks => {
+                    app.move_theme_selection(ThemeDirection::Left);
+                }
+                KeyCode::Right if app.menu_page == MenuPage::Looks => {
+                    app.move_theme_selection(ThemeDirection::Right);
+                }
+                KeyCode::Enter if app.menu_page == MenuPage::Looks => {
+                    if let Err(e) = app.apply_selected_theme() {
+                        eprintln!("Error applying theme: {}", e);
+                    }
                 }
                 _ => {} // Ignore other keys when menu is shown
             }

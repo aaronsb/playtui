@@ -1,6 +1,6 @@
 {
   "theme_info": {
-    "name": "Default Theme",
+    "name": "Copper",
     "version": "1.0",
     "author": "Aaron"
   },
@@ -10,13 +10,13 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
+          "fg": "Blue",
           "bg": null,
           "modifiers": []
         }
       },
       "style": {
-        "fg": "White",
+        "fg": "LightBlue",
         "bg": null,
         "modifiers": []
       }
@@ -26,13 +26,13 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
+          "fg": "Blue",
           "bg": null,
           "modifiers": []
         }
       },
       "gauge_style": {
-        "fg": "Green",
+        "fg": "LightBlue",
         "bg": null,
         "modifiers": []
       }
@@ -42,13 +42,13 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
+          "fg": "Blue",
           "bg": null,
           "modifiers": []
         }
       },
       "style": {
-        "fg": "White",
+        "fg": "LightBlue",
         "bg": null,
         "modifiers": []
       }
@@ -59,24 +59,24 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "Cyan",
+            "fg": "Blue",
             "bg": null,
             "modifiers": []
           },
           "focused": {
-            "fg": "Yellow",
+            "fg": "LightBlue",
             "bg": null,
-            "modifiers": []
+            "modifiers": ["BOLD"]
           }
         }
       },
       "list_style": {
-        "fg": null,
+        "fg": "Gray",
         "bg": null,
         "modifiers": []
       },
       "highlight_style": {
-        "fg": null,
+        "fg": "White",
         "bg": "DarkGray",
         "modifiers": ["BOLD"]
       },
@@ -88,31 +88,31 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "Cyan",
+            "fg": "Blue",
             "bg": null,
             "modifiers": []
           },
           "focused": {
-            "fg": "Yellow",
+            "fg": "LightBlue",
             "bg": null,
-            "modifiers": []
+            "modifiers": ["BOLD"]
           }
         }
       },
       "list_style": {
-        "fg": null,
+        "fg": "Gray",
         "bg": null,
         "modifiers": []
       },
       "highlight_style": {
-        "fg": null,
+        "fg": "White",
         "bg": "DarkGray",
         "modifiers": ["BOLD"]
       },
       "playing_style": {
-        "fg": "Green",
+        "fg": "LightBlue",
         "bg": null,
-        "modifiers": []
+        "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
     },
@@ -122,31 +122,31 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "Cyan",
+            "fg": "Blue",
             "bg": null,
             "modifiers": []
           },
           "focused": {
-            "fg": "Yellow",
+            "fg": "LightBlue",
             "bg": null,
-            "modifiers": []
+            "modifiers": ["BOLD"]
           }
         }
       },
       "list_style": {
-        "fg": null,
+        "fg": "Gray",
         "bg": null,
         "modifiers": []
       },
       "highlight_style": {
-        "fg": null,
+        "fg": "White",
         "bg": "DarkGray",
         "modifiers": ["BOLD"]
       },
       "playing_style": {
-        "fg": "Green",
+        "fg": "LightBlue",
         "bg": null,
-        "modifiers": []
+        "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
     },
@@ -155,20 +155,20 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
+          "fg": "Blue",
           "bg": null,
           "modifiers": []
         }
       },
       "style": {
-        "fg": "White",
+        "fg": "Gray",
         "bg": null,
         "modifiers": []
       },
       "volume_style": {
-        "fg": "Cyan",
+        "fg": "LightBlue",
         "bg": null,
-        "modifiers": []
+        "modifiers": ["BOLD"]
       }
     },
     "menu": {
@@ -176,15 +176,53 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "White",
+          "fg": "Blue",
           "bg": null,
           "modifiers": []
         }
       },
       "style": {
-        "fg": "White",
+        "fg": "Gray",
         "bg": null,
         "modifiers": []
+      },
+      "tabs": {
+        "preferences": {
+          "selected": {
+            "fg": "Black",
+            "bg": "LightBlue",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "Blue",
+            "bg": null,
+            "modifiers": []
+          }
+        },
+        "looks": {
+          "selected": {
+            "fg": "Black",
+            "bg": "LightBlue",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "Blue",
+            "bg": null,
+            "modifiers": []
+          }
+        },
+        "about": {
+          "selected": {
+            "fg": "Black",
+            "bg": "LightBlue",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "Blue",
+            "bg": null,
+            "modifiers": []
+          }
+        }
       }
     }
   }
