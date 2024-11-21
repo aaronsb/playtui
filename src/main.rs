@@ -53,12 +53,29 @@ fn run_app<B: Backend>(
     audio_player: &mut AudioPlayer,
 ) -> Result<()> {
     loop {
+        // Update playback position if playing
+        if app.playback_state == PlaybackState::Playing {
+            app.playback_position = audio_player.position();
+        }
+
         terminal.draw(|f| ui::draw(f, app))?;
 
         if event::poll(Duration::from_millis(100))? {
             if let Event::Key(key) = event::read()? {
+                // Handle menu-specific keys first
+                if app.show_menu {
+                    match key.code {
+                        KeyCode::Char('m') | KeyCode::Esc => {
+                            app.toggle_menu();
+                            continue;
+                        }
+                        _ => continue, // Ignore other keys when menu is shown
+                    }
+                }
+
                 match key.code {
                     KeyCode::Char('q') => return Ok(()),
+                    KeyCode::Char('m') => app.toggle_menu(),
                     KeyCode::Tab => {
                         if key.modifiers.contains(KeyModifiers::SHIFT) {
                             app.reverse_toggle_focus();
@@ -87,6 +104,7 @@ fn run_app<B: Backend>(
                                         continue;
                                     }
                                     app.playback_state = PlaybackState::Playing;
+                                    app.playback_position = 0;
                                 } else {
                                     // If no current track, try to play from current focus
                                     let tracks = match app.focus {
@@ -104,13 +122,14 @@ fn run_app<B: Backend>(
                                                 continue;
                                             }
                                             app.playback_state = PlaybackState::Playing;
+                                            app.playback_position = 0;
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    KeyCode::Char('n') => {
+                    KeyCode::Char('.') => {
                         app.next_track();
                         if let Some(track) = &app.current_track {
                             if let Err(e) = audio_player.play(&track.path) {
@@ -118,9 +137,10 @@ fn run_app<B: Backend>(
                                 continue;
                             }
                             app.playback_state = PlaybackState::Playing;
+                            app.playback_position = 0;
                         }
                     }
-                    KeyCode::Char('p') => {
+                    KeyCode::Char(',') => {
                         app.previous_track();
                         if let Some(track) = &app.current_track {
                             if let Err(e) = audio_player.play(&track.path) {
@@ -128,6 +148,7 @@ fn run_app<B: Backend>(
                                 continue;
                             }
                             app.playback_state = PlaybackState::Playing;
+                            app.playback_position = 0;
                         }
                     }
                     KeyCode::Char('+') => {
@@ -190,6 +211,7 @@ fn run_app<B: Backend>(
                                         eprintln!("Error playing track: {}", e);
                                         continue;
                                     }
+                                    app.playback_position = 0;
                                 }
                             }
                         }
@@ -202,6 +224,12 @@ fn run_app<B: Backend>(
                     _ => {}
                 }
             }
+        }
+
+        // Check if playback has finished
+        if app.playback_state == PlaybackState::Playing && !audio_player.is_playing() {
+            app.stop_playback();
+            audio_player.stop();
         }
     }
 }

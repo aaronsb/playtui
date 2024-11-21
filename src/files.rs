@@ -2,6 +2,10 @@ use anyhow::Result;
 use id3::{Tag, TagLike};
 use std::path::Path;
 use crate::app::Track;
+use std::fs::File;
+use std::io::BufReader;
+use rodio::Decoder;
+use rodio::Source;
 
 pub fn scan_directory<P: AsRef<Path>>(path: P) -> Result<Vec<Track>> {
     let mut tracks = Vec::new();
@@ -39,7 +43,7 @@ pub fn scan_directory<P: AsRef<Path>>(path: P) -> Result<Vec<Track>> {
 fn create_track_from_path(path: &Path) -> Result<Track> {
     let mut title = None;
     let mut artist = None;
-    let duration = None;
+    let mut duration = None;
 
     // Try to read ID3 tags for MP3 files
     if let Some(ext) = path.extension() {
@@ -63,6 +67,16 @@ fn create_track_from_path(path: &Path) -> Result<Track> {
             } else {
                 title = Some(clean_name);
                 artist = Some("Unknown Artist".to_string());
+            }
+        }
+    }
+
+    // Get audio duration using rodio
+    if let Ok(file) = File::open(path) {
+        if let Ok(decoder) = Decoder::new(BufReader::new(file)) {
+            let total_duration = decoder.total_duration();
+            if let Some(total) = total_duration {
+                duration = Some(total.as_secs());
             }
         }
     }

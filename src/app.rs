@@ -143,6 +143,8 @@ pub struct App {
     pub selected_playlist_index: usize,
     pub filesystem: FileSystem,
     pub focus: Focus,
+    pub show_menu: bool,  // New field for menu visibility
+    pub playback_position: u64,  // Current position in seconds
 }
 
 impl Default for App {
@@ -161,6 +163,8 @@ impl Default for App {
             selected_playlist_index: 0,
             filesystem: FileSystem::new(current_dir),
             focus: Focus::Browser,
+            show_menu: false,  // Initialize menu as hidden
+            playback_position: 0,
         }
     }
 }
@@ -168,6 +172,10 @@ impl Default for App {
 impl App {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn toggle_menu(&mut self) {
+        self.show_menu = !self.show_menu;
     }
 
     pub fn next_track(&mut self) {
@@ -182,6 +190,7 @@ impl App {
                 self.current_track_index = Some(current_index + 1);
                 if let Some(track) = tracks.get(current_index + 1) {
                     self.current_track = Some(track.clone());
+                    self.playback_position = 0;
                 }
             }
         } else {
@@ -189,10 +198,12 @@ impl App {
                 Focus::Songs if !self.songs.is_empty() => {
                     self.current_track_index = Some(0);
                     self.current_track = self.songs.first().cloned();
+                    self.playback_position = 0;
                 }
                 Focus::Playlist if !self.playlist.is_empty() => {
                     self.current_track_index = Some(0);
                     self.current_track = self.playlist.first().cloned();
+                    self.playback_position = 0;
                 }
                 _ => {}
             }
@@ -210,6 +221,7 @@ impl App {
                 };
                 if let Some(track) = tracks.get(current_index - 1) {
                     self.current_track = Some(track.clone());
+                    self.playback_position = 0;
                 }
             }
         }
@@ -230,6 +242,7 @@ impl App {
                 // Only start playing if we have a track selected
                 if self.current_track.is_some() {
                     self.playback_state = PlaybackState::Playing;
+                    self.playback_position = 0;
                 }
             }
         }
@@ -239,6 +252,7 @@ impl App {
         self.playback_state = PlaybackState::Stopped;
         self.current_track = None;
         self.current_track_index = None;
+        self.playback_position = 0;
     }
 
     pub fn increase_volume(&mut self) {
@@ -304,6 +318,7 @@ impl App {
                     self.current_track_index = Some(self.selected_song_index);
                     self.current_track = self.songs.get(self.selected_song_index).cloned();
                     self.playback_state = PlaybackState::Playing;
+                    self.playback_position = 0;
                 }
             }
             Focus::Playlist => {
@@ -311,6 +326,7 @@ impl App {
                     self.current_track_index = Some(self.selected_playlist_index);
                     self.current_track = self.playlist.get(self.selected_playlist_index).cloned();
                     self.playback_state = PlaybackState::Playing;
+                    self.playback_position = 0;
                 }
             }
             _ => {}
