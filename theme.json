@@ -16,7 +16,7 @@
         "modifiers": []
       }
     },
-    "progress": {
+    "progress_gauge": {
       "name": "Progress",
       "block": {
         "borders": true,
@@ -30,6 +30,17 @@
         "fg": "Green",
         "bg": null,
         "modifiers": []
+      }
+    },
+    "progress_text": {
+      "name": "Progress (No Duration)",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
       },
       "style": {
         "fg": "White",
@@ -42,49 +53,54 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
-          "bg": null,
-          "modifiers": []
-        },
-        "focused_border_style": {
-          "fg": "Yellow",
-          "bg": null,
-          "modifiers": []
+          "unfocused": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "Yellow",
+            "bg": null,
+            "modifiers": []
+          }
         }
       },
-      "style": {
-        "fg": "White",
+      "list_style": {
+        "fg": null,
         "bg": null,
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "White",
+        "fg": null,
         "bg": "DarkGray",
         "modifiers": ["BOLD"]
-      }
+      },
+      "highlight_symbol": "► "
     },
     "songs": {
       "name": "Songs",
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
-          "bg": null,
-          "modifiers": []
-        },
-        "focused_border_style": {
-          "fg": "Yellow",
-          "bg": null,
-          "modifiers": []
+          "unfocused": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "Yellow",
+            "bg": null,
+            "modifiers": []
+          }
         }
       },
-      "style": {
-        "fg": "White",
+      "list_style": {
+        "fg": null,
         "bg": null,
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "White",
+        "fg": null,
         "bg": "DarkGray",
         "modifiers": ["BOLD"]
       },
@@ -92,30 +108,33 @@
         "fg": "Green",
         "bg": null,
         "modifiers": []
-      }
+      },
+      "highlight_symbol": "► "
     },
     "playlist": {
       "name": "Playlist",
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Cyan",
-          "bg": null,
-          "modifiers": []
-        },
-        "focused_border_style": {
-          "fg": "Yellow",
-          "bg": null,
-          "modifiers": []
+          "unfocused": {
+            "fg": "Cyan",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "Yellow",
+            "bg": null,
+            "modifiers": []
+          }
         }
       },
-      "style": {
-        "fg": "White",
+      "list_style": {
+        "fg": null,
         "bg": null,
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "White",
+        "fg": null,
         "bg": "DarkGray",
         "modifiers": ["BOLD"]
       },
@@ -123,7 +142,8 @@
         "fg": "Green",
         "bg": null,
         "modifiers": []
-      }
+      },
+      "highlight_symbol": "► "
     },
     "controls": {
       "name": "Controls",
