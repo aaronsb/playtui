@@ -16,6 +16,7 @@ pub fn handle_input(
                     app.toggle_menu();
                 }
                 KeyCode::Tab => {
+                    // In menu, tab always cycles forward regardless of shift
                     app.cycle_menu_page();
                 }
                 _ => {} // Ignore other keys when menu is shown
@@ -23,16 +24,16 @@ pub fn handle_input(
             return Ok(None);
         }
 
+        // Handle shift+tab separately to ensure it's caught
+        if key.code == KeyCode::BackTab || (key.code == KeyCode::Tab && key.modifiers.contains(KeyModifiers::SHIFT)) {
+            app.reverse_toggle_focus();
+            return Ok(None);
+        }
+
         match key.code {
             KeyCode::Char('q') => return Ok(Some(())),
             KeyCode::Char('m') => app.toggle_menu(),
-            KeyCode::Tab => {
-                if key.modifiers.contains(KeyModifiers::SHIFT) {
-                    app.reverse_toggle_focus();
-                } else {
-                    app.toggle_focus();
-                }
-            }
+            KeyCode::Tab => app.toggle_focus(),
             KeyCode::Char(' ') => handle_playback(app, audio_player)?,
             KeyCode::Char('.') => handle_next_track(app, audio_player)?,
             KeyCode::Char(',') => handle_previous_track(app, audio_player)?,

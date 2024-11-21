@@ -16,11 +16,41 @@ pub enum PlaybackState {
     Stopped,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Focus {
     Browser,
     Songs,
     Playlist,
+}
+
+impl Focus {
+    // Define the focus order as a constant array
+    const FOCUS_ORDER: [Focus; 3] = [Focus::Browser, Focus::Songs, Focus::Playlist];
+    
+    // Get the current focus index
+    fn get_index(&self) -> usize {
+        Self::FOCUS_ORDER.iter()
+            .position(|f| f == self)
+            .unwrap_or(0)
+    }
+    
+    // Cycle to next focus
+    fn next(&self) -> Self {
+        let current_idx = self.get_index();
+        let next_idx = (current_idx + 1) % Self::FOCUS_ORDER.len();
+        Self::FOCUS_ORDER[next_idx]
+    }
+    
+    // Cycle to previous focus
+    fn previous(&self) -> Self {
+        let current_idx = self.get_index();
+        let prev_idx = if current_idx == 0 {
+            Self::FOCUS_ORDER.len() - 1
+        } else {
+            current_idx - 1
+        };
+        Self::FOCUS_ORDER[prev_idx]
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -314,19 +344,11 @@ impl App {
     }
 
     pub fn toggle_focus(&mut self) {
-        self.focus = match self.focus {
-            Focus::Browser => Focus::Songs,
-            Focus::Songs => Focus::Playlist,
-            Focus::Playlist => Focus::Browser,
-        };
+        self.focus = self.focus.next();
     }
 
     pub fn reverse_toggle_focus(&mut self) {
-        self.focus = match self.focus {
-            Focus::Browser => Focus::Playlist,
-            Focus::Songs => Focus::Browser,
-            Focus::Playlist => Focus::Songs,
-        };
+        self.focus = self.focus.previous();
     }
 
     pub fn play_selected(&mut self) {

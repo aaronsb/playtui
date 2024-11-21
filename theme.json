@@ -1,4 +1,9 @@
 {
+  "theme_info": {
+    "name": "Default Theme",
+    "version": "1.0",
+    "author": "Aaron"
+  },
   "widgets": {
     "now_playing": {
       "name": "Now Playing",
