@@ -1,0 +1,166 @@
+{
+  "widgets": {
+    "now_playing": {
+      "name": "Now Playing",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "progress": {
+      "name": "Progress",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "gauge_style": {
+        "fg": "Green",
+        "bg": null,
+        "modifiers": []
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "browser": {
+      "name": "Browser",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        },
+        "focused_border_style": {
+          "fg": "Yellow",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": "White",
+        "bg": "DarkGray",
+        "modifiers": ["BOLD"]
+      }
+    },
+    "songs": {
+      "name": "Songs",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        },
+        "focused_border_style": {
+          "fg": "Yellow",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": "White",
+        "bg": "DarkGray",
+        "modifiers": ["BOLD"]
+      },
+      "playing_style": {
+        "fg": "Green",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "playlist": {
+      "name": "Playlist",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        },
+        "focused_border_style": {
+          "fg": "Yellow",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": "White",
+        "bg": "DarkGray",
+        "modifiers": ["BOLD"]
+      },
+      "playing_style": {
+        "fg": "Green",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "controls": {
+      "name": "Controls",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "Cyan",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      },
+      "volume_style": {
+        "fg": "Cyan",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "menu": {
+      "name": "Menu",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "White",
+          "bg": null,
+          "modifiers": []
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": []
+      }
+    }
+  }
+}
