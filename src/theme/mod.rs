@@ -1,4 +1,5 @@
 mod colors;
+mod color_dictionary;
 
 use std::fs;
 use std::path::PathBuf;

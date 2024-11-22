@@ -803,6 +803,7 @@ dependencies = [
  "dirs",
  "env_logger",
  "id3",
+ "lazy_static",
  "log",
  "ratatui",
  "rodio",
