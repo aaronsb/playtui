@@ -9,6 +9,13 @@ use ratatui::widgets::BorderType;
 pub use colors::parse_color;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct ThemeInfo {
+    pub name: String,
+    pub version: String,
+    pub author: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StyleConfig {
     pub fg: Option<String>,
     pub bg: Option<String>,
@@ -128,11 +135,6 @@ pub struct MenuConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Widgets {
-    pub widgets: WidgetConfigs,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct WidgetConfigs {
     pub now_playing: NowPlayingConfig,
     pub progress_gauge: ProgressGaugeConfig,
@@ -144,9 +146,16 @@ pub struct WidgetConfigs {
     pub menu: MenuConfig,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ThemeFile {
+    pub theme_info: ThemeInfo,
+    pub widgets: WidgetConfigs,
+}
+
 #[derive(Debug)]
 pub struct Theme {
-    config: Widgets,
+    pub theme_info: ThemeInfo,
+    config: WidgetConfigs,
 }
 
 impl Theme {
@@ -157,8 +166,11 @@ impl Theme {
     pub fn load_theme(name: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let path = PathBuf::from("themes").join(format!("{}.json", name));
         let content = fs::read_to_string(path)?;
-        let config: Widgets = serde_json::from_str(&content)?;
-        Ok(Self { config })
+        let theme_file: ThemeFile = serde_json::from_str(&content)?;
+        Ok(Self { 
+            theme_info: theme_file.theme_info,
+            config: theme_file.widgets,
+        })
     }
 
     pub fn list_themes() -> Result<Vec<String>, Box<dyn std::error::Error>> {
@@ -249,166 +261,166 @@ impl Theme {
     }
 
     pub fn now_playing_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.now_playing.style)
+        Self::style_from_config(&self.config.now_playing.style)
     }
 
     pub fn now_playing_border_style(&self) -> Style {
-        Self::border_style_from_config(&self.config.widgets.now_playing.block.border_style)
+        Self::border_style_from_config(&self.config.now_playing.block.border_style)
     }
 
     pub fn now_playing_border_type(&self) -> BorderType {
-        Self::parse_border_type(&self.config.widgets.now_playing.block.border_style.border_type)
+        Self::parse_border_type(&self.config.now_playing.block.border_style.border_type)
     }
 
     pub fn progress_gauge_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.progress_gauge.gauge_style)
+        Self::style_from_config(&self.config.progress_gauge.gauge_style)
     }
 
     pub fn progress_gauge_border_style(&self) -> Style {
-        Self::border_style_from_config(&self.config.widgets.progress_gauge.block.border_style)
+        Self::border_style_from_config(&self.config.progress_gauge.block.border_style)
     }
 
     pub fn progress_gauge_border_type(&self) -> BorderType {
-        Self::parse_border_type(&self.config.widgets.progress_gauge.block.border_style.border_type)
+        Self::parse_border_type(&self.config.progress_gauge.block.border_style.border_type)
     }
 
     pub fn progress_text_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.progress_text.style)
+        Self::style_from_config(&self.config.progress_text.style)
     }
 
     pub fn progress_text_border_style(&self) -> Style {
-        Self::border_style_from_config(&self.config.widgets.progress_text.block.border_style)
+        Self::border_style_from_config(&self.config.progress_text.block.border_style)
     }
 
     pub fn progress_text_border_type(&self) -> BorderType {
-        Self::parse_border_type(&self.config.widgets.progress_text.block.border_style.border_type)
+        Self::parse_border_type(&self.config.progress_text.block.border_style.border_type)
     }
 
     pub fn browser_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.browser.list_style)
+        Self::style_from_config(&self.config.browser.list_style)
     }
 
     pub fn browser_border_style(&self, focused: bool) -> Style {
         if focused {
-            Self::style_from_config(&self.config.widgets.browser.block.border_style.focused)
+            Self::style_from_config(&self.config.browser.block.border_style.focused)
         } else {
-            Self::style_from_config(&self.config.widgets.browser.block.border_style.unfocused)
+            Self::style_from_config(&self.config.browser.block.border_style.unfocused)
         }
     }
 
     pub fn browser_border_type(&self, focused: bool) -> BorderType {
         if focused {
-            Self::parse_border_type(&self.config.widgets.browser.block.border_style.focused_border_type)
+            Self::parse_border_type(&self.config.browser.block.border_style.focused_border_type)
         } else {
-            Self::parse_border_type(&self.config.widgets.browser.block.border_style.unfocused_border_type)
+            Self::parse_border_type(&self.config.browser.block.border_style.unfocused_border_type)
         }
     }
 
     pub fn browser_highlight_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.browser.highlight_style)
+        Self::style_from_config(&self.config.browser.highlight_style)
     }
 
     pub fn browser_highlight_symbol(&self) -> &str {
-        &self.config.widgets.browser.highlight_symbol
+        &self.config.browser.highlight_symbol
     }
 
     pub fn songs_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.songs.list_style)
+        Self::style_from_config(&self.config.songs.list_style)
     }
 
     pub fn songs_border_style(&self, focused: bool) -> Style {
         if focused {
-            Self::style_from_config(&self.config.widgets.songs.block.border_style.focused)
+            Self::style_from_config(&self.config.songs.block.border_style.focused)
         } else {
-            Self::style_from_config(&self.config.widgets.songs.block.border_style.unfocused)
+            Self::style_from_config(&self.config.songs.block.border_style.unfocused)
         }
     }
 
     pub fn songs_border_type(&self, focused: bool) -> BorderType {
         if focused {
-            Self::parse_border_type(&self.config.widgets.songs.block.border_style.focused_border_type)
+            Self::parse_border_type(&self.config.songs.block.border_style.focused_border_type)
         } else {
-            Self::parse_border_type(&self.config.widgets.songs.block.border_style.unfocused_border_type)
+            Self::parse_border_type(&self.config.songs.block.border_style.unfocused_border_type)
         }
     }
 
     pub fn songs_highlight_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.songs.highlight_style)
+        Self::style_from_config(&self.config.songs.highlight_style)
     }
 
     pub fn songs_playing_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.songs.playing_style)
+        Self::style_from_config(&self.config.songs.playing_style)
     }
 
     pub fn songs_highlight_symbol(&self) -> &str {
-        &self.config.widgets.songs.highlight_symbol
+        &self.config.songs.highlight_symbol
     }
 
     pub fn playlist_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.playlist.list_style)
+        Self::style_from_config(&self.config.playlist.list_style)
     }
 
     pub fn playlist_border_style(&self, focused: bool) -> Style {
         if focused {
-            Self::style_from_config(&self.config.widgets.playlist.block.border_style.focused)
+            Self::style_from_config(&self.config.playlist.block.border_style.focused)
         } else {
-            Self::style_from_config(&self.config.widgets.playlist.block.border_style.unfocused)
+            Self::style_from_config(&self.config.playlist.block.border_style.unfocused)
         }
     }
 
     pub fn playlist_border_type(&self, focused: bool) -> BorderType {
         if focused {
-            Self::parse_border_type(&self.config.widgets.playlist.block.border_style.focused_border_type)
+            Self::parse_border_type(&self.config.playlist.block.border_style.focused_border_type)
         } else {
-            Self::parse_border_type(&self.config.widgets.playlist.block.border_style.unfocused_border_type)
+            Self::parse_border_type(&self.config.playlist.block.border_style.unfocused_border_type)
         }
     }
 
     pub fn playlist_highlight_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.playlist.highlight_style)
+        Self::style_from_config(&self.config.playlist.highlight_style)
     }
 
     pub fn playlist_playing_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.playlist.playing_style)
+        Self::style_from_config(&self.config.playlist.playing_style)
     }
 
     pub fn playlist_highlight_symbol(&self) -> &str {
-        &self.config.widgets.playlist.highlight_symbol
+        &self.config.playlist.highlight_symbol
     }
 
     pub fn controls_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.controls.style)
+        Self::style_from_config(&self.config.controls.style)
     }
 
     pub fn controls_border_style(&self) -> Style {
-        Self::border_style_from_config(&self.config.widgets.controls.block.border_style)
+        Self::border_style_from_config(&self.config.controls.block.border_style)
     }
 
     pub fn controls_border_type(&self) -> BorderType {
-        Self::parse_border_type(&self.config.widgets.controls.block.border_style.border_type)
+        Self::parse_border_type(&self.config.controls.block.border_style.border_type)
     }
 
     pub fn controls_volume_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.controls.volume_style)
+        Self::style_from_config(&self.config.controls.volume_style)
     }
 
     pub fn menu_style(&self) -> Style {
-        Self::style_from_config(&self.config.widgets.menu.style)
+        Self::style_from_config(&self.config.menu.style)
     }
 
     pub fn menu_border_style(&self) -> Style {
-        Self::border_style_from_config(&self.config.widgets.menu.block.border_style)
+        Self::border_style_from_config(&self.config.menu.block.border_style)
     }
 
     pub fn menu_border_type(&self) -> BorderType {
-        Self::parse_border_type(&self.config.widgets.menu.block.border_style.border_type)
+        Self::parse_border_type(&self.config.menu.block.border_style.border_type)
     }
 
     pub fn menu_tab_style(&self, tab: crate::app::MenuPage, is_selected: bool) -> Style {
         let tab_config = match tab {
-            crate::app::MenuPage::Preferences => &self.config.widgets.menu.tabs.preferences,
-            crate::app::MenuPage::Looks => &self.config.widgets.menu.tabs.looks,
-            crate::app::MenuPage::About => &self.config.widgets.menu.tabs.about,
+            crate::app::MenuPage::Preferences => &self.config.menu.tabs.preferences,
+            crate::app::MenuPage::Looks => &self.config.menu.tabs.looks,
+            crate::app::MenuPage::About => &self.config.menu.tabs.about,
         };
 
         if is_selected {

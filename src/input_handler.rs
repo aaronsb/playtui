@@ -34,6 +34,18 @@ pub fn handle_input(
                 KeyCode::Enter if app.menu_page == MenuPage::Looks => {
                     if let Err(e) = app.apply_selected_theme() {
                         eprintln!("Error applying theme: {}", e);
+                    } else {
+                        // Save preferences after theme change
+                        if let Err(e) = app.get_current_preferences().save() {
+                            eprintln!("Error saving preferences: {}", e);
+                        }
+                    }
+                }
+                KeyCode::Char('r') if app.menu_page == MenuPage::Preferences => {
+                    app.toggle_repeat_mode();
+                    // Save preferences after repeat mode change
+                    if let Err(e) = app.get_current_preferences().save() {
+                        eprintln!("Error saving preferences: {}", e);
                     }
                 }
                 _ => {} // Ignore other keys when menu is shown
@@ -57,19 +69,31 @@ pub fn handle_input(
             KeyCode::Char('+') => {
                 app.increase_volume();
                 audio_player.set_volume(app.volume as f32 / 100.0);
+                // Save preferences after volume change
+                if let Err(e) = app.get_current_preferences().save() {
+                    eprintln!("Error saving preferences: {}", e);
+                }
             }
             KeyCode::Char('-') => {
                 app.decrease_volume();
                 audio_player.set_volume(app.volume as f32 / 100.0);
+                // Save preferences after volume change
+                if let Err(e) = app.get_current_preferences().save() {
+                    eprintln!("Error saving preferences: {}", e);
+                }
             }
             KeyCode::Up | KeyCode::Char('k') => app.move_selection_up(),
             KeyCode::Down | KeyCode::Char('j') => app.move_selection_down(),
-            KeyCode::Right => handle_right_key(app, key.modifiers),
-            KeyCode::Left => handle_left_key(app, key.modifiers),
+            KeyCode::Right => handle_right_key(app, key.modifiers)?,
+            KeyCode::Left => handle_left_key(app, key.modifiers)?,
             KeyCode::Enter => handle_enter_key(app, audio_player)?,
             KeyCode::Backspace => {
                 if app.focus == Focus::Browser {
                     app.go_to_parent();
+                    // Save preferences after directory change
+                    if let Err(e) = app.get_current_preferences().save() {
+                        eprintln!("Error saving preferences: {}", e);
+                    }
                 }
             }
             _ => {}
@@ -140,13 +164,18 @@ fn handle_previous_track(app: &mut App, audio_player: &mut AudioPlayer) -> Resul
     Ok(())
 }
 
-fn handle_right_key(app: &mut App, modifiers: KeyModifiers) {
+fn handle_right_key(app: &mut App, modifiers: KeyModifiers) -> Result<()> {
     match app.focus {
         Focus::Browser => {
             if let Some(path) = app.filesystem.get_selected_path() {
                 if path.is_dir() {
                     if let Err(e) = app.enter_directory() {
                         eprintln!("Error accessing directory: {}", e);
+                    } else {
+                        // Save preferences after directory change
+                        if let Err(e) = app.get_current_preferences().save() {
+                            eprintln!("Error saving preferences: {}", e);
+                        }
                     }
                 }
             }
@@ -160,11 +189,18 @@ fn handle_right_key(app: &mut App, modifiers: KeyModifiers) {
         }
         _ => {}
     }
+    Ok(())
 }
 
-fn handle_left_key(app: &mut App, modifiers: KeyModifiers) {
+fn handle_left_key(app: &mut App, modifiers: KeyModifiers) -> Result<()> {
     match app.focus {
-        Focus::Browser => app.go_to_parent(),
+        Focus::Browser => {
+            app.go_to_parent();
+            // Save preferences after directory change
+            if let Err(e) = app.get_current_preferences().save() {
+                eprintln!("Error saving preferences: {}", e);
+            }
+        }
         Focus::Songs => app.remove_from_playlist(),
         Focus::Playlist => {
             if modifiers.contains(KeyModifiers::SHIFT) {
@@ -172,6 +208,7 @@ fn handle_left_key(app: &mut App, modifiers: KeyModifiers) {
             }
         }
     }
+    Ok(())
 }
 
 fn handle_enter_key(app: &mut App, audio_player: &mut AudioPlayer) -> Result<()> {
@@ -181,6 +218,11 @@ fn handle_enter_key(app: &mut App, audio_player: &mut AudioPlayer) -> Result<()>
                 if path.is_dir() {
                     if let Err(e) = app.enter_directory() {
                         eprintln!("Error accessing directory: {}", e);
+                    } else {
+                        // Save preferences after directory change
+                        if let Err(e) = app.get_current_preferences().save() {
+                            eprintln!("Error saving preferences: {}", e);
+                        }
                     }
                 }
             }

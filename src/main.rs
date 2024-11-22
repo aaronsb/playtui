@@ -1,19 +1,60 @@
 use anyhow::Result;
 use crossterm::{
-    event::{self, DisableMouseCapture, EnableMouseCapture},
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+    style::{Color, SetForegroundColor},
 };
 use playtui::{
     app::{App, PlaybackState},
     audio::AudioPlayer,
     input_handler,
+    preferences::{Preferences, PreferencesError},
     ui,
 };
 use ratatui::prelude::*;
-use std::{io, time::Duration};
+use std::{io::{self, Write}, time::Duration};
+
+fn handle_preferences_error(error: PreferencesError) -> Result<Preferences> {
+    println!("{}", SetForegroundColor(Color::Yellow));
+    println!("Warning: {}", error);
+    println!("Choose an option:");
+    println!("1. Re-create default configuration");
+    println!("2. Continue without preferences");
+    println!("3. Exit");
+    println!("{}", SetForegroundColor(Color::Reset));
+    
+    io::stdout().flush()?;
+
+    loop {
+        if let Event::Key(key) = event::read()? {
+            match key.code {
+                KeyCode::Char('1') => {
+                    let prefs = Preferences::default();
+                    prefs.save()?;
+                    return Ok(prefs);
+                }
+                KeyCode::Char('2') => {
+                    return Ok(Preferences::default());
+                }
+                KeyCode::Char('3') => {
+                    std::process::exit(0);
+                }
+                _ => {}
+            }
+        }
+    }
+}
 
 fn main() -> Result<()> {
+    // Load preferences before setting up the terminal
+    let (preferences, error) = Preferences::load()?;
+    let preferences = if let Some(error) = error {
+        handle_preferences_error(error)?
+    } else {
+        preferences
+    };
+
     // Set up terminal
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -21,16 +62,25 @@ fn main() -> Result<()> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    // Create app state starting in current directory
+    // Create app state with loaded preferences
     let mut app = App::default();
+    // Apply preferences
+    app.apply_preferences(&preferences);
     // Initialize songs for starting directory
     app.update_songs();
 
     // Create audio player
     let mut audio_player = AudioPlayer::new()?;
+    // Apply audio preferences
+    audio_player.set_volume(preferences.volume);
 
     // Run app
     let res = run_app(&mut terminal, &mut app, &mut audio_player);
+
+    // Save preferences before exit
+    if let Err(e) = preferences.save() {
+        eprintln!("Failed to save preferences: {}", e);
+    }
 
     // Restore terminal
     disable_raw_mode()?;

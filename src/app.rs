@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use crate::theme::Theme;
+use crate::preferences::Preferences;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Track {
@@ -175,6 +176,7 @@ pub struct App {
     pub playback_position: u64,
     pub theme: Theme,
     pub selected_theme_index: usize,
+    pub repeat_mode: bool,
 }
 
 impl Default for App {
@@ -201,6 +203,7 @@ impl Default for App {
             playback_position: 0,
             theme,
             selected_theme_index: 0,
+            repeat_mode: false,
         }
     }
 }
@@ -208,6 +211,37 @@ impl Default for App {
 impl App {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn apply_preferences(&mut self, preferences: &Preferences) {
+        // Apply theme
+        if let Ok(theme) = Theme::load_theme(&preferences.theme) {
+            self.theme = theme;
+        }
+
+        // Apply volume (convert from f32 to u8)
+        self.volume = (preferences.volume * 100.0) as u8;
+
+        // Apply repeat mode
+        self.repeat_mode = preferences.repeat_mode;
+
+        // Apply last directory if it exists
+        if let Some(last_dir) = &preferences.last_directory {
+            let path = PathBuf::from(last_dir);
+            if path.exists() && path.is_dir() {
+                self.filesystem = FileSystem::new(path);
+                self.update_songs();
+            }
+        }
+    }
+
+    pub fn get_current_preferences(&self) -> Preferences {
+        Preferences {
+            theme: self.theme.theme_info.name.clone(),
+            volume: self.volume as f32 / 100.0,
+            repeat_mode: self.repeat_mode,
+            last_directory: Some(self.filesystem.current_dir.to_string_lossy().into_owned()),
+        }
     }
 
     pub fn toggle_menu(&mut self) {
@@ -293,6 +327,13 @@ impl App {
                     self.current_track = Some(track.clone());
                     self.playback_position = 0;
                 }
+            } else if self.repeat_mode {
+                // If repeat mode is on and we're at the end, go back to the first track
+                self.current_track_index = Some(0);
+                if let Some(track) = tracks.first() {
+                    self.current_track = Some(track.clone());
+                    self.playback_position = 0;
+                }
             }
         } else {
             match self.focus {
@@ -322,6 +363,19 @@ impl App {
                 };
                 if let Some(track) = tracks.get(current_index - 1) {
                     self.current_track = Some(track.clone());
+                    self.playback_position = 0;
+                }
+            } else if self.repeat_mode {
+                // If repeat mode is on and we're at the start, go to the last track
+                let tracks = match self.focus {
+                    Focus::Songs => &self.songs,
+                    Focus::Playlist => &self.playlist,
+                    _ => return,
+                };
+                if !tracks.is_empty() {
+                    let last_index = tracks.len() - 1;
+                    self.current_track_index = Some(last_index);
+                    self.current_track = tracks.last().cloned();
                     self.playback_position = 0;
                 }
             }
@@ -485,6 +539,10 @@ impl App {
         self.selected_playlist_index = 0;
         // Don't reset current track or playback state when clearing playlist
     }
+
+    pub fn toggle_repeat_mode(&mut self) {
+        self.repeat_mode = !self.repeat_mode;
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -494,3 +552,4 @@ pub enum ThemeDirection {
     Left,
     Right,
 }
+
