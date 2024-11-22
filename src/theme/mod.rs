@@ -4,6 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use ratatui::style::{Modifier, Style};
+use ratatui::widgets::BorderType;
 
 pub use colors::parse_color;
 
@@ -19,12 +20,30 @@ pub struct BorderStyleConfig {
     pub fg: Option<String>,
     pub bg: Option<String>,
     pub modifiers: Vec<String>,
+    #[serde(default = "default_border_type")]
+    pub border_type: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FocusableBorderStyleConfig {
     pub unfocused: StyleConfig,
     pub focused: StyleConfig,
+    #[serde(default = "default_unfocused_border_type")]
+    pub unfocused_border_type: String,
+    #[serde(default = "default_focused_border_type")]
+    pub focused_border_type: String,
+}
+
+fn default_border_type() -> String {
+    "rounded".to_string()
+}
+
+fn default_unfocused_border_type() -> String {
+    "rounded".to_string()
+}
+
+fn default_focused_border_type() -> String {
+    "thick".to_string()
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -183,6 +202,16 @@ impl Theme {
         result
     }
 
+    fn parse_border_type(border_type: &str) -> BorderType {
+        match border_type.to_lowercase().as_str() {
+            "plain" => BorderType::Plain,
+            "rounded" => BorderType::Rounded,
+            "double" => BorderType::Double,
+            "thick" => BorderType::Thick,
+            _ => BorderType::Plain,  // Default fallback
+        }
+    }
+
     fn style_from_config(style_config: &StyleConfig) -> Style {
         let mut style = Style::default();
         
@@ -227,6 +256,10 @@ impl Theme {
         Self::border_style_from_config(&self.config.widgets.now_playing.block.border_style)
     }
 
+    pub fn now_playing_border_type(&self) -> BorderType {
+        Self::parse_border_type(&self.config.widgets.now_playing.block.border_style.border_type)
+    }
+
     pub fn progress_gauge_style(&self) -> Style {
         Self::style_from_config(&self.config.widgets.progress_gauge.gauge_style)
     }
@@ -235,12 +268,20 @@ impl Theme {
         Self::border_style_from_config(&self.config.widgets.progress_gauge.block.border_style)
     }
 
+    pub fn progress_gauge_border_type(&self) -> BorderType {
+        Self::parse_border_type(&self.config.widgets.progress_gauge.block.border_style.border_type)
+    }
+
     pub fn progress_text_style(&self) -> Style {
         Self::style_from_config(&self.config.widgets.progress_text.style)
     }
 
     pub fn progress_text_border_style(&self) -> Style {
         Self::border_style_from_config(&self.config.widgets.progress_text.block.border_style)
+    }
+
+    pub fn progress_text_border_type(&self) -> BorderType {
+        Self::parse_border_type(&self.config.widgets.progress_text.block.border_style.border_type)
     }
 
     pub fn browser_style(&self) -> Style {
@@ -252,6 +293,14 @@ impl Theme {
             Self::style_from_config(&self.config.widgets.browser.block.border_style.focused)
         } else {
             Self::style_from_config(&self.config.widgets.browser.block.border_style.unfocused)
+        }
+    }
+
+    pub fn browser_border_type(&self, focused: bool) -> BorderType {
+        if focused {
+            Self::parse_border_type(&self.config.widgets.browser.block.border_style.focused_border_type)
+        } else {
+            Self::parse_border_type(&self.config.widgets.browser.block.border_style.unfocused_border_type)
         }
     }
 
@@ -272,6 +321,14 @@ impl Theme {
             Self::style_from_config(&self.config.widgets.songs.block.border_style.focused)
         } else {
             Self::style_from_config(&self.config.widgets.songs.block.border_style.unfocused)
+        }
+    }
+
+    pub fn songs_border_type(&self, focused: bool) -> BorderType {
+        if focused {
+            Self::parse_border_type(&self.config.widgets.songs.block.border_style.focused_border_type)
+        } else {
+            Self::parse_border_type(&self.config.widgets.songs.block.border_style.unfocused_border_type)
         }
     }
 
@@ -299,6 +356,14 @@ impl Theme {
         }
     }
 
+    pub fn playlist_border_type(&self, focused: bool) -> BorderType {
+        if focused {
+            Self::parse_border_type(&self.config.widgets.playlist.block.border_style.focused_border_type)
+        } else {
+            Self::parse_border_type(&self.config.widgets.playlist.block.border_style.unfocused_border_type)
+        }
+    }
+
     pub fn playlist_highlight_style(&self) -> Style {
         Self::style_from_config(&self.config.widgets.playlist.highlight_style)
     }
@@ -319,6 +384,10 @@ impl Theme {
         Self::border_style_from_config(&self.config.widgets.controls.block.border_style)
     }
 
+    pub fn controls_border_type(&self) -> BorderType {
+        Self::parse_border_type(&self.config.widgets.controls.block.border_style.border_type)
+    }
+
     pub fn controls_volume_style(&self) -> Style {
         Self::style_from_config(&self.config.widgets.controls.volume_style)
     }
@@ -329,6 +398,10 @@ impl Theme {
 
     pub fn menu_border_style(&self) -> Style {
         Self::border_style_from_config(&self.config.widgets.menu.block.border_style)
+    }
+
+    pub fn menu_border_type(&self) -> BorderType {
+        Self::parse_border_type(&self.config.widgets.menu.block.border_style.border_type)
     }
 
     pub fn menu_tab_style(&self, tab: crate::app::MenuPage, is_selected: bool) -> Style {

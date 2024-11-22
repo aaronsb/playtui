@@ -1,6 +1,37 @@
 use ratatui::style::Color as RatatuiColor;
 
+fn hex_to_rgb(hex: &str) -> Option<(u8, u8, u8)> {
+    // Remove '#' if present
+    let hex = hex.trim_start_matches('#');
+    
+    match hex.len() {
+        6 => {
+            // Parse 6-digit hex (#RRGGBB)
+            let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
+            let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
+            let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
+            Some((r, g, b))
+        }
+        3 => {
+            // Parse 3-digit hex (#RGB)
+            // Convert to 6-digit by duplicating each digit
+            let r = u8::from_str_radix(&format!("{}{}", &hex[0..1], &hex[0..1]), 16).ok()?;
+            let g = u8::from_str_radix(&format!("{}{}", &hex[1..2], &hex[1..2]), 16).ok()?;
+            let b = u8::from_str_radix(&format!("{}{}", &hex[2..3], &hex[2..3]), 16).ok()?;
+            Some((r, g, b))
+        }
+        _ => None
+    }
+}
+
 pub fn parse_color(color_str: &str) -> RatatuiColor {
+    // Check for hex color format first
+    if color_str.starts_with('#') {
+        if let Some((r, g, b)) = hex_to_rgb(color_str) {
+            return RatatuiColor::Rgb(r, g, b);
+        }
+    }
+    
     // Convert to lowercase for case-insensitive matching
     let color_key = color_str.to_lowercase();
     
@@ -166,6 +197,20 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_hex_colors() {
+        // Test 6-digit hex colors
+        assert_eq!(parse_color("#FF0000"), RatatuiColor::Rgb(255, 0, 0));
+        assert_eq!(parse_color("#00FF00"), RatatuiColor::Rgb(0, 255, 0));
+        assert_eq!(parse_color("#0000FF"), RatatuiColor::Rgb(0, 0, 255));
+        assert_eq!(parse_color("#D2691E"), RatatuiColor::Rgb(210, 105, 30)); // chocolate
+
+        // Test 3-digit hex colors
+        assert_eq!(parse_color("#F00"), RatatuiColor::Rgb(255, 0, 0));
+        assert_eq!(parse_color("#0F0"), RatatuiColor::Rgb(0, 255, 0));
+        assert_eq!(parse_color("#00F"), RatatuiColor::Rgb(0, 0, 255));
+    }
+
+    #[test]
     fn test_parse_aliases() {
         // Test our custom aliases
         assert_eq!(parse_color("lightred"), RatatuiColor::Rgb(255, 182, 193));
@@ -176,5 +221,7 @@ mod tests {
     fn test_unknown_color() {
         // Test fallback for unknown colors
         assert_eq!(parse_color("nonexistentcolor"), RatatuiColor::Rgb(0, 0, 0));
+        assert_eq!(parse_color("#XYZ"), RatatuiColor::Rgb(0, 0, 0)); // Invalid hex
+        assert_eq!(parse_color("#12"), RatatuiColor::Rgb(0, 0, 0));  // Invalid hex length
     }
 }

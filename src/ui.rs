@@ -5,7 +5,6 @@ use ratatui::{
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Paragraph, Clear, Gauge, Tabs, Padding},
     Frame,
-    symbols,
 };
 
 fn format_time(seconds: u64) -> String {
@@ -58,6 +57,7 @@ fn draw_theme_preview(frame: &mut Frame, theme: &crate::theme::Theme, area: Rect
     let preview = Block::default()
         .borders(Borders::ALL)
         .border_style(border_style)
+        .border_type(theme.songs_border_type(false))
         .title(format!(" {} ", name))
         .style(theme.songs_style()); // Add theme style to the block itself
 
@@ -175,7 +175,7 @@ fn draw_menu(frame: &mut Frame, app: &App) {
     let tabs = Tabs::new(titles)
         .block(Block::default()
             .borders(Borders::ALL)
-            .border_set(symbols::border::THICK)
+            .border_type(app.theme.menu_border_type())
             .border_style(app.theme.menu_border_style())
             .style(app.theme.menu_style())) // Add theme style to the block itself
         .select(selected_tab)
@@ -191,7 +191,7 @@ fn draw_menu(frame: &mut Frame, app: &App) {
             let content = Paragraph::new(format!("{}\n\nPress Tab to switch pages\nPress 'm' or 'q' to close", content))
                 .block(Block::default()
                     .borders(Borders::ALL)
-                    .border_set(symbols::border::THICK)
+                    .border_type(app.theme.menu_border_type())
                     .padding(Padding::uniform(1))
                     .border_style(border_style)
                     .style(app.theme.menu_style())) // Add theme style to the block itself
@@ -203,7 +203,7 @@ fn draw_menu(frame: &mut Frame, app: &App) {
             // Draw theme previews in the content area
             let preview_block = Block::default()
                 .borders(Borders::ALL)
-                .border_set(symbols::border::THICK)
+                .border_type(app.theme.menu_border_type())
                 .border_style(app.theme.menu_border_style())
                 .style(app.theme.menu_style()); // Add theme style to the block itself
             let inner = preview_block.inner(chunks[1]);
@@ -216,7 +216,7 @@ fn draw_menu(frame: &mut Frame, app: &App) {
             let content = Paragraph::new(format!("{}\n\nPress Tab to switch pages\nPress 'm' or 'q' to close", content))
                 .block(Block::default()
                     .borders(Borders::ALL)
-                    .border_set(symbols::border::THICK)
+                    .border_type(app.theme.menu_border_type())
                     .padding(Padding::uniform(1))
                     .border_style(border_style)
                     .style(app.theme.menu_style())) // Add theme style to the block itself
@@ -261,6 +261,7 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
     let now_playing = Paragraph::new(text)
         .block(Block::default()
             .borders(Borders::ALL)
+            .border_type(app.theme.now_playing_border_type())
             .title(" Now Playing ")
             .border_style(app.theme.now_playing_border_style()))
         .style(app.theme.now_playing_style());
@@ -283,6 +284,7 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
             let gauge = Gauge::default()
                 .block(Block::default()
                     .borders(Borders::ALL)
+                    .border_type(app.theme.progress_gauge_border_type())
                     .title(title)
                     .border_style(app.theme.progress_gauge_border_style()))
                 .gauge_style(app.theme.progress_gauge_style())
@@ -295,6 +297,7 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
             let progress = Paragraph::new("--:--/--:--/--:--")
                 .block(Block::default()
                     .borders(Borders::ALL)
+                    .border_type(app.theme.progress_text_border_type())
                     .title(" Progress ")
                     .border_style(app.theme.progress_text_border_style()))
                 .alignment(Alignment::Center)
@@ -306,6 +309,7 @@ fn draw_now_playing(frame: &mut Frame, app: &App, area: Rect) {
         let progress = Paragraph::new("--:--/--:--/--:--")
             .block(Block::default()
                 .borders(Borders::ALL)
+                .border_type(app.theme.progress_text_border_type())
                 .title(" Progress ")
                 .border_style(app.theme.progress_text_border_style()))
             .alignment(Alignment::Center)
@@ -331,6 +335,7 @@ fn draw_browser(frame: &mut Frame, app: &App, area: Rect) {
     let browser = List::new(items)
         .block(Block::default()
             .borders(Borders::ALL)
+            .border_type(app.theme.browser_border_type(app.focus == Focus::Browser))
             .title(title)
             .border_style(app.theme.browser_border_style(app.focus == Focus::Browser))
             .style(app.theme.browser_style()))
@@ -370,6 +375,7 @@ fn draw_songs(frame: &mut Frame, app: &App, area: Rect) {
     let songs = List::new(items)
         .block(Block::default()
             .borders(Borders::ALL)
+            .border_type(app.theme.songs_border_type(app.focus == Focus::Songs))
             .title(" Songs ")
             .border_style(app.theme.songs_border_style(app.focus == Focus::Songs))
             .style(app.theme.songs_style()))
@@ -409,6 +415,7 @@ fn draw_playlist(frame: &mut Frame, app: &App, area: Rect) {
     let playlist = List::new(items)
         .block(Block::default()
             .borders(Borders::ALL)
+            .border_type(app.theme.playlist_border_type(app.focus == Focus::Playlist))
             .title(" Playlist ")
             .border_style(app.theme.playlist_border_style(app.focus == Focus::Playlist))
             .style(app.theme.playlist_style()))
@@ -441,6 +448,7 @@ fn draw_controls(frame: &mut Frame, app: &App, area: Rect) {
     let controls_widget = Paragraph::new(Line::from(controls))
         .block(Block::default()
             .borders(Borders::ALL)
+            .border_type(app.theme.controls_border_type())
             .title(" Controls ")
             .border_style(app.theme.controls_border_style()))
         .style(app.theme.controls_style());

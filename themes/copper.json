@@ -12,7 +12,8 @@
         "border_style": {
           "fg": "wheat",
           "bg": "goldenrod",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
@@ -28,7 +29,8 @@
         "border_style": {
           "fg": "wheat",
           "bg": "goldenrod",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "gauge_style": {
@@ -44,7 +46,8 @@
         "border_style": {
           "fg": "wheat",
           "bg": "goldenrod",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
@@ -67,7 +70,9 @@
             "fg": "cornsilk",
             "bg": "goldenrod",
             "modifiers": ["BOLD"]
-          }
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
@@ -96,7 +101,9 @@
             "fg": "cornsilk",
             "bg": "goldenrod",
             "modifiers": ["BOLD"]
-          }
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
@@ -130,7 +137,9 @@
             "fg": "cornsilk",
             "bg": "goldenrod",
             "modifiers": ["BOLD"]
-          }
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
@@ -157,7 +166,8 @@
         "border_style": {
           "fg": "wheat",
           "bg": "goldenrod",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
@@ -178,7 +188,8 @@
         "border_style": {
           "fg": "wheat",
           "bg": "goldenrod",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {

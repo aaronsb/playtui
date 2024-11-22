@@ -12,12 +12,8 @@
         "border_style": {
           "fg": "lightsteelblue",
           "bg": "royalblue",
-          "modifiers": []
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
@@ -33,12 +29,8 @@
         "border_style": {
           "fg": "lightsteelblue",
           "bg": "royalblue",
-          "modifiers": []
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "gauge_style": {
@@ -54,12 +46,8 @@
         "border_style": {
           "fg": "lightsteelblue",
           "bg": "royalblue",
-          "modifiers": []
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
@@ -82,12 +70,9 @@
             "fg": "lightsteelblue",
             "bg": "royalblue",
             "modifiers": ["BOLD"]
-          }
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
@@ -116,12 +101,9 @@
             "fg": "lightsteelblue",
             "bg": "royalblue",
             "modifiers": ["BOLD"]
-          }
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
@@ -155,12 +137,9 @@
             "fg": "lightsteelblue",
             "bg": "royalblue",
             "modifiers": ["BOLD"]
-          }
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
@@ -187,12 +166,8 @@
         "border_style": {
           "fg": "lightsteelblue",
           "bg": "royalblue",
-          "modifiers": []
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
@@ -213,12 +188,8 @@
         "border_style": {
           "fg": "lightsteelblue",
           "bg": "royalblue",
-          "modifiers": []
-        },
-        "style": {
-          "fg": "aliceblue",
-          "bg": "midnightblue",
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {

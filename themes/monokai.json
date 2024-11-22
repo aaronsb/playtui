@@ -10,14 +10,15 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "DarkGray",
+          "fg": "#A6E22E",
           "bg": null,
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       }
     },
@@ -26,14 +27,15 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "DarkGray",
+          "fg": "#A6E22E",
           "bg": null,
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "gauge_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#FD971F",
+        "bg": "#272822",
         "modifiers": []
       }
     },
@@ -42,14 +44,15 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "DarkGray",
+          "fg": "#A6E22E",
           "bg": null,
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       }
     },
@@ -59,25 +62,27 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "DarkGray",
+            "fg": "#A6E22E",
             "bg": null,
             "modifiers": []
           },
           "focused": {
-            "fg": "Black",
+            "fg": "#F92672",
             "bg": null,
             "modifiers": ["BOLD"]
-          }
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "Black",
-        "bg": "LightGray",
+        "fg": "#272822",
+        "bg": "#FD971F",
         "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
@@ -88,30 +93,32 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "DarkGray",
+            "fg": "#A6E22E",
             "bg": null,
             "modifiers": []
           },
           "focused": {
-            "fg": "Black",
+            "fg": "#F92672",
             "bg": null,
             "modifiers": ["BOLD"]
-          }
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "Black",
-        "bg": "LightGray",
+        "fg": "#272822",
+        "bg": "#FD971F",
         "modifiers": ["BOLD"]
       },
       "playing_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#66D9EF",
+        "bg": "#272822",
         "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
@@ -122,30 +129,32 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "DarkGray",
+            "fg": "#A6E22E",
             "bg": null,
             "modifiers": []
           },
           "focused": {
-            "fg": "Black",
+            "fg": "#F92672",
             "bg": null,
             "modifiers": ["BOLD"]
-          }
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "thick"
         }
       },
       "list_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "Black",
-        "bg": "LightGray",
+        "fg": "#272822",
+        "bg": "#FD971F",
         "modifiers": ["BOLD"]
       },
       "playing_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#66D9EF",
+        "bg": "#272822",
         "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
@@ -155,19 +164,20 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "DarkGray",
+          "fg": "#A6E22E",
           "bg": null,
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       },
       "volume_style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#66D9EF",
+        "bg": "#272822",
         "modifiers": ["BOLD"]
       }
     },
@@ -176,49 +186,50 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "DarkGray",
+          "fg": "#A6E22E",
           "bg": null,
-          "modifiers": []
+          "modifiers": [],
+          "border_type": "rounded"
         }
       },
       "style": {
-        "fg": "Black",
-        "bg": null,
+        "fg": "#F8F8F2",
+        "bg": "#272822",
         "modifiers": []
       },
       "tabs": {
         "preferences": {
           "selected": {
-            "fg": "White",
-            "bg": "Black",
+            "fg": "#272822",
+            "bg": "#F92672",
             "modifiers": ["BOLD"]
           },
           "unselected": {
-            "fg": "Black",
+            "fg": "#F92672",
             "bg": null,
             "modifiers": []
           }
         },
         "looks": {
           "selected": {
-            "fg": "White",
-            "bg": "Black",
+            "fg": "#272822",
+            "bg": "#66D9EF",
             "modifiers": ["BOLD"]
           },
           "unselected": {
-            "fg": "Black",
+            "fg": "#66D9EF",
             "bg": null,
             "modifiers": []
           }
         },
         "about": {
           "selected": {
-            "fg": "White",
-            "bg": "Black",
+            "fg": "#272822",
+            "bg": "#FD971F",
             "modifiers": ["BOLD"]
           },
           "unselected": {
-            "fg": "Black",
+            "fg": "#FD971F",
             "bg": null,
             "modifiers": []
           }
