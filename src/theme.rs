@@ -126,6 +126,12 @@ pub struct Theme {
     config: Widgets,
 }
 
+struct ColorRgb {
+    r: u8,
+    g: u8,
+    b: u8,
+}
+
 impl Theme {
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
         Self::load_theme("default")
@@ -160,26 +166,31 @@ impl Theme {
         Ok(themes)
     }
 
-    fn parse_color(color_str: &str) -> Color {
-        match color_str {
-            "Black" => Color::Black,
-            "Red" => Color::Red,
-            "Green" => Color::Green,
-            "Yellow" => Color::Yellow,
-            "Blue" => Color::Blue,
-            "Magenta" => Color::Magenta,
-            "Cyan" => Color::Cyan,
-            "Gray" => Color::Gray,
-            "DarkGray" => Color::DarkGray,
-            "LightRed" => Color::LightRed,
-            "LightGreen" => Color::LightGreen,
-            "LightYellow" => Color::LightYellow,
-            "LightBlue" => Color::LightBlue,
-            "LightMagenta" => Color::LightMagenta,
-            "LightCyan" => Color::LightCyan,
-            "White" => Color::White,
-            _ => Color::Reset,
+    fn color_name_to_rgb(color_name: &str) -> ColorRgb {
+        match color_name {
+            "Black" => ColorRgb { r: 0, g: 0, b: 0 },
+            "Red" => ColorRgb { r: 255, g: 0, b: 0 },
+            "Green" => ColorRgb { r: 0, g: 255, b: 0 },
+            "Yellow" => ColorRgb { r: 255, g: 255, b: 0 },
+            "Blue" => ColorRgb { r: 0, g: 0, b: 255 },
+            "Magenta" => ColorRgb { r: 255, g: 0, b: 255 },
+            "Cyan" => ColorRgb { r: 0, g: 255, b: 255 },
+            "Gray" => ColorRgb { r: 128, g: 128, b: 128 },
+            "DarkGray" => ColorRgb { r: 64, g: 64, b: 64 },
+            "LightRed" => ColorRgb { r: 255, g: 128, b: 128 },
+            "LightGreen" => ColorRgb { r: 128, g: 255, b: 128 },
+            "LightYellow" => ColorRgb { r: 255, g: 255, b: 128 },
+            "LightBlue" => ColorRgb { r: 128, g: 128, b: 255 },
+            "LightMagenta" => ColorRgb { r: 255, g: 128, b: 255 },
+            "LightCyan" => ColorRgb { r: 128, g: 255, b: 255 },
+            "White" => ColorRgb { r: 255, g: 255, b: 255 },
+            _ => ColorRgb { r: 0, g: 0, b: 0 }, // Default to black for unknown colors
         }
+    }
+
+    fn parse_color(color_str: &str) -> Color {
+        let rgb = Self::color_name_to_rgb(color_str);
+        Color::Rgb(rgb.r, rgb.g, rgb.b)
     }
 
     fn parse_modifiers(modifiers: &[String]) -> ratatui::style::Modifier {
@@ -360,6 +371,44 @@ impl Theme {
             Self::style_from_config(&tab_config.selected)
         } else {
             Self::style_from_config(&tab_config.unselected)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_color_name_to_rgb() {
+        // Test basic color conversion
+        let rgb = Theme::color_name_to_rgb("Blue");
+        assert_eq!(rgb.r, 0);
+        assert_eq!(rgb.g, 0);
+        assert_eq!(rgb.b, 255);
+
+        // Test light color conversion
+        let rgb = Theme::color_name_to_rgb("LightBlue");
+        assert_eq!(rgb.r, 128);
+        assert_eq!(rgb.g, 128);
+        assert_eq!(rgb.b, 255);
+
+        // Test unknown color defaults to black
+        let rgb = Theme::color_name_to_rgb("NonexistentColor");
+        assert_eq!(rgb.r, 0);
+        assert_eq!(rgb.g, 0);
+        assert_eq!(rgb.b, 0);
+    }
+
+    #[test]
+    fn test_parse_color() {
+        match Theme::parse_color("Blue") {
+            Color::Rgb(r, g, b) => {
+                assert_eq!(r, 0);
+                assert_eq!(g, 0);
+                assert_eq!(b, 255);
+            }
+            _ => panic!("Expected RGB color"),
         }
     }
 }
