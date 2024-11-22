@@ -261,6 +261,10 @@ impl Theme {
         Self::border_style_from_config(&self.config.widgets.progress_text.block.border_style)
     }
 
+    pub fn browser_style(&self) -> Style {
+        Self::style_from_config(&self.config.widgets.browser.list_style)
+    }
+
     pub fn browser_border_style(&self, focused: bool) -> Style {
         if focused {
             Self::style_from_config(&self.config.widgets.browser.block.border_style.focused)
@@ -275,6 +279,10 @@ impl Theme {
 
     pub fn browser_highlight_symbol(&self) -> &str {
         &self.config.widgets.browser.highlight_symbol
+    }
+
+    pub fn songs_style(&self) -> Style {
+        Self::style_from_config(&self.config.widgets.songs.list_style)
     }
 
     pub fn songs_border_style(&self, focused: bool) -> Style {
@@ -295,6 +303,10 @@ impl Theme {
 
     pub fn songs_highlight_symbol(&self) -> &str {
         &self.config.widgets.songs.highlight_symbol
+    }
+
+    pub fn playlist_style(&self) -> Style {
+        Self::style_from_config(&self.config.widgets.playlist.list_style)
     }
 
     pub fn playlist_border_style(&self, focused: bool) -> Style {

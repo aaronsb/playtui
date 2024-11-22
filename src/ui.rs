@@ -58,26 +58,29 @@ fn draw_theme_preview(frame: &mut Frame, theme: &crate::theme::Theme, area: Rect
     let preview = Block::default()
         .borders(Borders::ALL)
         .border_style(border_style)
-        .title(format!(" {} ", name));
-    
+        .title(format!(" {} ", name))
+        .style(theme.songs_style()); // Add theme style to the block itself
+
     let inner = preview.inner(area);
     frame.render_widget(preview, area);
 
     // Create a sample song list to show theme styling
     let items = vec![
-        ListItem::new("► Song Title - Artist"),
+        ListItem::new(Line::from(vec![
+            Span::styled("► Song Title - Artist", theme.songs_style())
+        ])),
         ListItem::new(Line::from(vec![
             Span::styled("Now Playing: ", theme.songs_playing_style()),
-            Span::raw("Current Song"),
+            Span::styled("Current Song", theme.songs_style())
         ])),
         ListItem::new(Line::from(vec![
             Span::styled("Selected: ", theme.songs_highlight_style()),
-            Span::raw("Selected Song"),
+            Span::styled("Selected Song", theme.songs_style())
         ])),
     ];
 
     let list = List::new(items)
-        .style(Style::default());
+        .style(theme.songs_style());
 
     frame.render_widget(list, inner);
     inner
@@ -173,7 +176,8 @@ fn draw_menu(frame: &mut Frame, app: &App) {
         .block(Block::default()
             .borders(Borders::ALL)
             .border_set(symbols::border::THICK)
-            .border_style(app.theme.menu_border_style()))
+            .border_style(app.theme.menu_border_style())
+            .style(app.theme.menu_style())) // Add theme style to the block itself
         .select(selected_tab)
         .divider("|");
 
@@ -189,14 +193,22 @@ fn draw_menu(frame: &mut Frame, app: &App) {
                     .borders(Borders::ALL)
                     .border_set(symbols::border::THICK)
                     .padding(Padding::uniform(1))
-                    .border_style(border_style))
+                    .border_style(border_style)
+                    .style(app.theme.menu_style())) // Add theme style to the block itself
                 .alignment(Alignment::Center)
                 .style(app.theme.menu_style());
             frame.render_widget(content, chunks[1]);
         }
         MenuPage::Looks => {
             // Draw theme previews in the content area
-            draw_theme_previews(frame, app, chunks[1]);
+            let preview_block = Block::default()
+                .borders(Borders::ALL)
+                .border_set(symbols::border::THICK)
+                .border_style(app.theme.menu_border_style())
+                .style(app.theme.menu_style()); // Add theme style to the block itself
+            let inner = preview_block.inner(chunks[1]);
+            frame.render_widget(preview_block, chunks[1]);
+            draw_theme_previews(frame, app, inner);
         }
         MenuPage::About => {
             let content = "About Menu\n\nPlaceholder for app information";
@@ -206,7 +218,8 @@ fn draw_menu(frame: &mut Frame, app: &App) {
                     .borders(Borders::ALL)
                     .border_set(symbols::border::THICK)
                     .padding(Padding::uniform(1))
-                    .border_style(border_style))
+                    .border_style(border_style)
+                    .style(app.theme.menu_style())) // Add theme style to the block itself
                 .alignment(Alignment::Center)
                 .style(app.theme.menu_style());
             frame.render_widget(content, chunks[1]);
@@ -307,7 +320,7 @@ fn draw_browser(frame: &mut Frame, app: &App, area: Rect) {
         .map(|i| {
             let name = app.filesystem.get_entry_name(i);
             ListItem::new(Line::from(vec![
-                Span::styled(format!("📁 {}", name), Style::default())
+                Span::styled(format!("📁 {}", name), app.theme.browser_style())
             ]))
         })
         .collect();
@@ -319,7 +332,9 @@ fn draw_browser(frame: &mut Frame, app: &App, area: Rect) {
         .block(Block::default()
             .borders(Borders::ALL)
             .title(title)
-            .border_style(app.theme.browser_border_style(app.focus == Focus::Browser)))
+            .border_style(app.theme.browser_border_style(app.focus == Focus::Browser))
+            .style(app.theme.browser_style()))
+        .style(app.theme.browser_style())
         .highlight_style(app.theme.browser_highlight_style())
         .highlight_symbol(app.theme.browser_highlight_symbol());
 
@@ -343,7 +358,7 @@ fn draw_songs(frame: &mut Frame, app: &App, area: Rect) {
             let style = if app.focus == Focus::Songs && app.current_track.as_ref() == Some(track) && app.playback_state != PlaybackState::Stopped {
                 app.theme.songs_playing_style()
             } else {
-                Style::default()
+                app.theme.songs_style()
             };
 
             ListItem::new(Line::from(vec![
@@ -356,7 +371,9 @@ fn draw_songs(frame: &mut Frame, app: &App, area: Rect) {
         .block(Block::default()
             .borders(Borders::ALL)
             .title(" Songs ")
-            .border_style(app.theme.songs_border_style(app.focus == Focus::Songs)))
+            .border_style(app.theme.songs_border_style(app.focus == Focus::Songs))
+            .style(app.theme.songs_style()))
+        .style(app.theme.songs_style())
         .highlight_style(app.theme.songs_highlight_style())
         .highlight_symbol(app.theme.songs_highlight_symbol());
 
@@ -380,7 +397,7 @@ fn draw_playlist(frame: &mut Frame, app: &App, area: Rect) {
             let style = if app.focus == Focus::Playlist && app.current_track.as_ref() == Some(track) && app.playback_state != PlaybackState::Stopped {
                 app.theme.playlist_playing_style()
             } else {
-                Style::default()
+                app.theme.playlist_style()
             };
 
             ListItem::new(Line::from(vec![
@@ -393,7 +410,9 @@ fn draw_playlist(frame: &mut Frame, app: &App, area: Rect) {
         .block(Block::default()
             .borders(Borders::ALL)
             .title(" Playlist ")
-            .border_style(app.theme.playlist_border_style(app.focus == Focus::Playlist)))
+            .border_style(app.theme.playlist_border_style(app.focus == Focus::Playlist))
+            .style(app.theme.playlist_style()))
+        .style(app.theme.playlist_style())
         .highlight_style(app.theme.playlist_highlight_style())
         .highlight_symbol(app.theme.playlist_highlight_symbol());
 

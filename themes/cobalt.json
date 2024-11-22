@@ -10,14 +10,19 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Blue",
-          "bg": null,
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
           "modifiers": []
         }
       },
       "style": {
-        "fg": "LightBlue",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       }
     },
@@ -26,14 +31,19 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Blue",
-          "bg": null,
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
           "modifiers": []
         }
       },
       "gauge_style": {
-        "fg": "LightBlue",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       }
     },
@@ -42,14 +52,19 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Blue",
-          "bg": null,
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
           "modifiers": []
         }
       },
       "style": {
-        "fg": "LightBlue",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       }
     },
@@ -59,25 +74,30 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "Blue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": []
           },
           "focused": {
-            "fg": "LightBlue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": ["BOLD"]
           }
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
         }
       },
       "list_style": {
-        "fg": "Gray",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "White",
-        "bg": "DarkGray",
+        "fg": "Blue",
+        "bg": "White",
         "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
@@ -88,30 +108,35 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "Blue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": []
           },
           "focused": {
-            "fg": "LightBlue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": ["BOLD"]
           }
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
         }
       },
       "list_style": {
-        "fg": "Gray",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "White",
-        "bg": "DarkGray",
+        "fg": "Blue",
+        "bg": "White",
         "modifiers": ["BOLD"]
       },
       "playing_style": {
-        "fg": "LightBlue",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
@@ -122,30 +147,35 @@
         "borders": true,
         "border_style": {
           "unfocused": {
-            "fg": "Blue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": []
           },
           "focused": {
-            "fg": "LightBlue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": ["BOLD"]
           }
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
         }
       },
       "list_style": {
-        "fg": "Gray",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       },
       "highlight_style": {
-        "fg": "White",
-        "bg": "DarkGray",
+        "fg": "Blue",
+        "bg": "White",
         "modifiers": ["BOLD"]
       },
       "playing_style": {
-        "fg": "LightBlue",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": ["BOLD"]
       },
       "highlight_symbol": "► "
@@ -155,19 +185,24 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Blue",
-          "bg": null,
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
           "modifiers": []
         }
       },
       "style": {
-        "fg": "Gray",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       },
       "volume_style": {
-        "fg": "LightBlue",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": ["BOLD"]
       }
     },
@@ -176,50 +211,55 @@
       "block": {
         "borders": true,
         "border_style": {
-          "fg": "Blue",
-          "bg": null,
+          "fg": "White",
+          "bg": "Blue",
+          "modifiers": []
+        },
+        "style": {
+          "fg": "White",
+          "bg": "Blue",
           "modifiers": []
         }
       },
       "style": {
-        "fg": "Gray",
-        "bg": null,
+        "fg": "White",
+        "bg": "Blue",
         "modifiers": []
       },
       "tabs": {
         "preferences": {
           "selected": {
-            "fg": "Black",
-            "bg": "LightBlue",
+            "fg": "Blue",
+            "bg": "White",
             "modifiers": ["BOLD"]
           },
           "unselected": {
-            "fg": "Blue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": []
           }
         },
         "looks": {
           "selected": {
-            "fg": "Black",
-            "bg": "LightBlue",
+            "fg": "Blue",
+            "bg": "White",
             "modifiers": ["BOLD"]
           },
           "unselected": {
-            "fg": "Blue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": []
           }
         },
         "about": {
           "selected": {
-            "fg": "Black",
-            "bg": "LightBlue",
+            "fg": "Blue",
+            "bg": "White",
             "modifiers": ["BOLD"]
           },
           "unselected": {
-            "fg": "Blue",
-            "bg": null,
+            "fg": "White",
+            "bg": "Blue",
             "modifiers": []
           }
         }
