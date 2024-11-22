@@ -1,7 +1,11 @@
+mod colors;
+
 use std::fs;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::style::{Modifier, Style};
+
+pub use colors::parse_color;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StyleConfig {
@@ -126,12 +130,6 @@ pub struct Theme {
     config: Widgets,
 }
 
-struct ColorRgb {
-    r: u8,
-    g: u8,
-    b: u8,
-}
-
 impl Theme {
     pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
         Self::load_theme("default")
@@ -166,33 +164,6 @@ impl Theme {
         Ok(themes)
     }
 
-    fn color_name_to_rgb(color_name: &str) -> ColorRgb {
-        match color_name {
-            "Black" => ColorRgb { r: 0, g: 0, b: 0 },
-            "Red" => ColorRgb { r: 255, g: 0, b: 0 },
-            "Green" => ColorRgb { r: 0, g: 255, b: 0 },
-            "Yellow" => ColorRgb { r: 255, g: 255, b: 0 },
-            "Blue" => ColorRgb { r: 0, g: 0, b: 255 },
-            "Magenta" => ColorRgb { r: 255, g: 0, b: 255 },
-            "Cyan" => ColorRgb { r: 0, g: 255, b: 255 },
-            "Gray" => ColorRgb { r: 128, g: 128, b: 128 },
-            "DarkGray" => ColorRgb { r: 64, g: 64, b: 64 },
-            "LightRed" => ColorRgb { r: 255, g: 128, b: 128 },
-            "LightGreen" => ColorRgb { r: 128, g: 255, b: 128 },
-            "LightYellow" => ColorRgb { r: 255, g: 255, b: 128 },
-            "LightBlue" => ColorRgb { r: 128, g: 128, b: 255 },
-            "LightMagenta" => ColorRgb { r: 255, g: 128, b: 255 },
-            "LightCyan" => ColorRgb { r: 128, g: 255, b: 255 },
-            "White" => ColorRgb { r: 255, g: 255, b: 255 },
-            _ => ColorRgb { r: 0, g: 0, b: 0 }, // Default to black for unknown colors
-        }
-    }
-
-    fn parse_color(color_str: &str) -> Color {
-        let rgb = Self::color_name_to_rgb(color_str);
-        Color::Rgb(rgb.r, rgb.g, rgb.b)
-    }
-
     fn parse_modifiers(modifiers: &[String]) -> ratatui::style::Modifier {
         let mut result = ratatui::style::Modifier::empty();
         for modifier in modifiers {
@@ -216,11 +187,11 @@ impl Theme {
         let mut style = Style::default();
         
         if let Some(fg) = &style_config.fg {
-            style = style.fg(Self::parse_color(fg));
+            style = style.fg(parse_color(fg));
         }
         
         if let Some(bg) = &style_config.bg {
-            style = style.bg(Self::parse_color(bg));
+            style = style.bg(parse_color(bg));
         }
         
         if !style_config.modifiers.is_empty() {
@@ -234,11 +205,11 @@ impl Theme {
         let mut style = Style::default();
         
         if let Some(fg) = &style_config.fg {
-            style = style.fg(Self::parse_color(fg));
+            style = style.fg(parse_color(fg));
         }
         
         if let Some(bg) = &style_config.bg {
-            style = style.bg(Self::parse_color(bg));
+            style = style.bg(parse_color(bg));
         }
         
         if !style_config.modifiers.is_empty() {
@@ -378,37 +349,16 @@ impl Theme {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_color_name_to_rgb() {
-        // Test basic color conversion
-        let rgb = Theme::color_name_to_rgb("Blue");
-        assert_eq!(rgb.r, 0);
-        assert_eq!(rgb.g, 0);
-        assert_eq!(rgb.b, 255);
-
-        // Test light color conversion
-        let rgb = Theme::color_name_to_rgb("LightBlue");
-        assert_eq!(rgb.r, 128);
-        assert_eq!(rgb.g, 128);
-        assert_eq!(rgb.b, 255);
-
-        // Test unknown color defaults to black
-        let rgb = Theme::color_name_to_rgb("NonexistentColor");
-        assert_eq!(rgb.r, 0);
-        assert_eq!(rgb.g, 0);
-        assert_eq!(rgb.b, 0);
-    }
+    use ratatui::style::Color;
 
     #[test]
     fn test_parse_color() {
-        match Theme::parse_color("Blue") {
-            Color::Rgb(r, g, b) => {
-                assert_eq!(r, 0);
-                assert_eq!(g, 0);
-                assert_eq!(b, 255);
-            }
-            _ => panic!("Expected RGB color"),
-        }
+        // Test CSS color
+        let color = parse_color("chartreuse");
+        assert_eq!(color, Color::Rgb(127, 255, 0));
+
+        // Test legacy color
+        let color = parse_color("Blue");
+        assert_eq!(color, Color::Rgb(0, 0, 255));
     }
 }
