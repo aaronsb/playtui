@@ -1,8 +1,15 @@
 use ratatui::style::Color as RatatuiColor;
 
+/// Converts a hex color string to RGB components.
+/// Supports both 6-digit (#RRGGBB) and 3-digit (#RGB) formats.
 fn hex_to_rgb(hex: &str) -> Option<(u8, u8, u8)> {
     // Remove '#' if present
     let hex = hex.trim_start_matches('#');
+    
+    // Validate hex string only contains valid hex characters
+    if !hex.chars().all(|c| c.is_ascii_hexdigit()) {
+        return None;
+    }
     
     match hex.len() {
         6 => {
@@ -24,7 +31,19 @@ fn hex_to_rgb(hex: &str) -> Option<(u8, u8, u8)> {
     }
 }
 
+/// Parses a color string into a RatatuiColor.
+/// Supports:
+/// - Hex colors (#RRGGBB or #RGB)
+/// - Named CSS colors
+/// - Custom color aliases
+/// 
+/// Returns black (0,0,0) for unknown or invalid colors.
 pub fn parse_color(color_str: &str) -> RatatuiColor {
+    // Validate input
+    if color_str.is_empty() {
+        return RatatuiColor::Rgb(0, 0, 0);
+    }
+
     // Check for hex color format first
     if color_str.starts_with('#') {
         if let Some((r, g, b)) = hex_to_rgb(color_str) {
@@ -175,9 +194,9 @@ pub fn parse_color(color_str: &str) -> RatatuiColor {
         "wheat" => RatatuiColor::Rgb(245, 222, 179),
         "whitesmoke" => RatatuiColor::Rgb(245, 245, 245),
         "yellowgreen" => RatatuiColor::Rgb(154, 205, 50),
-        // Our custom aliases
-        "lightred" => RatatuiColor::Rgb(255, 182, 193),    // Same as lightpink
-        "lightmagenta" => RatatuiColor::Rgb(255, 182, 193),// Same as lightpink
+        // Custom aliases with unique values
+        "lightred" => RatatuiColor::Rgb(255, 128, 128),    // A lighter shade of red
+        "lightmagenta" => RatatuiColor::Rgb(255, 128, 255),// A lighter shade of magenta
         _ => RatatuiColor::Rgb(0, 0, 0), // Default to black for unknown colors
     }
 }
@@ -212,16 +231,24 @@ mod tests {
 
     #[test]
     fn test_parse_aliases() {
-        // Test our custom aliases
-        assert_eq!(parse_color("lightred"), RatatuiColor::Rgb(255, 182, 193));
-        assert_eq!(parse_color("darkgray"), RatatuiColor::Rgb(169, 169, 169));
+        // Test our custom aliases with unique values
+        assert_eq!(parse_color("lightred"), RatatuiColor::Rgb(255, 128, 128));
+        assert_eq!(parse_color("lightmagenta"), RatatuiColor::Rgb(255, 128, 255));
     }
 
     #[test]
-    fn test_unknown_color() {
-        // Test fallback for unknown colors
+    fn test_invalid_inputs() {
+        // Test invalid inputs
+        assert_eq!(parse_color(""), RatatuiColor::Rgb(0, 0, 0));
         assert_eq!(parse_color("nonexistentcolor"), RatatuiColor::Rgb(0, 0, 0));
         assert_eq!(parse_color("#XYZ"), RatatuiColor::Rgb(0, 0, 0)); // Invalid hex
         assert_eq!(parse_color("#12"), RatatuiColor::Rgb(0, 0, 0));  // Invalid hex length
+    }
+
+    #[test]
+    fn test_hex_validation() {
+        // Test hex validation
+        assert_eq!(parse_color("#GGG"), RatatuiColor::Rgb(0, 0, 0)); // Invalid hex chars
+        assert_eq!(parse_color("#12345"), RatatuiColor::Rgb(0, 0, 0)); // Wrong length
     }
 }
