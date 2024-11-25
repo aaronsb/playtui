@@ -1,0 +1,240 @@
+{
+  "theme_info": {
+    "name": "Cobalt",
+    "version": "1.0",
+    "author": "Cline"
+  },
+  "widgets": {
+    "now_playing": {
+      "name": "Now Playing",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "RoyalBlue",
+          "bg": null,
+          "modifiers": [],
+          "border_type": "rounded"
+        }
+      },
+      "style": {
+        "fg": "White",
+        "bg": null,
+        "modifiers": ["BOLD"]
+      }
+    },
+    "progress_gauge": {
+      "name": "Progress",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "RoyalBlue",
+          "bg": null,
+          "modifiers": [],
+          "border_type": "rounded"
+        }
+      },
+      "gauge_style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "progress_text": {
+      "name": "Progress (No Duration)",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "RoyalBlue",
+          "bg": null,
+          "modifiers": [],
+          "border_type": "rounded"
+        }
+      },
+      "style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": []
+      }
+    },
+    "browser": {
+      "name": "Browser",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "unfocused": {
+            "fg": "RoyalBlue",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "White",
+            "bg": null,
+            "modifiers": ["BOLD"]
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "double"
+        }
+      },
+      "list_style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": "White",
+        "bg": "DarkBlue",
+        "modifiers": ["BOLD"]
+      },
+      "highlight_symbol": "▶ "
+    },
+    "songs": {
+      "name": "Songs",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "unfocused": {
+            "fg": "RoyalBlue",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "White",
+            "bg": null,
+            "modifiers": ["BOLD"]
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "double"
+        }
+      },
+      "list_style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": "White",
+        "bg": "DarkBlue",
+        "modifiers": ["BOLD"]
+      },
+      "playing_style": {
+        "fg": "LightGreen",
+        "bg": null,
+        "modifiers": ["BOLD"]
+      },
+      "highlight_symbol": "▶ "
+    },
+    "playlist": {
+      "name": "Playlist",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "unfocused": {
+            "fg": "RoyalBlue",
+            "bg": null,
+            "modifiers": []
+          },
+          "focused": {
+            "fg": "White",
+            "bg": null,
+            "modifiers": ["BOLD"]
+          },
+          "unfocused_border_type": "rounded",
+          "focused_border_type": "double"
+        }
+      },
+      "list_style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": []
+      },
+      "highlight_style": {
+        "fg": "White",
+        "bg": "DarkBlue",
+        "modifiers": ["BOLD"]
+      },
+      "playing_style": {
+        "fg": "LightGreen",
+        "bg": null,
+        "modifiers": ["BOLD"]
+      },
+      "highlight_symbol": "▶ "
+    },
+    "controls": {
+      "name": "Controls",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "RoyalBlue",
+          "bg": null,
+          "modifiers": [],
+          "border_type": "rounded"
+        }
+      },
+      "style": {
+        "fg": "Gray",
+        "bg": null,
+        "modifiers": []
+      },
+      "volume_style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": ["BOLD"]
+      }
+    },
+    "menu": {
+      "name": "Menu",
+      "block": {
+        "borders": true,
+        "border_style": {
+          "fg": "RoyalBlue",
+          "bg": null,
+          "modifiers": [],
+          "border_type": "rounded"
+        }
+      },
+      "style": {
+        "fg": "LightBlue",
+        "bg": null,
+        "modifiers": []
+      },
+      "tabs": {
+        "preferences": {
+          "selected": {
+            "fg": "White",
+            "bg": "DarkBlue",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "LightBlue",
+            "bg": null,
+            "modifiers": []
+          }
+        },
+        "looks": {
+          "selected": {
+            "fg": "White",
+            "bg": "DarkBlue",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "LightBlue",
+            "bg": null,
+            "modifiers": []
+          }
+        },
+        "about": {
+          "selected": {
+            "fg": "White",
+            "bg": "DarkBlue",
+            "modifiers": ["BOLD"]
+          },
+          "unselected": {
+            "fg": "LightBlue",
+            "bg": null,
+            "modifiers": []
+          }
+        }
+      }
+    }
+  }
+}
