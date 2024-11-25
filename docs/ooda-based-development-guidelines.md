@@ -228,6 +228,22 @@ impl Component for OODAComponent {
    - Component health monitoring
    - Technical debt management
 
+4. Module Organization
+   - Keep mod.rs files focused and minimal
+   - Split large mod.rs files into dedicated modules
+   - Follow the "Rule of Three":
+     * When a mod.rs contains more than three major components
+     * When a mod.rs exceeds 100 lines
+     * When a mod.rs handles multiple distinct responsibilities
+   - Maintain clear module boundaries:
+     * mod.rs should primarily contain exports and core traits
+     * Complex implementations belong in separate files
+     * Group related functionality into sub-modules
+   - Regular module health checks:
+     * Review mod.rs complexity during code reviews
+     * Monitor module growth patterns
+     * Refactor early when signs of bloat appear
+
 ## 5. Metrics and Monitoring
 
 ### Key Metrics
@@ -245,6 +261,11 @@ impl Component for OODAComponent {
    - Memory usage
    - CPU utilization
    - Render time
+
+4. Module Metrics
+   - Lines of code in mod.rs files
+   - Number of exports per module
+   - Module dependency counts
 
 ### Monitoring Implementation
 ```rust
