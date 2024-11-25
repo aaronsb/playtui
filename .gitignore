@@ -1,8 +1,47 @@
-/target
+# Rust specific ignores
+/target/
+**/*.rs.bk
+*.pdb
 
+# Cargo.lock is ignored for libraries but kept for binaries
+# Cargo.lock
 
-# Added by cargo
-#
-# already existing elements were commented out
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.vs/
+*.sublime-workspace
+*.sublime-project
 
-#/target
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Debug files
+*.log
+*.dmp
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# Build output
+/dist/
+/build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+*.lcov
