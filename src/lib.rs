@@ -3,6 +3,8 @@ pub mod ui;
 pub mod audio;
 pub mod components;
 pub mod metadata;
+pub mod events;
+pub mod state;
 
 use std::sync::Arc;
 use std::time::Duration;
