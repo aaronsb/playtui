@@ -4,38 +4,53 @@ use super::{Controls, Section};
 
 pub fn handle_event(controls: &mut Controls, event: Event) -> Option<Action> {
     match event {
-        Event::Key(key_event) => match key_event {
-            // Navigation key events should work regardless of focus
-            KeyEvent::Left => Some(Action::NavigateLeft),
-            KeyEvent::Right => Some(Action::NavigateRight),
-            KeyEvent::Up => Some(Action::NavigateUp),
-            KeyEvent::Down => Some(Action::NavigateDown),
-            // Other key events require focus
-            _ => {
-                if !controls.focused() {
-                    return None;
-                }
-                match key_event {
-                    KeyEvent::Tab => {
-                        handle_tab_navigation(controls, false);
+        Event::Key(key_event) => {
+            // All key events require focus now
+            if !controls.focused() {
+                return None;
+            }
+            match key_event {
+                KeyEvent::Left => {
+                    if controls.focused_section == Section::Controls {
+                        // Move to previous button
+                        if controls.focused_button == 0 {
+                            controls.focused_button = 7;
+                        } else {
+                            controls.focused_button = (controls.focused_button - 1) % 8;
+                        }
                         Some(Action::Refresh)
+                    } else {
+                        None
                     }
-                    KeyEvent::BackTab => {
-                        handle_tab_navigation(controls, true);
+                },
+                KeyEvent::Right => {
+                    if controls.focused_section == Section::Controls {
+                        // Move to next button
+                        controls.focused_button = (controls.focused_button + 1) % 8;
                         Some(Action::Refresh)
+                    } else {
+                        None
                     }
-                    KeyEvent::Enter => handle_enter_action(controls),
-                    // Handle media control keys
-                    KeyEvent::Play => Some(Action::Player(PlayerAction::Play)),
-                    KeyEvent::Pause => Some(Action::Player(PlayerAction::Pause)),
-                    KeyEvent::Stop => Some(Action::Player(PlayerAction::Stop)),
-                    KeyEvent::FastForward => Some(Action::Player(PlayerAction::FastForward)),
-                    KeyEvent::Rewind => Some(Action::Player(PlayerAction::Rewind)),
-                    KeyEvent::Record => Some(Action::Player(PlayerAction::Record)),
-                    KeyEvent::Next => Some(Action::Player(PlayerAction::LoadTrack(String::new()))),
-                    KeyEvent::Previous => Some(Action::Player(PlayerAction::LoadTrack(String::new()))),
-                    _ => None,
-                }
+                },
+                KeyEvent::Tab => {
+                    handle_tab_navigation(controls, false);
+                    Some(Action::Refresh)
+                },
+                KeyEvent::BackTab => {
+                    handle_tab_navigation(controls, true);
+                    Some(Action::Refresh)
+                },
+                KeyEvent::Enter => handle_enter_action(controls),
+                // Handle media control keys
+                KeyEvent::Play => Some(Action::Player(PlayerAction::Play)),
+                KeyEvent::Pause => Some(Action::Player(PlayerAction::Pause)),
+                KeyEvent::Stop => Some(Action::Player(PlayerAction::Stop)),
+                KeyEvent::FastForward => Some(Action::Player(PlayerAction::FastForward)),
+                KeyEvent::Rewind => Some(Action::Player(PlayerAction::Rewind)),
+                KeyEvent::Record => Some(Action::Player(PlayerAction::Record)),
+                KeyEvent::Next => Some(Action::Player(PlayerAction::LoadTrack(String::new()))),
+                KeyEvent::Previous => Some(Action::Player(PlayerAction::LoadTrack(String::new()))),
+                _ => None,
             }
         },
         Event::Mouse(mouse_event) => {
