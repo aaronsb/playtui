@@ -33,11 +33,11 @@
     - [x] Create theme/types.rs for data structures
     - [x] Create theme/color.rs for color management
     - [x] Create theme/style.rs for style management
-  - [ ] Split app.rs (166 lines):
-    - [ ] Create app/mod.rs for core functionality
-    - [ ] Create app/components.rs for component management
-    - [ ] Create app/event_handling.rs for event handling
-    - [ ] Create app/focus.rs for focus management
+  - [x] Split app.rs (166 lines):
+    - [x] Create app/mod.rs for core functionality
+    - [x] Create app/components.rs for component management
+    - [x] Create app/event_handling.rs for event handling
+    - [x] Create app/focus.rs for focus management
 
 ### Core Audio Implementation
 - [ ] Implement basic audio playback functionality in player.rs
