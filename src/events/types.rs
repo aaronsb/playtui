@@ -76,7 +76,7 @@ pub enum SystemEvent {
     Error(String),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FocusDirection {
     Next,
     Previous,
