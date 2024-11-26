@@ -1,6 +1,7 @@
 use std::path::Path;
 use crate::metadata::{Metadata, MetadataError, MetadataParser};
-use super::{matches_extension, tag_extractor::TagExtractor, audio_properties::AudioPropertiesExtractor};
+use crate::metadata::formats::matches_extension;
+use super::{tag_extractor::TagExtractor, audio_properties::AudioPropertiesExtractor};
 
 pub struct VorbisParser;
 
