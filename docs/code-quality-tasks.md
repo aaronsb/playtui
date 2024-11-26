@@ -25,11 +25,12 @@
   - [x] Create components/library_browser/state.rs for state management
   - [x] Create components/library_browser/events.rs for event handling
 
-- [ ] Split components/tests.rs (237 lines):
-  - [ ] Create components/tests/mod.rs for test organization
-  - [ ] Create components/tests/library_tests.rs for library component tests
-  - [ ] Create components/tests/track_tests.rs for track-related tests
-  - [ ] Create components/tests/control_tests.rs for control component tests
+- [x] Split components/tests.rs (237 lines):
+  - [x] Create components/tests/mock.rs for mock component implementation
+  - [x] Create components/tests/theme.rs for theme creation and testing utilities
+  - [x] Create components/tests/events.rs for event handling tests
+  - [x] Create components/tests/state.rs for component state tests
+  - [x] Create components/tests/mod.rs for test organization
 
 - [ ] Split components/controls/events.rs (194 lines):
   - [ ] Create components/controls/events/mod.rs for event handling core
