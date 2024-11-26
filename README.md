@@ -1,3 +1,4 @@
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N416MTT1)
 # PlayTUI
 
 A terminal-based audio player with a rich text user interface.
