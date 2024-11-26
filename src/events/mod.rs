@@ -12,7 +12,7 @@ mod filter;
 
 // Re-export all public items
 pub use error::{EventError, EventResult};
-pub use types::{Event, KeyEvent, MouseEvent, SystemEvent, FocusDirection};
+pub use types::{Event, KeyEvent, MouseEvent, SystemEvent, FocusDirection, NavigationEvent};
 pub use actions::{
     Action, PlayerAction, PlaylistAction, UIAction, MetadataAction, 
     AppAction, TrackMetadata

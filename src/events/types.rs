@@ -5,6 +5,7 @@ pub enum Event {
     Key(KeyEvent),
     Mouse(MouseEvent),
     System(SystemEvent),
+    Navigation(NavigationEvent),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -32,6 +33,14 @@ pub enum KeyEvent {
     Record,
     FastForward,
     Rewind,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum NavigationEvent {
+    Left,
+    Right,
+    Up,
+    Down,
 }
 
 impl From<KeyCode> for KeyEvent {

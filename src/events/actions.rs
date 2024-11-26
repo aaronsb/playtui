@@ -1,10 +1,16 @@
 use super::types::FocusDirection;
+use super::KeyEvent;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Action {
+    // Key events
+    Key(KeyEvent),
+    
     // Navigation actions
     NavigateUp,
     NavigateDown,
+    NavigateLeft,
+    NavigateRight,
     Select,
     Back,
     Refresh,
@@ -27,7 +33,7 @@ pub enum Action {
     App(AppAction),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum PlayerAction {
     Play,
     Pause,
@@ -41,7 +47,7 @@ pub enum PlayerAction {
     StopEject,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum PlaylistAction {
     SelectTrack(usize),
     AddTrack(String),
@@ -49,28 +55,28 @@ pub enum PlaylistAction {
     Clear,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum UIAction {
     Focus(FocusDirection),
     UpdateTheme(String),
     Resize { width: u16, height: u16 },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum MetadataAction {
     Load(String),
     Update(TrackMetadata),
     Clear,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum AppAction {
     Quit,
     Error(String),
     NoOp,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TrackMetadata {
     pub title: Option<String>,
     pub artist: Option<String>,

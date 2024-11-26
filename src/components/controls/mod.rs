@@ -16,7 +16,7 @@ pub struct Controls {
     pub(crate) area: RefCell<Option<Rect>>,
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub(crate) enum Section {
     Controls,
     Volume,
@@ -25,6 +25,8 @@ pub(crate) enum Section {
 mod layout;
 mod events;
 mod actions;
+#[cfg(test)]
+mod tests;
 
 impl Component for Controls {
     fn new() -> Self {

@@ -1,8 +1,10 @@
+use crate::events::{Event, Action, EventHandler, EventResult, SystemEvent, KeyEvent, NavigationEvent};
 use crate::components::{
     Component, LibraryBrowser, TrackList, TrackDetails,
     CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
 };
-use crate::events::{Event, Action, EventHandler, EventResult, SystemEvent};
+use std::rc::Rc;
+use std::cell::RefCell;
 
 /// Manages component registration and interaction
 pub struct ComponentManager {
@@ -11,16 +13,23 @@ pub struct ComponentManager {
 
 /// Wrapper for components that implement the EventHandler trait
 struct ComponentWrapper<T: Component> {
-    component: T,
+    component: Rc<RefCell<T>>,
 }
 
-impl<T: Component> EventHandler for ComponentWrapper<T> {
+impl<T: Component + 'static> EventHandler for ComponentWrapper<T> {
     fn handle_event(&mut self, event: &Event) -> EventResult<Option<Action>> {
-        Ok(self.component.handle_event(event.clone()))
+        Ok(self.component.borrow_mut().handle_event(event.clone()))
     }
 
-    fn can_handle(&self, _event: &Event) -> bool {
-        self.component.focused()
+    fn can_handle(&self, event: &Event) -> bool {
+        match event {
+            // Navigation events can be handled regardless of focus
+            Event::Navigation(_) => true,
+            // For key events that generate navigation actions, also allow regardless of focus
+            Event::Key(KeyEvent::Left | KeyEvent::Right | KeyEvent::Up | KeyEvent::Down) => true,
+            // All other events require focus
+            _ => self.component.borrow().focused()
+        }
     }
 }
 
@@ -34,32 +43,31 @@ impl ComponentManager {
 
     /// Registers all application components
     pub fn register_components(&mut self,
-        library_browser: &LibraryBrowser,
-        track_list: &TrackList,
-        track_details: &TrackDetails,
-        current_track_info: &CurrentTrackInfo,
-        playback_status: &PlaybackStatus,
-        controls: &Controls,
-        volume_control: &VolumeControl,
+        library_browser: &Rc<RefCell<LibraryBrowser>>,
+        track_list: &Rc<RefCell<TrackList>>,
+        track_details: &Rc<RefCell<TrackDetails>>,
+        current_track_info: &Rc<RefCell<CurrentTrackInfo>>,
+        playback_status: &Rc<RefCell<PlaybackStatus>>,
+        controls: &Rc<RefCell<Controls>>,
+        volume_control: &Rc<RefCell<VolumeControl>>,
     ) {
         // Register each component with a wrapper
         let components: Vec<Box<dyn EventHandler>> = vec![
-            Box::new(ComponentWrapper { component: library_browser.clone() }),
-            Box::new(ComponentWrapper { component: track_list.clone() }),
-            Box::new(ComponentWrapper { component: track_details.clone() }),
-            Box::new(ComponentWrapper { component: current_track_info.clone() }),
-            Box::new(ComponentWrapper { component: playback_status.clone() }),
-            Box::new(ComponentWrapper { component: controls.clone() }),
-            Box::new(ComponentWrapper { component: volume_control.clone() }),
+            Box::new(ComponentWrapper { component: Rc::clone(library_browser) }),
+            Box::new(ComponentWrapper { component: Rc::clone(track_list) }),
+            Box::new(ComponentWrapper { component: Rc::clone(track_details) }),
+            Box::new(ComponentWrapper { component: Rc::clone(current_track_info) }),
+            Box::new(ComponentWrapper { component: Rc::clone(playback_status) }),
+            Box::new(ComponentWrapper { component: Rc::clone(controls) }),
+            Box::new(ComponentWrapper { component: Rc::clone(volume_control) }),
         ];
 
         self.components = components;
     }
 
     /// Updates all components with an action
-    pub fn update_components(&mut self, initial_action: Action) {
-        let mut pending_actions = vec![initial_action];
-        let state_event = Event::System(SystemEvent::TrackLoaded);
+    pub fn update_components(&mut self, action: Action) {
+        let mut pending_actions = vec![action];
 
         // Process actions until no new ones are generated
         while !pending_actions.is_empty() {
@@ -67,10 +75,22 @@ impl ComponentManager {
             
             // Process each action
             for action in current_actions {
-                // Collect new actions from each component
+                // Convert navigation actions to events
+                let event = match &action {
+                    Action::NavigateLeft => Event::Navigation(NavigationEvent::Left),
+                    Action::NavigateRight => Event::Navigation(NavigationEvent::Right),
+                    Action::NavigateUp => Event::Navigation(NavigationEvent::Up),
+                    Action::NavigateDown => Event::Navigation(NavigationEvent::Down),
+                    Action::Key(key_event) => Event::Key(key_event.clone()),
+                    _ => Event::System(SystemEvent::TrackLoaded),
+                };
+
+                // Process the event through all components
                 for component in self.components.iter_mut() {
-                    if let Ok(Some(follow_up)) = component.handle_event(&state_event) {
-                        pending_actions.push(follow_up);
+                    if component.can_handle(&event) {
+                        if let Ok(Some(follow_up)) = component.handle_event(&event) {
+                            pending_actions.push(follow_up);
+                        }
                     }
                 }
             }

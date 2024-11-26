@@ -7,6 +7,8 @@ use crate::state::AppState;
 use crate::theme::Theme;
 use crate::logger::Logger;
 use anyhow::Result;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 // Declare submodules
 mod components;
@@ -23,15 +25,15 @@ pub struct App {
     pub state: AppState,
     pub theme: Theme,
     // Primary Row Components
-    pub library_browser: LibraryBrowser,
-    pub track_list: TrackList,
-    pub track_details: TrackDetails,
+    pub library_browser: Rc<RefCell<LibraryBrowser>>,
+    pub track_list: Rc<RefCell<TrackList>>,
+    pub track_details: Rc<RefCell<TrackDetails>>,
     // Secondary Row Components
-    pub current_track_info: CurrentTrackInfo,
-    pub playback_status: PlaybackStatus,
+    pub current_track_info: Rc<RefCell<CurrentTrackInfo>>,
+    pub playback_status: Rc<RefCell<PlaybackStatus>>,
     // Control Row Components
-    pub controls: Controls,
-    pub volume_control: VolumeControl,
+    pub controls: Rc<RefCell<Controls>>,
+    pub volume_control: Rc<RefCell<VolumeControl>>,
     // Managers
     component_manager: ComponentManager,
     event_manager: EventManager,
@@ -44,20 +46,41 @@ impl App {
     pub fn new() -> Result<App> {
         let theme = Theme::load_default()?;
         
-        // Initialize components
-        let library_browser = LibraryBrowser::new();
-        let track_list = TrackList::new();
-        let track_details = TrackDetails::new();
-        let current_track_info = CurrentTrackInfo::new();
-        let playback_status = PlaybackStatus::new();
-        let controls = Controls::new();
-        let volume_control = VolumeControl::new();
+        // Initialize components wrapped in Rc<RefCell>
+        let library_browser = Rc::new(RefCell::new(LibraryBrowser::new()));
+        let track_list = Rc::new(RefCell::new(TrackList::new()));
+        let track_details = Rc::new(RefCell::new(TrackDetails::new()));
+        let current_track_info = Rc::new(RefCell::new(CurrentTrackInfo::new()));
+        let playback_status = Rc::new(RefCell::new(PlaybackStatus::new()));
+        let controls = Rc::new(RefCell::new(Controls::new()));
+        let volume_control = Rc::new(RefCell::new(VolumeControl::new()));
 
         // Initialize managers
-        let component_manager = ComponentManager::new();
-        let event_manager = EventManager::new();
+        let mut component_manager = ComponentManager::new();
+        let mut event_manager = EventManager::new();
         let focus_manager = FocusManager::new();
         let logger = Logger::new()?;
+
+        // Register components with both managers using cloned Rc references
+        component_manager.register_components(
+            &library_browser,
+            &track_list,
+            &track_details,
+            &current_track_info,
+            &playback_status,
+            &controls,
+            &volume_control,
+        );
+
+        event_manager.register_components(
+            &library_browser,
+            &track_list,
+            &track_details,
+            &current_track_info,
+            &playback_status,
+            &controls,
+            &volume_control,
+        );
 
         // Create App instance
         let mut app = App {
@@ -76,27 +99,6 @@ impl App {
             logger,
         };
 
-        // Register components with both managers
-        app.component_manager.register_components(
-            &app.library_browser,
-            &app.track_list,
-            &app.track_details,
-            &app.current_track_info,
-            &app.playback_status,
-            &app.controls,
-            &app.volume_control,
-        );
-
-        app.event_manager.register_components(
-            &app.library_browser,
-            &app.track_list,
-            &app.track_details,
-            &app.current_track_info,
-            &app.playback_status,
-            &app.controls,
-            &app.volume_control,
-        );
-
         // Initialize focus states
         app.update_focus_states();
 
@@ -114,26 +116,34 @@ impl App {
         // Log the event, ignoring any logging errors to not disrupt the app
         let _ = self.logger.log_event(&event);
 
-        // Handle focus-related events first
+        // Handle focus-specific events
         match &event {
             Event::Key(KeyEvent::Tab) => {
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(FocusDirection::Next)))?;
+                self.update_focus_states();
+                Ok(())
             },
             Event::Key(KeyEvent::BackTab) => {
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(FocusDirection::Previous)))?;
+                self.update_focus_states();
+                Ok(())
             },
-            _ => {
+            Event::Key(KeyEvent::Focus(_)) => {
                 self.focus_manager.handle_event(&event)?;
+                self.update_focus_states();
+                Ok(())
+            },
+            // For all other events, process through both managers
+            _ => {
+                // First let the event manager convert the event to an action
+                if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                    // Then process the action through the component manager
+                    self.component_manager.update_components(action);
+                }
+                self.update_focus_states();
+                Ok(())
             }
         }
-        
-        // Process event through event manager
-        self.event_manager.handle_event(event)?;
-        
-        // Update focus states after event processing
-        self.update_focus_states();
-        
-        Ok(())
     }
 
     /// Updates focus states for all components and syncs with UI state
@@ -143,13 +153,13 @@ impl App {
 
         // Update component focus states
         self.focus_manager.update_focus_states(
-            &mut self.library_browser,
-            &mut self.track_list,
-            &mut self.track_details,
-            &mut self.current_track_info,
-            &mut self.playback_status,
-            &mut self.controls,
-            &mut self.volume_control,
+            &mut self.library_browser.borrow_mut(),
+            &mut self.track_list.borrow_mut(),
+            &mut self.track_details.borrow_mut(),
+            &mut self.current_track_info.borrow_mut(),
+            &mut self.playback_status.borrow_mut(),
+            &mut self.controls.borrow_mut(),
+            &mut self.volume_control.borrow_mut(),
         );
     }
 

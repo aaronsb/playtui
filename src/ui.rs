@@ -52,19 +52,19 @@ pub fn render(frame: &mut Frame, app: &App) {
     frame.render_widget(background, frame.size());
 
     // Render Primary Row components
-    app.library_browser.render(
+    app.library_browser.borrow().render(
         frame,
         primary_chunks[0],
         app.state.ui.focused_component == "library_browser",
         &app.theme
     );
-    app.track_list.render(
+    app.track_list.borrow().render(
         frame,
         primary_chunks[1],
         app.state.ui.focused_component == "track_list",
         &app.theme
     );
-    app.track_details.render(
+    app.track_details.borrow().render(
         frame,
         primary_chunks[2],
         app.state.ui.focused_component == "track_details",
@@ -72,13 +72,13 @@ pub fn render(frame: &mut Frame, app: &App) {
     );
 
     // Render Secondary Row components
-    app.current_track_info.render(
+    app.current_track_info.borrow().render(
         frame,
         secondary_chunks[0],
         app.state.ui.focused_component == "current_track_info",
         &app.theme
     );
-    app.playback_status.render(
+    app.playback_status.borrow().render(
         frame,
         secondary_chunks[1],
         app.state.ui.focused_component == "playback_status",
@@ -86,13 +86,13 @@ pub fn render(frame: &mut Frame, app: &App) {
     );
 
     // Render Control Row components
-    app.controls.render(
+    app.controls.borrow().render(
         frame,
         control_chunks[0],
         app.state.ui.focused_component == "controls",
         &app.theme
     );
-    app.volume_control.render(
+    app.volume_control.borrow().render(
         frame,
         control_chunks[1],
         app.state.ui.focused_component == "volume_control",

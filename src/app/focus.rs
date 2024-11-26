@@ -3,6 +3,8 @@ use crate::components::{
     CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
 };
 use crate::events::{Event, KeyEvent, FocusDirection, EventResult};
+use std::rc::Rc;
+use std::cell::RefCell;
 
 /// Manages focus state and navigation between components
 pub struct FocusManager {

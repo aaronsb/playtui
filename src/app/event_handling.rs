@@ -1,9 +1,11 @@
-use crate::events::{Event, Action, EventResult, EventError, SystemEvent, KeyEvent, UIAction, AppAction, FocusDirection};
+use crate::events::{Event, Action, EventResult, EventError, SystemEvent, KeyEvent, UIAction, AppAction, FocusDirection, NavigationEvent};
 use crate::components::{
     LibraryBrowser, TrackList, TrackDetails,
     CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
 };
 use super::components::ComponentManager;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 /// Manages event processing and dispatching
 pub struct EventManager {
@@ -38,18 +40,34 @@ impl EventManager {
     }
 
     /// Orient and Decide phases: Analyze event and determine appropriate action
-    fn orient_and_decide(&self, event: Event) -> EventResult<Action> {
+    pub fn orient_and_decide(&self, event: Event) -> EventResult<Action> {
         match event {
             Event::System(SystemEvent::Error(e)) => {
                 Err(EventError::DispatchError(format!("Error event received: {}", e)))
             },
             Event::Key(key_event) => {
                 match key_event {
+                    // Tab navigation between frames
                     KeyEvent::Tab => Ok(Action::UI(UIAction::Focus(FocusDirection::Next))),
                     KeyEvent::BackTab => Ok(Action::UI(UIAction::Focus(FocusDirection::Previous))),
                     KeyEvent::Focus(direction) => Ok(Action::UI(UIAction::Focus(direction))),
-                    KeyEvent::Esc => Ok(Action::App(AppAction::Quit)),
-                    _ => Ok(Action::App(AppAction::NoOp)),
+                    
+                    // Convert arrow keys to navigation events
+                    KeyEvent::Left => Ok(Action::NavigateLeft),
+                    KeyEvent::Right => Ok(Action::NavigateRight),
+                    KeyEvent::Up => Ok(Action::NavigateUp),
+                    KeyEvent::Down => Ok(Action::NavigateDown),
+                    
+                    // Pass through other key events directly
+                    _ => Ok(Action::Key(key_event)),
+                }
+            },
+            Event::Navigation(nav_event) => {
+                match nav_event {
+                    NavigationEvent::Left => Ok(Action::NavigateLeft),
+                    NavigationEvent::Right => Ok(Action::NavigateRight),
+                    NavigationEvent::Up => Ok(Action::NavigateUp),
+                    NavigationEvent::Down => Ok(Action::NavigateDown),
                 }
             },
             _ => Ok(Action::App(AppAction::NoOp)),
@@ -65,13 +83,13 @@ impl EventManager {
 
     /// Register components with the event manager
     pub fn register_components(&mut self,
-        library_browser: &LibraryBrowser,
-        track_list: &TrackList,
-        track_details: &TrackDetails,
-        current_track_info: &CurrentTrackInfo,
-        playback_status: &PlaybackStatus,
-        controls: &Controls,
-        volume_control: &VolumeControl,
+        library_browser: &Rc<RefCell<LibraryBrowser>>,
+        track_list: &Rc<RefCell<TrackList>>,
+        track_details: &Rc<RefCell<TrackDetails>>,
+        current_track_info: &Rc<RefCell<CurrentTrackInfo>>,
+        playback_status: &Rc<RefCell<PlaybackStatus>>,
+        controls: &Rc<RefCell<Controls>>,
+        volume_control: &Rc<RefCell<VolumeControl>>,
     ) {
         self.component_manager.register_components(
             library_browser,

@@ -64,7 +64,7 @@ impl Default for UIState {
     fn default() -> Self {
         Self {
             theme: "default".to_string(),
-            focused_component: "library_browser".to_string(), // Changed to match FocusManager's initial focus
+            focused_component: "library_browser".to_string(),
             window_size: (0, 0),
         }
     }
@@ -128,9 +128,17 @@ pub trait StateManager {
 impl StateManager for AppState {
     fn update(&mut self, action: Action) -> Option<Action> {
         match action {
+            // Pass through key events without state changes
+            Action::Key(_) => Some(Action::Refresh),
+            
             // Navigation actions
-            Action::NavigateUp | Action::NavigateDown | Action::Select | Action::Back => {
-                // These actions are handled by the LibraryBrowser component
+            Action::NavigateUp | 
+            Action::NavigateDown | 
+            Action::NavigateLeft |
+            Action::NavigateRight |
+            Action::Select | 
+            Action::Back => {
+                // These actions are handled by the focused component
                 Some(Action::Refresh)
             }
             Action::Refresh => None,
