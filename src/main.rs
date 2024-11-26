@@ -7,7 +7,8 @@ use crossterm::{
 use ratatui::prelude::*;
 use std::io;
 
-use playtui::{App, ui};
+use playtui::app::App;
+use playtui::ui;
 
 fn main() -> Result<()> {
     // Setup terminal
