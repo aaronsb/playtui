@@ -64,7 +64,7 @@ impl Default for UIState {
     fn default() -> Self {
         Self {
             theme: "default".to_string(),
-            focused_component: "playlist".to_string(),
+            focused_component: "library_browser".to_string(), // Changed to match FocusManager's initial focus
             window_size: (0, 0),
         }
     }

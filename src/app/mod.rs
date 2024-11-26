@@ -97,6 +97,9 @@ impl App {
             &app.volume_control,
         );
 
+        // Initialize focus states
+        app.update_focus_states();
+
         Ok(app)
     }
 
@@ -133,8 +136,12 @@ impl App {
         Ok(())
     }
 
-    /// Updates focus states for all components
+    /// Updates focus states for all components and syncs with UI state
     pub fn update_focus_states(&mut self) {
+        // Update the UI state to match FocusManager's current focus
+        self.state.ui.focused_component = self.focus_manager.current_focus().to_string();
+
+        // Update component focus states
         self.focus_manager.update_focus_states(
             &mut self.library_browser,
             &mut self.track_list,
