@@ -3,7 +3,7 @@ use ratatui::{
     widgets::{List, ListItem, ListState},
 };
 use super::{Component, ComponentState, create_block};
-use crate::events::{Event, Action, KeyEvent, NavigationEvent};
+use crate::events::{Event, Action, KeyEvent, NavigationEvent, EventHandler, EventResult};
 use crate::components::filesystem::{FSNavigator, FSAction};
 use crate::theme::Theme;
 use std::{path::PathBuf, cell::RefCell};
@@ -12,20 +12,95 @@ use std::{path::PathBuf, cell::RefCell};
 pub struct LibraryBrowser {
     state: ComponentState,
     fs_navigator: RefCell<FSNavigator>,
-    list_state: RefCell<ListState>,
+}
+
+impl LibraryBrowser {
+    // Helper method to process events
+    fn process_event(&mut self, event: &Event) -> Option<Action> {
+        if !self.focused() {
+            return None;
+        }
+
+        match event {
+            Event::Key(key_event) => match key_event {
+                KeyEvent::Up => {
+                    let mut navigator = self.fs_navigator.borrow_mut();
+                    let current_index = navigator.state().selected_index().unwrap_or(0);
+                    let new_index = if current_index > 0 { current_index - 1 } else { 0 };
+                    
+                    if let Err(e) = navigator.handle_action(FSAction::Select(new_index)) {
+                        eprintln!("Error navigating: {}", e);
+                    }
+                    Some(Action::Refresh)
+                },
+                KeyEvent::Down => {
+                    let mut navigator = self.fs_navigator.borrow_mut();
+                    let current_index = navigator.state().selected_index().unwrap_or(0);
+                    let max_index = navigator.state().entries().len().saturating_sub(1);
+                    let new_index = if current_index < max_index { current_index + 1 } else { max_index };
+                    
+                    if let Err(e) = navigator.handle_action(FSAction::Select(new_index)) {
+                        eprintln!("Error navigating: {}", e);
+                    }
+                    Some(Action::Refresh)
+                },
+                KeyEvent::Right | KeyEvent::Enter => {
+                    if let Err(e) = self.fs_navigator.borrow_mut().handle_action(FSAction::NavigateToSelected) {
+                        eprintln!("Error selecting entry: {}", e);
+                    }
+                    Some(Action::Refresh)
+                },
+                KeyEvent::Left | KeyEvent::Escape => {
+                    if let Err(e) = self.fs_navigator.borrow_mut().handle_action(FSAction::NavigateToParent) {
+                        eprintln!("Error navigating to parent: {}", e);
+                    }
+                    Some(Action::Refresh)
+                },
+                _ => None,
+            },
+            Event::Navigation(nav_event) => match nav_event {
+                NavigationEvent::Up => Some(Action::NavigateUp),
+                NavigationEvent::Down => Some(Action::NavigateDown),
+                NavigationEvent::Right => Some(Action::NavigateRight),
+                NavigationEvent::Left => Some(Action::NavigateLeft),
+            },
+            _ => None,
+        }
+    }
+}
+
+impl EventHandler for LibraryBrowser {
+    fn can_handle(&self, event: &Event) -> bool {
+        match event {
+            Event::Key(KeyEvent::Tab) |
+            Event::Key(KeyEvent::Quit) => true,
+            
+            Event::Key(KeyEvent::Enter) |
+            Event::Key(KeyEvent::Left) |
+            Event::Key(KeyEvent::Right) |
+            Event::Key(KeyEvent::Up) |
+            Event::Key(KeyEvent::Down) |
+            Event::Navigation(_) => self.focused(),
+            
+            _ => false
+        }
+    }
+
+    fn handle_event(&mut self, event: &Event) -> EventResult<Option<Action>> {
+        if !self.can_handle(event) {
+            return Ok(None);
+        }
+        Ok(self.process_event(event))
+    }
 }
 
 impl Component for LibraryBrowser {
     fn new() -> Self {
         // Start in the current directory
         let fs_navigator = FSNavigator::new(PathBuf::from("."));
-        let mut list_state = ListState::default();
-        list_state.select(Some(0)); // Initialize with first item selected
-        
         let browser = Self {
             state: ComponentState::default(),
             fs_navigator: RefCell::new(fs_navigator),
-            list_state: RefCell::new(list_state),
         };
         
         // Initial directory scan
@@ -45,75 +120,74 @@ impl Component for LibraryBrowser {
         let selected = navigator.state().selected_index();
         drop(navigator);
         
-        // Create list items
+        // Create list items with proper styling
         let items: Vec<ListItem> = entries
             .iter()
-            .map(|entry| {
+            .enumerate()
+            .map(|(index, entry)| {
                 let prefix = if entry.is_dir() { "📁 " } else { "📄 " };
-                ListItem::new(format!("{}{}", prefix, entry.name()))
-                    .style(if focused {
+                let style = if Some(index) == selected {
+                    if focused {
+                        Style::default()
+                            .fg(Color::Black)
+                            .bg(Color::Yellow)
+                            .add_modifier(Modifier::BOLD)
+                    } else {
+                        Style::default()
+                            .fg(Color::Black)
+                            .bg(Color::DarkGray)
+                    }
+                } else {
+                    if focused {
                         theme.get_style("list_item")
                     } else {
-                        theme.get_style("list_item_unfocused")
-                    })
+                        Style::default().fg(Color::DarkGray)
+                    }
+                };
+                
+                ListItem::new(format!("{}{}", prefix, entry.name()))
+                    .style(style)
             })
             .collect();
 
-        // Update list state
-        let mut list_state = self.list_state.borrow_mut();
-        list_state.select(selected);
-
+        // Create list widget with explicit highlight style
         let list = List::new(items)
             .block(block)
             .highlight_style(
                 if focused {
-                    theme.get_style("list_selected")
+                    Style::default()
+                        .bg(Color::Yellow)
+                        .fg(Color::Black)
                         .add_modifier(Modifier::BOLD)
                 } else {
-                    theme.get_style("list_selected_unfocused")
+                    Style::default()
+                        .bg(Color::DarkGray)
+                        .fg(Color::Black)
                 }
-            )
-            .highlight_symbol("▶ "); // More visible cursor
+            );
 
+        // Create and render list state
+        let mut list_state = ListState::default();
+        list_state.select(selected);
         frame.render_stateful_widget(list, area, &mut list_state);
     }
 
     fn update(&mut self, action: Action) -> Option<Action> {
         match action {
-            Action::NavigateUp => {
-                // Get all the data we need in one borrow
-                let mut navigator = self.fs_navigator.borrow_mut();
-                let current_index = navigator.state().selected_index().unwrap_or(0);
-                let new_index = if current_index > 0 { current_index - 1 } else { 0 };
-                
-                if let Err(e) = navigator.handle_action(FSAction::Select(new_index)) {
-                    eprintln!("Error navigating: {}", e);
-                }
+            Action::NavigateUp | Action::NavigateDown | 
+            Action::NavigateRight | Action::NavigateLeft |
+            Action::Select | Action::Back => {
+                // Let process_event handle these actions directly
+                self.process_event(&Event::Key(match action {
+                    Action::NavigateUp => KeyEvent::Up,
+                    Action::NavigateDown => KeyEvent::Down,
+                    Action::NavigateRight | Action::Select => KeyEvent::Enter,
+                    Action::NavigateLeft | Action::Back => KeyEvent::Left,
+                    _ => unreachable!(),
+                }))
             }
-            Action::NavigateDown => {
-                // Get all the data we need in one borrow
-                let mut navigator = self.fs_navigator.borrow_mut();
-                let current_index = navigator.state().selected_index().unwrap_or(0);
-                let max_index = navigator.state().entries().len().saturating_sub(1);
-                let new_index = if current_index < max_index { current_index + 1 } else { max_index };
-                
-                if let Err(e) = navigator.handle_action(FSAction::Select(new_index)) {
-                    eprintln!("Error navigating: {}", e);
-                }
-            }
-            Action::NavigateRight | Action::Select => {
-                if let Err(e) = self.fs_navigator.borrow_mut().handle_action(FSAction::NavigateToSelected) {
-                    eprintln!("Error selecting entry: {}", e);
-                }
-            }
-            Action::NavigateLeft | Action::Back => {
-                if let Err(e) = self.fs_navigator.borrow_mut().handle_action(FSAction::NavigateToParent) {
-                    eprintln!("Error navigating to parent: {}", e);
-                }
-            }
-            _ => return None,
+            _ => None,
         }
-        Some(Action::Refresh)
     }
 
     fn focused(&self) -> bool {
@@ -125,21 +199,6 @@ impl Component for LibraryBrowser {
     }
 
     fn handle_event(&mut self, event: Event) -> Option<Action> {
-        match event {
-            Event::Key(key_event) if self.focused() => match key_event {
-                KeyEvent::Up => Some(Action::NavigateUp),
-                KeyEvent::Down => Some(Action::NavigateDown),
-                KeyEvent::Right | KeyEvent::Enter => Some(Action::Select),
-                KeyEvent::Left | KeyEvent::Escape => Some(Action::Back),
-                _ => None,
-            },
-            Event::Navigation(nav_event) => match nav_event {
-                NavigationEvent::Up => Some(Action::NavigateUp),
-                NavigationEvent::Down => Some(Action::NavigateDown),
-                NavigationEvent::Right => Some(Action::NavigateRight),
-                NavigationEvent::Left => Some(Action::NavigateLeft),
-            },
-            _ => None,
-        }
+        self.process_event(&event)
     }
 }

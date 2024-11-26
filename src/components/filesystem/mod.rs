@@ -45,7 +45,7 @@ impl Default for FSState {
         Self {
             current_dir: PathBuf::from("."),
             entries: Vec::new(),
-            selected_index: None,
+            selected_index: Some(0),  // Initialize with first item selected
         }
     }
 }
@@ -55,7 +55,7 @@ impl FSState {
         Self {
             current_dir: path,
             entries: Vec::new(),
-            selected_index: None,
+            selected_index: Some(0),  // Initialize with first item selected
         }
     }
 
@@ -73,15 +73,28 @@ impl FSState {
 
     pub fn set_entries(&mut self, entries: Vec<FSEntry>) {
         self.entries = entries;
+        // Only set initial selection if there isn't one already
+        if self.selected_index.is_none() {
+            self.selected_index = if self.entries.is_empty() { None } else { Some(0) };
+        }
+        // Ensure selection is still valid after changing entries
+        if let Some(index) = self.selected_index {
+            if index >= self.entries.len() {
+                self.selected_index = if self.entries.is_empty() { None } else { Some(0) };
+            }
+        }
     }
 
     pub fn set_selected_index(&mut self, index: Option<usize>) {
-        self.selected_index = index;
+        // Ensure the index is valid
+        self.selected_index = index.filter(|&i| i < self.entries.len());
     }
 
     pub fn navigate_to(&mut self, path: PathBuf) {
         self.current_dir = path;
-        self.selected_index = None;
+        // Reset selection when changing directories
+        self.selected_index = Some(0);
+        self.entries.clear();
     }
 }
 
