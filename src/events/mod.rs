@@ -83,6 +83,13 @@ pub enum FocusDirection {
 
 #[derive(Debug, Clone)]
 pub enum Action {
+    // Navigation actions
+    NavigateUp,
+    NavigateDown,
+    Select,
+    Back,
+    Refresh,
+    
     // Playback control actions
     Play,
     Pause,

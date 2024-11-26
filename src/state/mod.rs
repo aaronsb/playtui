@@ -75,11 +75,27 @@ impl Default for MetadataState {
 }
 
 #[derive(Debug, Clone)]
+pub struct NavigationState {
+    pub current_path: Option<String>,
+    pub selected_item: Option<String>,
+}
+
+impl Default for NavigationState {
+    fn default() -> Self {
+        Self {
+            current_path: None,
+            selected_item: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct AppState {
     pub player: PlayerState,
     pub playlist: PlaylistState,
     pub ui: UIState,
     pub metadata: MetadataState,
+    pub navigation: NavigationState,
 }
 
 impl Default for AppState {
@@ -89,6 +105,7 @@ impl Default for AppState {
             playlist: PlaylistState::default(),
             ui: UIState::default(),
             metadata: MetadataState::default(),
+            navigation: NavigationState::default(),
         }
     }
 }
@@ -100,6 +117,13 @@ pub trait StateManager {
 impl StateManager for AppState {
     fn update(&mut self, action: Action) -> Option<Action> {
         match action {
+            // Navigation actions
+            Action::NavigateUp | Action::NavigateDown | Action::Select | Action::Back => {
+                // These actions are handled by the LibraryBrowser component
+                Some(Action::Refresh)
+            }
+            Action::Refresh => None,
+
             // Direct playback control actions
             Action::Play => {
                 self.player.playback_state = PlaybackState::Playing;

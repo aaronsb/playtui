@@ -27,9 +27,9 @@
 ### PlaylistComponent
 - [x] Create basic playlist view
 - [x] Implement track selection interface
-- [ ] Directory scanning system
+- [x] Directory scanning system
 - [ ] Music library management
-- [ ] Playlist navigation
+- [x] Playlist navigation
 - [ ] Search capabilities
 - [ ] Advanced sorting options
 - Playlist persistence:

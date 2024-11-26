@@ -13,6 +13,9 @@ mod play_pause;
 mod next_track;
 mod volume_control;
 
+// Filesystem Module
+pub mod filesystem;
+
 // Re-export all components
 pub use self::library_browser::LibraryBrowser;
 pub use self::track_list::TrackList;
