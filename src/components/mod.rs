@@ -8,7 +8,7 @@ mod current_track_info;
 mod playback_status;
 
 // Control Row Components
-mod controls;
+pub mod controls;  // Changed to pub mod since we're using submodules
 mod volume_control;
 
 // Filesystem Module
@@ -20,7 +20,7 @@ pub use self::track_list::TrackList;
 pub use self::track_details::TrackDetails;
 pub use self::current_track_info::CurrentTrackInfo;
 pub use self::playback_status::PlaybackStatus;
-pub use self::controls::Controls;
+pub use self::controls::Controls;  // This will now re-export from controls/mod.rs
 pub use self::volume_control::VolumeControl;
 
 use ratatui::{

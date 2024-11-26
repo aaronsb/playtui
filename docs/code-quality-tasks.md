@@ -5,11 +5,11 @@
 ## High Priority
 
 ### Module Organization
-- [ ] Split controls.rs into smaller modules:
-  - [ ] Create controls/mod.rs for core traits and exports
-  - [ ] Create controls/layout.rs for rendering logic
-  - [ ] Create controls/events.rs for event handling
-  - [ ] Create controls/actions.rs for action handling
+- [x] Split controls.rs into smaller modules:
+  - [x] Create controls/mod.rs for core traits and exports
+  - [x] Create controls/layout.rs for rendering logic
+  - [x] Create controls/events.rs for event handling
+  - [x] Create controls/actions.rs for action handling
 - [ ] Review and potentially split other modules exceeding 150 lines
 
 ### Core Audio Implementation
