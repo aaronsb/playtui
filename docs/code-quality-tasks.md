@@ -56,26 +56,73 @@
   - [x] Create app/components/relationships.rs for component relationships
 
 ### Module Organization Guidelines
-1. File Size Threshold:
-   - Regular review of files exceeding 150 lines
-   - Split files when they exceed 200 lines
-   - Consider splitting earlier if complexity warrants it
+1. File Size Assessment:
+   - Base splitting decisions on complexity and cohesion, not just line count
+   - The 150-line threshold is a guideline, not a strict rule
+   - Files may exceed 150 lines if they maintain:
+     * Single, focused purpose
+     * Clear internal organization
+     * Strong component cohesion
+     * Manageable complexity
+   - Immediate review required when files exceed 300 lines
 
-2. Module Structure:
-   - Core functionality in mod.rs
-   - Separate view logic from state management
-   - Isolate event handling
-   - Group related functionality
+2. When to Split Modules:
+   - Primary Indicators (any of these suggest splitting):
+     * Multiple distinct responsibilities
+     * Complex state management across different concerns
+     * Multiple independent feature sets
+     * Test file size exceeding implementation size
+   - Secondary Indicators (consider in combination):
+     * File size over 150 lines
+     * Multiple levels of nested logic
+     * Complex event handling paths
+     * Extensive configuration options
 
-3. Testing Organization:
-   - Test files should mirror main code structure
-   - Separate integration tests from unit tests
-   - Group related test cases logically
+3. When to Keep Modules Together:
+   - Keep together when:
+     * Logic is tightly coupled
+     * Splitting would increase complexity
+     * Implementation and tests are closely related
+     * Component has a single, well-defined purpose
+   - Examples from current codebase:
+     * track_list.rs: Exceeds line count but maintains focused purpose
+     * library_browser.rs: Complex but cohesive file system navigation
+     * volume_control/mod.rs: Slightly over limit but logically cohesive
 
-4. Monitoring:
+4. Testing Organization:
+   - Test Location Patterns:
+     * Same-file tests: Use #[cfg(test)] for simple, focused tests
+     * Parallel test file: module.rs → module_tests.rs
+     * Test directory: module/tests/{unit,integration}_tests.rs
+     * Integration tests: tests/integration/{feature}_tests.rs
+
+   - Test Naming and Structure:
+     * Clear relationship to tested module:
+       - Direct: user.rs → user_tests.rs
+       - Categorized: user_unit_tests.rs, user_integration_tests.rs
+     * Group related tests in nested modules
+     * Use descriptive test function names
+     * Document test categories and setups
+
+   - When to Keep Tests in Module:
+     * Tests are simple and focused
+     * Test setup is minimal
+     * Tests directly verify basic behavior
+     * Total test code is less than implementation
+
+   - When to Split Tests:
+     * Test code exceeds implementation code
+     * Complex test setup required
+     * Multiple test categories exist
+     * Integration tests spanning components
+     * Performance or specialized testing needed
+
+5. Monitoring and Maintenance:
    - Regular line count checks using: find src -type f -name "*.rs" -exec wc -l {} \;
    - Review during code reviews
-   - Track module growth over time
+   - Document reasons for keeping larger files
+   - Track module growth patterns
+   - Consider splitting when complexity increases
 
 ## Medium Priority
 
