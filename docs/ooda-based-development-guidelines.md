@@ -196,6 +196,17 @@ impl Component for OODAComponent {
    - Each OODA phase should be independently testable
    - Clear state transitions
 
+4. Don't Repeat Yourself (DRY)
+   - Extract common functionality into shared utilities
+   - Create reusable components and traits
+   - Maintain consistent patterns across similar features
+   - Example: Using a shared block creation function for UI components
+   - Benefits:
+     * Reduces maintenance burden
+     * Ensures consistency
+     * Makes updates easier
+     * Reduces potential for bugs
+
 ### Development Workflow
 1. Component Planning
    - Define component responsibilities
@@ -304,3 +315,4 @@ impl ComponentMonitor {
 ## Conclusion
 
 This guide provides a framework for implementing OODA loop development processes within a component architecture. By following these guidelines, developers can create more responsive, maintainable, and efficient TUI applications. Regular review and adjustment of these practices ensure continuous improvement and adaptation to changing requirements.
+

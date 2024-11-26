@@ -23,11 +23,11 @@
     - [x] Create metadata/formats/vorbis/tag_extractor.rs for tag handling
     - [x] Create metadata/formats/vorbis/audio_properties.rs for audio analysis
     - [x] Create metadata/formats/vorbis/tests.rs for tests
-  - [ ] Split components/playlist.rs (200 lines):
-    - [ ] Create components/playlist/mod.rs for core functionality
-    - [ ] Create components/playlist/event_handler.rs for event handling
-    - [ ] Create components/playlist/selection.rs for track selection
-    - [ ] Create components/playlist/renderer.rs for UI rendering
+  - [x] Split components/playlist.rs (200 lines):
+    - [x] Create components/playlist/mod.rs for core functionality
+    - [x] Create components/playlist/event_handler.rs for event handling
+    - [x] Create components/playlist/selection.rs for track selection
+    - [x] Create components/playlist/renderer.rs for UI rendering
   - [ ] Split theme.rs (191 lines):
     - [ ] Create theme/mod.rs for core functionality
     - [ ] Create theme/types.rs for data structures
@@ -121,3 +121,4 @@
 - Regular reassessment of this list is recommended
 - New tasks should be added as they are identified
 - This list complements the main [tasks.md](tasks.md) which focuses on feature implementation
+

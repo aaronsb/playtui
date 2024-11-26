@@ -1,62 +1,55 @@
-// Primary Row Components
-mod library_browser;
-mod track_list;
-mod track_details;
-
-// Secondary Row Components
-mod current_track_info;
-mod playback_status;
-
-// Control Row Components
-pub mod controls;  // Changed to pub mod since we're using submodules
-mod volume_control;
-
-// Filesystem Module
-pub mod filesystem;
-
-// Re-export all components
-pub use self::library_browser::LibraryBrowser;
-pub use self::track_list::TrackList;
-pub use self::track_details::TrackDetails;
-pub use self::current_track_info::CurrentTrackInfo;
-pub use self::playback_status::PlaybackStatus;
-pub use self::controls::Controls;  // This will now re-export from controls/mod.rs
-pub use self::volume_control::VolumeControl;
-
 use ratatui::{
     prelude::*,
     widgets::{Block, Borders, BorderType},
 };
+use crate::events::{Event, Action};
+use crate::theme::Theme;
 
-// Re-export everything needed by components
-pub use crate::events::{Event, Action, KeyEvent};
-pub use crate::theme::Theme;
+mod current_track_info;
+mod library_browser;
+mod now_playing;
+mod playback_status;
+mod playlist;
+mod track_details;
+mod track_list;
+mod volume_control;
+mod controls;
+mod filesystem;
 
-#[derive(Clone, Default)]
+pub use current_track_info::*;
+pub use library_browser::*;
+pub use now_playing::*;
+pub use playback_status::*;
+pub use playlist::*;
+pub use track_details::*;
+pub use track_list::*;
+pub use volume_control::*;
+pub use controls::*;
+pub use filesystem::*;
+
+#[derive(Default, Clone)]
 pub struct ComponentState {
     pub focused: bool,
 }
 
-pub trait Component: Clone + Send + 'static {
+pub trait Component {
     fn new() -> Self where Self: Sized;
     fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme);
     fn update(&mut self, action: Action) -> Option<Action>;
+    fn handle_event(&mut self, event: Event) -> Option<Action>;
     fn focused(&self) -> bool;
     fn set_focused(&mut self, focused: bool);
-    fn handle_event(&mut self, event: Event) -> Option<Action>;
 }
 
-// Helper function to create a styled block based on focus state and theme
-pub fn create_block<'a>(title: &'a str, focused: bool, theme: &Theme) -> Block<'a> {
+// The block is created with references that live as long as the input references
+pub fn create_block<'a>(title: &'a str, focused: bool, theme: &'a Theme) -> Block<'a> {
     Block::default()
         .title(title)
         .borders(Borders::ALL)
         .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
-        .border_style(
-            if focused {
-                theme.get_style("border_focused")
-            } else {
-                theme.get_style("border_unfocused")
-            }
-        )
+        .border_style(if focused {
+            theme.get_style("border_focused")
+        } else {
+            theme.get_style("border_unfocused")
+        })
 }
