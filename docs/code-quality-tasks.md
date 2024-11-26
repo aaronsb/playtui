@@ -13,17 +13,17 @@
   - [✓] Decided to keep rendering logic in ui.rs (see dev-11.md)
   - [x] Create app/lifecycle.rs for application lifecycle management
 
+- [x] Split components/track_list.rs (298 lines):
+  - [x] Create components/track_list/mod.rs for core functionality
+  - [x] Create components/track_list/view.rs for view logic
+  - [x] Create components/track_list/state.rs for state management
+  - [x] Create components/track_list/actions.rs for action handling
+
 - [ ] Split components/library_browser.rs (251 lines):
   - [ ] Create components/library_browser/mod.rs for core functionality
   - [ ] Create components/library_browser/view.rs for view logic
   - [ ] Create components/library_browser/state.rs for state management
   - [ ] Create components/library_browser/actions.rs for action handling
-
-- [ ] Split components/track_list.rs (298 lines):
-  - [ ] Create components/track_list/mod.rs for core functionality
-  - [ ] Create components/track_list/view.rs for view logic
-  - [ ] Create components/track_list/state.rs for state management
-  - [ ] Create components/track_list/actions.rs for action handling
 
 - [ ] Split components/tests.rs (237 lines):
   - [ ] Create components/tests/mod.rs for test organization
