@@ -10,35 +10,47 @@ pub enum Event {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum KeyEvent {
-    Char(char),
-    Enter,
-    Space,
-    Left,
-    Right,
-    Up,
-    Down,
+    // Global Navigation Events (always available)
     Tab,
     BackTab,
-    Esc,
-    Backspace,
-    Delete,
+    
+    // Global Hotkeys (available regardless of focus)
+    Quit,         // 'q'
+    Escape,       // ESC key
+    Space,        // Global pause/play
+    
+    // Frame-Specific Events (require focus)
+    Enter,        // Activate selected item in focused frame
+    Left,         // Navigate within focused frame
+    Right,        // Navigate within focused frame
+    Up,          // Navigate within focused frame
+    Down,        // Navigate within focused frame
+    
+    // Other Navigation
     Home,
     End,
     PageUp,
     PageDown,
+    
+    // Direct Input
+    Char(char),
+    Backspace,
+    Delete,
+    
+    // Focus Management
     Focus(FocusDirection),
-    // Playback controls
-    Play,
-    Pause,
-    Stop,
-    Next,
-    Previous,
-    VolumeUp,
-    VolumeDown,
-    // New control events
-    Record,
-    FastForward,
-    Rewind,
+    
+    // Global Playback Controls
+    Play,         // Direct play control
+    Pause,        // Direct pause control
+    Stop,         // Direct stop control
+    Next,         // Direct next track
+    Previous,     // Direct previous track
+    VolumeUp,     // Direct volume up
+    VolumeDown,   // Direct volume down
+    Record,       // Direct record control
+    FastForward,  // Direct fast forward
+    Rewind,       // Direct rewind
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -54,6 +66,7 @@ impl From<KeyCode> for KeyEvent {
         match code {
             KeyCode::Char(c) => match c {
                 ' ' => KeyEvent::Space,
+                'q' | 'Q' => KeyEvent::Quit,
                 'p' | 'P' => KeyEvent::Play,
                 's' | 'S' => KeyEvent::Stop,
                 'n' | 'N' => KeyEvent::Next,
@@ -73,7 +86,7 @@ impl From<KeyCode> for KeyEvent {
             KeyCode::Down => KeyEvent::Down,
             KeyCode::Tab => KeyEvent::Tab,
             KeyCode::BackTab => KeyEvent::BackTab,
-            KeyCode::Esc => KeyEvent::Esc,
+            KeyCode::Esc => KeyEvent::Escape,
             KeyCode::Backspace => KeyEvent::Backspace,
             KeyCode::Delete => KeyEvent::Delete,
             KeyCode::Home => KeyEvent::Home,

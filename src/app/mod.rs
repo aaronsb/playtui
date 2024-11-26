@@ -113,46 +113,91 @@ impl App {
 
     /// Handles incoming events
     pub fn handle_event(&mut self, event: Event) -> EventResult<()> {
-        // Log the event, ignoring any logging errors to not disrupt the app
+        // Log the incoming event and current state
+        let _ = self.logger.log_debug("=== Event Processing Start ===");
         let _ = self.logger.log_event(&event);
+        let _ = self.logger.log_debug(&format!("Current focus: {}", self.focus_manager.current_focus()));
 
-        // Handle focus-specific events first
         match &event {
+            // Global Navigation Events - Always process
             Event::Key(KeyEvent::Tab) => {
+                let _ = self.logger.log_debug("Processing Tab event for global navigation");
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(FocusDirection::Next)))?;
                 self.update_focus_states();
-                return Ok(());
+                let _ = self.logger.log_debug(&format!("New focus after Tab: {}", self.focus_manager.current_focus()));
             },
             Event::Key(KeyEvent::BackTab) => {
+                let _ = self.logger.log_debug("Processing BackTab event for global navigation");
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(FocusDirection::Previous)))?;
                 self.update_focus_states();
-                return Ok(());
+                let _ = self.logger.log_debug(&format!("New focus after BackTab: {}", self.focus_manager.current_focus()));
             },
             Event::Key(KeyEvent::Focus(direction)) => {
+                let _ = self.logger.log_debug(&format!("Processing Focus event: {:?}", direction));
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(*direction)))?;
                 self.update_focus_states();
-                return Ok(());
+                let _ = self.logger.log_debug(&format!("New focus after Focus event: {}", self.focus_manager.current_focus()));
             },
-            // For navigation events, only process through component manager
-            Event::Key(KeyEvent::Left | KeyEvent::Right | KeyEvent::Up | KeyEvent::Down) => {
-                if let Ok(action) = self.event_manager.orient_and_decide(event) {
-                    self.component_manager.update_components(action);
+
+            // Frame-Specific Events - Only process if component is focused
+            Event::Key(KeyEvent::Left | KeyEvent::Right | KeyEvent::Up | KeyEvent::Down | KeyEvent::Enter) => {
+                let focused_component = self.focus_manager.current_focus();
+                let _ = self.logger.log_debug(&format!("Processing frame-specific event for {}: {:?}", focused_component, event));
+                
+                if self.focus_manager.should_process_event(&event, focused_component) {
+                    let _ = self.logger.log_debug("Component should process event");
+                    if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                        let _ = self.logger.log_debug(&format!("Generated action: {:?}", action));
+                        self.component_manager.update_components(action);
+                    } else {
+                        let _ = self.logger.log_debug("Failed to generate action from event");
+                    }
+                } else {
+                    let _ = self.logger.log_debug("Event ignored - component not focused");
                 }
-                return Ok(());
             },
-            _ => {}
+
+            // Global Hotkeys - Always process
+            Event::Key(KeyEvent::Space | KeyEvent::Quit | KeyEvent::Escape |
+                      KeyEvent::Play | KeyEvent::Pause | KeyEvent::Stop |
+                      KeyEvent::Next | KeyEvent::Previous |
+                      KeyEvent::VolumeUp | KeyEvent::VolumeDown) => {
+                let _ = self.logger.log_debug("Processing global hotkey");
+                if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                    let _ = self.logger.log_debug(&format!("Generated action from hotkey: {:?}", action));
+                    self.component_manager.update_components(action);
+                } else {
+                    let _ = self.logger.log_debug("Failed to generate action from hotkey");
+                }
+            },
+
+            // System Events - Always process
+            Event::System(_) => {
+                let _ = self.logger.log_debug("Processing system event");
+                if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                    let _ = self.logger.log_debug(&format!("Generated action from system event: {:?}", action));
+                    self.component_manager.update_components(action);
+                } else {
+                    let _ = self.logger.log_debug("Failed to generate action from system event");
+                }
+            },
+
+            // Other Events - Process through focus manager first
+            _ => {
+                let _ = self.logger.log_debug("Processing other event type");
+                self.focus_manager.handle_event(&event)?;
+                self.update_focus_states();
+
+                if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                    let _ = self.logger.log_debug(&format!("Generated action from other event: {:?}", action));
+                    self.component_manager.update_components(action);
+                } else {
+                    let _ = self.logger.log_debug("Failed to generate action from other event");
+                }
+            },
         }
 
-        // For all other events, process through both managers
-        if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
-            // Let focus manager handle the event first
-            self.focus_manager.handle_event(&event)?;
-            self.update_focus_states();
-
-            // Then process through component manager
-            self.component_manager.update_components(action);
-        }
-        
+        let _ = self.logger.log_debug("=== Event Processing End ===");
         Ok(())
     }
 
@@ -186,9 +231,35 @@ impl App {
 
 #[cfg(test)]
 mod tests {
-    // TODO: Add integration tests
-    // - Test component initialization
-    // - Test event flow
-    // - Test focus management
-    // - Test theme loading
+    use super::*;
+
+    #[test]
+    fn test_global_navigation_events() {
+        let mut app = App::new().unwrap();
+        let initial_focus = app.focus_manager.current_focus().to_string();
+        
+        // Tab should always change focus
+        app.handle_event(Event::Key(KeyEvent::Tab)).unwrap();
+        assert_ne!(app.focus_manager.current_focus(), initial_focus);
+    }
+
+    #[test]
+    fn test_frame_specific_events() {
+        let mut app = App::new().unwrap();
+        let focused_component = app.focus_manager.current_focus().to_string();
+        
+        // Arrow keys should only work on focused component
+        app.handle_event(Event::Key(KeyEvent::Left)).unwrap();
+        assert_eq!(app.focus_manager.current_focus(), focused_component);
+    }
+
+    #[test]
+    fn test_global_hotkeys() {
+        let mut app = App::new().unwrap();
+        let initial_focus = app.focus_manager.current_focus().to_string();
+        
+        // Space should work regardless of focus
+        app.handle_event(Event::Key(KeyEvent::Space)).unwrap();
+        assert_eq!(app.focus_manager.current_focus(), initial_focus);
+    }
 }

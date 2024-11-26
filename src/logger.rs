@@ -43,4 +43,17 @@ impl Logger {
         
         Ok(())
     }
+
+    pub fn log_debug(&mut self, message: &str) -> std::io::Result<()> {
+        let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        
+        let log_entry = format!("[{}] Debug: {}\n", timestamp, message);
+        self.file.write_all(log_entry.as_bytes())?;
+        self.file.flush()?;
+        
+        Ok(())
+    }
 }
