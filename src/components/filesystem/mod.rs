@@ -52,8 +52,10 @@ impl Default for FSState {
 
 impl FSState {
     pub fn new(path: PathBuf) -> Self {
+        // Attempt to canonicalize the path, fall back to original if it fails
+        let current_dir = path.canonicalize().unwrap_or_else(|_| path.clone());
         Self {
-            current_dir: path,
+            current_dir,
             entries: Vec::new(),
             selected_index: Some(0),  // Initialize with first item selected
         }
@@ -91,7 +93,8 @@ impl FSState {
     }
 
     pub fn navigate_to(&mut self, path: PathBuf) {
-        self.current_dir = path;
+        // Attempt to canonicalize the path, fall back to original if it fails
+        self.current_dir = path.canonicalize().unwrap_or(path);
         // Reset selection when changing directories
         self.selected_index = Some(0);
         self.entries.clear();
