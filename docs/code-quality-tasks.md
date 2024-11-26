@@ -7,11 +7,11 @@
 ## High Priority
 
 ### Module Organization
-- [ ] Split app/mod.rs (300 lines):
-  - [ ] Create app/state.rs for application state management
-  - [ ] Create app/initialization.rs for startup logic
-  - [ ] Create app/rendering.rs for main render loop
-  - [ ] Create app/lifecycle.rs for application lifecycle management
+- [x] Split app/mod.rs (300 lines):
+  - [x] Create app/state.rs for application state management
+  - [x] Create app/initialization.rs for startup logic
+  - [✓] Decided to keep rendering logic in ui.rs (see dev-11.md)
+  - [x] Create app/lifecycle.rs for application lifecycle management
 
 - [ ] Split components/library_browser.rs (251 lines):
   - [ ] Create components/library_browser/mod.rs for core functionality
@@ -49,11 +49,11 @@
   - [ ] Create app/focus/navigation.rs for focus navigation logic
   - [ ] Create app/focus/events.rs for focus-related events
 
-- [ ] Split app/components.rs (200 lines):
-  - [ ] Create app/components/mod.rs for component management core
-  - [ ] Create app/components/registry.rs for component registration
-  - [ ] Create app/components/lifecycle.rs for component lifecycle
-  - [ ] Create app/components/relationships.rs for component relationships
+- [x] Split app/components.rs (200 lines):
+  - [x] Create app/components/mod.rs for component management core
+  - [x] Create app/components/registry.rs for component registration
+  - [x] Create app/components/lifecycle.rs for component lifecycle
+  - [x] Create app/components/relationships.rs for component relationships
 
 ### Module Organization Guidelines
 1. File Size Threshold:
@@ -120,7 +120,7 @@
 - [ ] Performance benchmark tracking
 
 ### Documentation Updates
-- [ ] Keep development journal entries current
+- [x] Keep development journal entries current
 - [ ] Update architecture documentation as needed
 - [ ] Maintain clear task progression records
 - [ ] Document any deviations from guidelines

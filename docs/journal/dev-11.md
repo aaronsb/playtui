@@ -1,64 +1,47 @@
-# Dev Journal Entry 11: Fixed Library Browser Selection Movement
+# Development Journal Entry 11
 
-## Issue
-The library browser's selection highlight was not moving when using arrow keys for navigation. While events were being processed correctly, the visual state wasn't updating to reflect the selection changes.
+## Module Organization Progress
 
-## Analysis
-Investigation revealed two key issues:
-1. In FSState::set_entries, the selection was being reset to 0 on every refresh
-2. The event handling chain was properly updating the state but the visual feedback wasn't reflecting these changes
+### Completed Tasks
+1. Split app/components.rs into modular structure:
+   - app/components/mod.rs - Core component management
+   - app/components/registry.rs - Component registration
+   - app/components/lifecycle.rs - Component lifecycle
+   - app/components/relationships.rs - Component relationships
 
-Event logs showed proper event processing:
-```
-Event: Key(Down)
-Debug: Current focus: library_browser
-Debug: Processing frame-specific event for library_browser: Key(Down)
-Debug: Component should process event
-Debug: Generated action: Key(Down)
-Debug: Component generated follow-up action: NavigateDown
-```
+2. Split app/mod.rs into focused modules:
+   - app/state.rs - Application state management
+   - app/initialization.rs - Startup logic
+   - app/lifecycle.rs - Application lifecycle management
 
-## Fix
-Modified src/components/filesystem/mod.rs to:
-1. Preserve selection state when updating entries:
-```rust
-pub fn set_entries(&mut self, entries: Vec<FSEntry>) {
-    self.entries = entries;
-    // Only set initial selection if there isn't one already
-    if self.selected_index.is_none() {
-        self.selected_index = if self.entries.is_empty() { None } else { Some(0) };
-    }
-    // Ensure selection is still valid after changing entries
-    if let Some(index) = self.selected_index {
-        if index >= self.entries.len() {
-            self.selected_index = if self.entries.is_empty() { None } else { Some(0) };
-        }
-    }
-}
-```
+### Design Decisions
+1. Rendering Logic Location
+   - Decision: Keep rendering logic in ui.rs instead of creating app/rendering.rs
+   - Rationale:
+     * Current ui.rs is well-organized and focused
+     * Clear separation between UI presentation (ui.rs) and application logic (app/)
+     * Follows single responsibility principle
+     * Current implementation doesn't exceed line length limits
+     * Moving to app/rendering.rs would blur the boundary between UI and app logic
 
-2. Reset selection only when explicitly navigating to a new directory:
-```rust
-pub fn navigate_to(&mut self, path: PathBuf) {
-    self.current_dir = path;
-    // Reset selection when changing directories
-    self.selected_index = Some(0);
-    self.entries.clear();
-}
-```
+2. Module Organization Strategy
+   - Following OODA-based development guidelines
+   - Maintaining clear module boundaries
+   - Keeping mod.rs files focused and minimal
+   - Separating concerns into logical units
 
-## Testing
-- Verified arrow up/down moves selection highlight
-- Confirmed enter expands folders correctly
-- Checked selection resets appropriately when entering new directories
-- Event logs show proper state updates and visual feedback
+### Next Steps
+1. Continue with high-priority module organization tasks:
+   - Split components/library_browser.rs (251 lines)
+   - Split components/track_list.rs (298 lines)
+   - Split components/tests.rs (237 lines)
 
-## Lessons Learned
-1. State management needs to carefully consider when to reset vs preserve state
-2. Visual feedback is crucial for user interaction
-3. Event logs help verify the system is working as expected even when visual feedback isn't
+### Testing Status
+- All tests passing (70 passed, 0 failed, 3 ignored)
+- Integration tests successful
+- No regressions from module reorganization
 
-## Next Steps
-- Consider adding visual feedback for failed navigation attempts
-- Add automated tests for navigation state management
-- Document the state preservation patterns in the architecture docs
+### Notes
+- Some non-critical warnings about unused imports and variables
+- Module organization improving code maintainability
+- Clear separation of concerns achieved in app module structure
