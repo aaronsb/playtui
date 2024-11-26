@@ -8,9 +8,7 @@ mod current_track_info;
 mod playback_status;
 
 // Control Row Components
-mod prev_track;
-mod play_pause;
-mod next_track;
+mod controls;
 mod volume_control;
 
 // Filesystem Module
@@ -22,9 +20,7 @@ pub use self::track_list::TrackList;
 pub use self::track_details::TrackDetails;
 pub use self::current_track_info::CurrentTrackInfo;
 pub use self::playback_status::PlaybackStatus;
-pub use self::prev_track::PrevTrack;
-pub use self::play_pause::PlayPause;
-pub use self::next_track::NextTrack;
+pub use self::controls::Controls;
 pub use self::volume_control::VolumeControl;
 
 use ratatui::{

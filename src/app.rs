@@ -1,7 +1,6 @@
 use crate::components::{
     Component, LibraryBrowser, TrackList, TrackDetails,
-    CurrentTrackInfo, PlaybackStatus, PrevTrack, PlayPause,
-    NextTrack, VolumeControl
+    CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
 };
 use crate::events::{Event, Action, EventHandler, EventDispatcher, EventResult, EventError};
 use crate::state::{AppState, StateManager};
@@ -19,9 +18,7 @@ pub struct App {
     pub current_track_info: CurrentTrackInfo,
     pub playback_status: PlaybackStatus,
     // Control Row Components
-    pub prev_track: PrevTrack,
-    pub play_pause: PlayPause,
-    pub next_track: NextTrack,
+    pub controls: Controls,
     pub volume_control: VolumeControl,
     event_dispatcher: EventDispatcher,
 }
@@ -42,9 +39,7 @@ impl App {
             current_track_info: CurrentTrackInfo::new(),
             playback_status: PlaybackStatus::new(),
             // Initialize Control Row Components
-            prev_track: PrevTrack::new(),
-            play_pause: PlayPause::new(),
-            next_track: NextTrack::new(),
+            controls: Controls::new(),
             volume_control: VolumeControl::new(),
             event_dispatcher: EventDispatcher::new(),
         };
@@ -82,9 +77,7 @@ impl App {
             Box::new(ComponentWrapper { component: self.track_details.clone() }),
             Box::new(ComponentWrapper { component: self.current_track_info.clone() }),
             Box::new(ComponentWrapper { component: self.playback_status.clone() }),
-            Box::new(ComponentWrapper { component: self.prev_track.clone() }),
-            Box::new(ComponentWrapper { component: self.play_pause.clone() }),
-            Box::new(ComponentWrapper { component: self.next_track.clone() }),
+            Box::new(ComponentWrapper { component: self.controls.clone() }),
             Box::new(ComponentWrapper { component: self.volume_control.clone() }),
         ];
 
@@ -120,9 +113,7 @@ impl App {
         self.track_details.update(action.clone());
         self.current_track_info.update(action.clone());
         self.playback_status.update(action.clone());
-        self.prev_track.update(action.clone());
-        self.play_pause.update(action.clone());
-        self.next_track.update(action.clone());
+        self.controls.update(action.clone());
         self.volume_control.update(action);
 
         Ok(())
@@ -140,9 +131,7 @@ impl App {
         self.track_details.update(action.clone());
         self.current_track_info.update(action.clone());
         self.playback_status.update(action.clone());
-        self.prev_track.update(action.clone());
-        self.play_pause.update(action.clone());
-        self.next_track.update(action.clone());
+        self.controls.update(action.clone());
         self.volume_control.update(action);
 
         Ok(())
@@ -168,9 +157,7 @@ impl App {
         self.track_details.set_focused(focused == "track_details");
         self.current_track_info.set_focused(focused == "current_track_info");
         self.playback_status.set_focused(focused == "playback_status");
-        self.prev_track.set_focused(focused == "prev_track");
-        self.play_pause.set_focused(focused == "play_pause");
-        self.next_track.set_focused(focused == "next_track");
+        self.controls.set_focused(focused == "controls");
         self.volume_control.set_focused(focused == "volume_control");
 
         // Re-register components to update their can_handle status

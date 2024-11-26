@@ -35,14 +35,12 @@ pub fn render(frame: &mut Frame, app: &App) {
         ])
         .split(main_chunks[1]);
 
-    // Split Control Row (15%) into four equal columns
+    // Split Control Row (15%) into controls (80%) and volume (20%)
     let control_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Percentage(25),  // Previous Track
-            Constraint::Percentage(25),  // Play/Pause
-            Constraint::Percentage(25),  // Next Track
-            Constraint::Percentage(25),  // Volume Control
+            Constraint::Percentage(80),  // Controls
+            Constraint::Percentage(20),  // Volume Control
         ])
         .split(main_chunks[2]);
 
@@ -88,27 +86,15 @@ pub fn render(frame: &mut Frame, app: &App) {
     );
 
     // Render Control Row components
-    app.prev_track.render(
+    app.controls.render(
         frame,
         control_chunks[0],
-        app.state.ui.focused_component == "prev_track",
-        &app.theme
-    );
-    app.play_pause.render(
-        frame,
-        control_chunks[1],
-        app.state.ui.focused_component == "play_pause",
-        &app.theme
-    );
-    app.next_track.render(
-        frame,
-        control_chunks[2],
-        app.state.ui.focused_component == "next_track",
+        app.state.ui.focused_component == "controls",
         &app.theme
     );
     app.volume_control.render(
         frame,
-        control_chunks[3],
+        control_chunks[1],
         app.state.ui.focused_component == "volume_control",
         &app.theme
     );

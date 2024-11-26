@@ -43,12 +43,36 @@ pub enum KeyEvent {
     BackTab,
     Esc,
     Focus(FocusDirection),
+    // Playback controls
+    Play,
+    Pause,
+    Stop,
+    Next,
+    Previous,
+    VolumeUp,
+    VolumeDown,
+    // New control events
+    Record,
+    FastForward,
+    Rewind,
 }
 
 impl From<KeyCode> for KeyEvent {
     fn from(code: KeyCode) -> Self {
         match code {
-            KeyCode::Char(c) => KeyEvent::Char(c),
+            KeyCode::Char(c) => match c {
+                'p' | 'P' => KeyEvent::Play,
+                's' | 'S' => KeyEvent::Stop,
+                'n' | 'N' => KeyEvent::Next,
+                'b' | 'B' => KeyEvent::Previous,
+                '+' => KeyEvent::VolumeUp,
+                '-' => KeyEvent::VolumeDown,
+                'u' | 'U' => KeyEvent::Pause,
+                'r' | 'R' => KeyEvent::Record,
+                'f' | 'F' => KeyEvent::FastForward,
+                'w' | 'W' => KeyEvent::Rewind,
+                _ => KeyEvent::Char(c),
+            },
             KeyCode::Enter => KeyEvent::Enter,
             KeyCode::Left => KeyEvent::Left,
             KeyCode::Right => KeyEvent::Right,
@@ -115,6 +139,11 @@ pub enum PlayerAction {
     Stop,
     SetVolume(u8),
     LoadTrack(String),
+    // New player actions
+    Record,
+    FastForward,
+    Rewind,
+    StopEject,
 }
 
 #[derive(Debug, Clone)]

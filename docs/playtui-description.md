@@ -14,18 +14,26 @@ Responsible for audio playback functionality
   - Current track information
   - Volume level
   - Playback progress
+  - Recording status
+  - Seek state (normal/fast-forward/rewind)
 - **Events**:
-  - Play/Pause/Stop commands
+  - Play/Pause/Stop/Eject commands
+  - Record functionality
+  - Fast Forward/Rewind operations
   - Next/Previous track
   - Volume adjustments
 - **Actions**:
   - Initialize audio system (PipeWire)
   - Handle playback controls
   - Manage audio stream
+  - Process recording requests
+  - Handle seek operations
 - **Features**:
   - Support for FLAC, MP3, OGG, WAV
-  - Basic playback controls
+  - Advanced playback controls
   - Volume management
+  - Recording capability
+  - Variable speed playback
 
 #### 2. PlaylistComponent
 Manages media library and playlist functionality
@@ -53,19 +61,25 @@ Handles the terminal user interface
   - Selected UI element
   - Visual theme settings
   - Focus state
+  - Button states (normal/active/pressed)
 - **Events**:
   - Key presses
   - Window resizing
   - Focus changes
+  - Button interactions
 - **Actions**:
   - Render interface
   - Handle navigation
   - Update displays
+  - Process button events
 - **Features**:
   - Retro-inspired design
   - True color support
   - Nerd Font icons
   - ANSI art elements
+  - Button highlight/shadow effects
+  - Volume slider widget
+  - 80/20 split control layout
 
 #### 4. MetadataComponent
 Manages audio file metadata
@@ -95,11 +109,11 @@ Manages audio file metadata
    ```
    App
    ├── UIComponent
-   │   └── Generates Actions (UserAction, NavigationAction)
+   │   └── Generates Actions (UserAction, NavigationAction, ButtonAction)
    ├── PlaylistComponent
    │   └── Generates Actions (TrackSelectedAction, PlaylistUpdateAction)
    ├── PlayerComponent
-   │   └── Generates Actions (PlaybackAction, AudioStateAction)
+   │   └── Generates Actions (PlaybackAction, AudioStateAction, RecordAction, SeekAction)
    └── MetadataComponent
        └── Generates Actions (MetadataUpdateAction)
    ```
@@ -152,22 +166,28 @@ pub trait Component {
 - Component-specific tests
 - State management verification
 - Event handling validation
+- Button interaction testing
+- Seek operation validation
 
 ### Integration Testing
 - Cross-component communication
 - Event flow verification
 - State synchronization
+- Recording functionality testing
+- Playback control integration
 
 ### Performance Testing
 - Component initialization time
 - Event handling latency
 - Rendering performance
+- Seek operation responsiveness
 
 ## Performance Requirements
 - Startup time < 1 second
 - Smooth playback
 - Responsive UI
 - Efficient memory usage
+- Fast seek operations
 
 ## Future Enhancements
 
@@ -180,18 +200,23 @@ pub trait Component {
 - Album art display
 - Lyrics view
 - Visualizer component
+- Advanced recording interface
+- Seek position indicator
 
 ### Accessibility Features
 - High contrast themes
 - Configurable bindings
+- Screen reader support
 
 ## Documentation Requirements
 - Component API documentation
 - Event flow documentation
 - Setup instructions
 - Keyboard shortcuts guide
+- Recording feature guide
 
 ## Security Considerations
 - File system access control
 - Resource usage limits
 - Input validation
+- Recording storage management

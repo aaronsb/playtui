@@ -9,11 +9,20 @@ pub enum PlaybackState {
 }
 
 #[derive(Debug, Clone)]
+pub enum SeekState {
+    Normal,
+    FastForward,
+    Rewind,
+}
+
+#[derive(Debug, Clone)]
 pub struct PlayerState {
     pub playback_state: PlaybackState,
     pub volume: u8,
     pub position: Duration,
     pub current_track: Option<String>,
+    pub is_recording: bool,
+    pub seek_state: SeekState,
 }
 
 impl Default for PlayerState {
@@ -23,6 +32,8 @@ impl Default for PlayerState {
             volume: 100,
             position: Duration::from_secs(0),
             current_track: None,
+            is_recording: false,
+            seek_state: SeekState::Normal,
         }
     }
 }
@@ -175,6 +186,7 @@ impl StateManager for AppState {
                 match player_action {
                     crate::events::PlayerAction::Play => {
                         self.player.playback_state = PlaybackState::Playing;
+                        self.player.seek_state = SeekState::Normal;
                         None
                     }
                     crate::events::PlayerAction::Pause => {
@@ -184,6 +196,7 @@ impl StateManager for AppState {
                     crate::events::PlayerAction::Stop => {
                         self.player.playback_state = PlaybackState::Stopped;
                         self.player.position = Duration::from_secs(0);
+                        self.player.seek_state = SeekState::Normal;
                         None
                     }
                     crate::events::PlayerAction::SetVolume(volume) => {
@@ -196,6 +209,25 @@ impl StateManager for AppState {
                         Some(Action::Metadata(crate::events::MetadataAction::Load(
                             self.player.current_track.clone().unwrap(),
                         )))
+                    }
+                    crate::events::PlayerAction::Record => {
+                        self.player.is_recording = !self.player.is_recording;
+                        None
+                    }
+                    crate::events::PlayerAction::FastForward => {
+                        self.player.seek_state = SeekState::FastForward;
+                        None
+                    }
+                    crate::events::PlayerAction::Rewind => {
+                        self.player.seek_state = SeekState::Rewind;
+                        None
+                    }
+                    crate::events::PlayerAction::StopEject => {
+                        self.player.playback_state = PlaybackState::Stopped;
+                        self.player.position = Duration::from_secs(0);
+                        self.player.current_track = None;
+                        self.player.seek_state = SeekState::Normal;
+                        Some(Action::Metadata(crate::events::MetadataAction::Clear))
                     }
                 }
             }
@@ -245,10 +277,8 @@ impl StateManager for AppState {
                             ("track_list", crate::events::FocusDirection::Next) => "track_details",
                             ("track_details", crate::events::FocusDirection::Next) => "current_track_info",
                             ("current_track_info", crate::events::FocusDirection::Next) => "playback_status",
-                            ("playback_status", crate::events::FocusDirection::Next) => "prev_track",
-                            ("prev_track", crate::events::FocusDirection::Next) => "play_pause",
-                            ("play_pause", crate::events::FocusDirection::Next) => "next_track",
-                            ("next_track", crate::events::FocusDirection::Next) => "volume_control",
+                            ("playback_status", crate::events::FocusDirection::Next) => "controls",
+                            ("controls", crate::events::FocusDirection::Next) => "volume_control",
                             ("volume_control", crate::events::FocusDirection::Next) => "library_browser",
                             
                             ("library_browser", crate::events::FocusDirection::Previous) => "volume_control",
@@ -256,10 +286,8 @@ impl StateManager for AppState {
                             ("track_details", crate::events::FocusDirection::Previous) => "track_list",
                             ("current_track_info", crate::events::FocusDirection::Previous) => "track_details",
                             ("playback_status", crate::events::FocusDirection::Previous) => "current_track_info",
-                            ("prev_track", crate::events::FocusDirection::Previous) => "playback_status",
-                            ("play_pause", crate::events::FocusDirection::Previous) => "prev_track",
-                            ("next_track", crate::events::FocusDirection::Previous) => "play_pause",
-                            ("volume_control", crate::events::FocusDirection::Previous) => "next_track",
+                            ("controls", crate::events::FocusDirection::Previous) => "playback_status",
+                            ("volume_control", crate::events::FocusDirection::Previous) => "controls",
                             
                             _ => "library_browser",
                         }

@@ -49,23 +49,55 @@ This document details the UI layout structure, component organization, and tab n
 - Focus: Fifth tab stop in navigation flow
 
 ### 3. Control Row (15% of screen height)
-All controls are equal width, distributed across the row
+Split into two main frames:
 
-#### Previous Track - Tab Index 6
-- Purpose: Skip to previous track
-- Focus: Sixth tab stop in navigation flow
+#### Controls Frame (80% width) - Tab Index 6
+Buttons distributed evenly across the frame, from left to right:
+- Record (Tab Index 6)
+  * Purpose: Record functionality (placeholder)
+  * Icon: Nerdfont circle symbol (⏺)
+  * Style: Button with highlight and shadow, red when active
+  
+- Play (Tab Index 7)
+  * Purpose: Start playback
+  * Icon: Nerdfont play symbol (⏵)
+  * Style: Button with highlight and shadow
 
-#### Play/Pause - Tab Index 7
-- Purpose: Toggle playback state
-- Focus: Seventh tab stop in navigation flow
+- Rewind (Tab Index 8)
+  * Purpose: Rewind current track
+  * Icon: Double left arrow symbol (◀◀)
+  * Style: Button with highlight and shadow
 
-#### Next Track - Tab Index 8
-- Purpose: Skip to next track
-- Focus: Eighth tab stop in navigation flow
+- Fast Forward (Tab Index 9)
+  * Purpose: Fast forward current track
+  * Icon: Double play symbol (⏵⏵)
+  * Style: Button with highlight and shadow
 
-#### Volume Control - Tab Index 9
-- Purpose: Adjust playback volume
-- Focus: Ninth tab stop in navigation flow
+- Stop/Eject (Tab Index 10)
+  * Purpose: Stop playback and clear current track
+  * Icon: Nerdfont eject symbol (⏏)
+  * Style: Button with highlight and shadow
+
+- Pause (Tab Index 11)
+  * Purpose: Pause playback
+  * Icon: Nerdfont pause symbol (⏸)
+  * Style: Button with highlight and shadow
+
+- Next Track (Tab Index 12)
+  * Purpose: Skip to next track
+  * Icon: Nerdfont down arrow symbol (⬇)
+  * Style: Button with highlight and shadow
+
+- Previous Track (Tab Index 13)
+  * Purpose: Return to previous track
+  * Icon: Nerdfont up arrow symbol (⬆)
+  * Style: Button with highlight and shadow
+
+#### Volume Frame (20% width) - Tab Index 14
+- Volume Control
+  * Purpose: Adjust playback volume
+  * Component: Slider widget
+  * Style: Consistent with button styling theme
 
 ## Navigation Flow
 
@@ -90,8 +122,17 @@ All controls are equal width, distributed across the row
 
 ### Layout Scaling
 - Components should scale proportionally with terminal window size
-- Maintain aspect ratios (60/25/15 vertical, 33/34/33 horizontal where applicable)
+- Maintain aspect ratios (60/25/15 vertical, 80/20 horizontal for control row)
 - Ensure minimum usable dimensions for each component
+
+### Button Styling
+- Each button should have:
+  * Consistent padding around the icon
+  * Highlight effect when focused
+  * Shadow effect for depth
+  * Clear visual feedback on press
+  * Nerdfont icon centered in button area
+  * Special red highlight for record button when active
 
 ### Focus Management
 - Implement focus tracking in UI state
@@ -108,3 +149,4 @@ All controls are equal width, distributed across the row
 - Use Constraint-based sizing for proper scaling
 - Handle terminal resize events appropriately
 - Maintain performance with larger libraries/playlists
+- Ensure proper nerdfont icon support and fallbacks
