@@ -116,34 +116,44 @@ impl App {
         // Log the event, ignoring any logging errors to not disrupt the app
         let _ = self.logger.log_event(&event);
 
-        // Handle focus-specific events
+        // Handle focus-specific events first
         match &event {
             Event::Key(KeyEvent::Tab) => {
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(FocusDirection::Next)))?;
                 self.update_focus_states();
-                Ok(())
+                return Ok(());
             },
             Event::Key(KeyEvent::BackTab) => {
                 self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(FocusDirection::Previous)))?;
                 self.update_focus_states();
-                Ok(())
+                return Ok(());
             },
-            Event::Key(KeyEvent::Focus(_)) => {
-                self.focus_manager.handle_event(&event)?;
+            Event::Key(KeyEvent::Focus(direction)) => {
+                self.focus_manager.handle_event(&Event::Key(KeyEvent::Focus(*direction)))?;
                 self.update_focus_states();
-                Ok(())
+                return Ok(());
             },
-            // For all other events, process through both managers
-            _ => {
-                // First let the event manager convert the event to an action
-                if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
-                    // Then process the action through the component manager
+            // For navigation events, only process through component manager
+            Event::Key(KeyEvent::Left | KeyEvent::Right | KeyEvent::Up | KeyEvent::Down) => {
+                if let Ok(action) = self.event_manager.orient_and_decide(event) {
                     self.component_manager.update_components(action);
                 }
-                self.update_focus_states();
-                Ok(())
-            }
+                return Ok(());
+            },
+            _ => {}
         }
+
+        // For all other events, process through both managers
+        if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+            // Let focus manager handle the event first
+            self.focus_manager.handle_event(&event)?;
+            self.update_focus_states();
+
+            // Then process through component manager
+            self.component_manager.update_components(action);
+        }
+        
+        Ok(())
     }
 
     /// Updates focus states for all components and syncs with UI state

@@ -52,22 +52,16 @@ impl EventManager {
                     KeyEvent::BackTab => Ok(Action::UI(UIAction::Focus(FocusDirection::Previous))),
                     KeyEvent::Focus(direction) => Ok(Action::UI(UIAction::Focus(direction))),
                     
-                    // Convert arrow keys to navigation events
-                    KeyEvent::Left => Ok(Action::NavigateLeft),
-                    KeyEvent::Right => Ok(Action::NavigateRight),
-                    KeyEvent::Up => Ok(Action::NavigateUp),
-                    KeyEvent::Down => Ok(Action::NavigateDown),
-                    
-                    // Pass through other key events directly
+                    // Pass through key events directly
                     _ => Ok(Action::Key(key_event)),
                 }
             },
             Event::Navigation(nav_event) => {
                 match nav_event {
-                    NavigationEvent::Left => Ok(Action::NavigateLeft),
-                    NavigationEvent::Right => Ok(Action::NavigateRight),
-                    NavigationEvent::Up => Ok(Action::NavigateUp),
-                    NavigationEvent::Down => Ok(Action::NavigateDown),
+                    NavigationEvent::Left => Ok(Action::Key(KeyEvent::Left)),
+                    NavigationEvent::Right => Ok(Action::Key(KeyEvent::Right)),
+                    NavigationEvent::Up => Ok(Action::Key(KeyEvent::Up)),
+                    NavigationEvent::Down => Ok(Action::Key(KeyEvent::Down)),
                 }
             },
             _ => Ok(Action::App(AppAction::NoOp)),

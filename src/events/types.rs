@@ -20,6 +20,12 @@ pub enum KeyEvent {
     Tab,
     BackTab,
     Esc,
+    Backspace,
+    Delete,
+    Home,
+    End,
+    PageUp,
+    PageDown,
     Focus(FocusDirection),
     // Playback controls
     Play,
@@ -47,6 +53,7 @@ impl From<KeyCode> for KeyEvent {
     fn from(code: KeyCode) -> Self {
         match code {
             KeyCode::Char(c) => match c {
+                ' ' => KeyEvent::Space,
                 'p' | 'P' => KeyEvent::Play,
                 's' | 'S' => KeyEvent::Stop,
                 'n' | 'N' => KeyEvent::Next,
@@ -67,7 +74,13 @@ impl From<KeyCode> for KeyEvent {
             KeyCode::Tab => KeyEvent::Tab,
             KeyCode::BackTab => KeyEvent::BackTab,
             KeyCode::Esc => KeyEvent::Esc,
-            _ => KeyEvent::Char(' '), // Default case
+            KeyCode::Backspace => KeyEvent::Backspace,
+            KeyCode::Delete => KeyEvent::Delete,
+            KeyCode::Home => KeyEvent::Home,
+            KeyCode::End => KeyEvent::End,
+            KeyCode::PageUp => KeyEvent::PageUp,
+            KeyCode::PageDown => KeyEvent::PageDown,
+            _ => KeyEvent::Space, // Default case
         }
     }
 }

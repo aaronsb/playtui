@@ -19,10 +19,13 @@ impl Component for LibraryBrowser {
     fn new() -> Self {
         // Start in the current directory
         let fs_navigator = FSNavigator::new(PathBuf::from("."));
+        let mut list_state = ListState::default();
+        list_state.select(Some(0)); // Initialize with first item selected
+        
         let browser = Self {
             state: ComponentState::default(),
             fs_navigator: RefCell::new(fs_navigator),
-            list_state: RefCell::new(ListState::default()),
+            list_state: RefCell::new(list_state),
         };
         
         // Initial directory scan
@@ -48,7 +51,11 @@ impl Component for LibraryBrowser {
             .map(|entry| {
                 let prefix = if entry.is_dir() { "📁 " } else { "📄 " };
                 ListItem::new(format!("{}{}", prefix, entry.name()))
-                    .style(theme.get_style("list_item"))
+                    .style(if focused {
+                        theme.get_style("list_item")
+                    } else {
+                        theme.get_style("list_item_unfocused")
+                    })
             })
             .collect();
 
@@ -58,8 +65,15 @@ impl Component for LibraryBrowser {
 
         let list = List::new(items)
             .block(block)
-            .highlight_style(theme.get_style("list_selected"))
-            .highlight_symbol("➤ ");
+            .highlight_style(
+                if focused {
+                    theme.get_style("list_selected")
+                        .add_modifier(Modifier::BOLD)
+                } else {
+                    theme.get_style("list_selected_unfocused")
+                }
+            )
+            .highlight_symbol("▶ "); // More visible cursor
 
         frame.render_stateful_widget(list, area, &mut list_state);
     }
@@ -87,12 +101,12 @@ impl Component for LibraryBrowser {
                     eprintln!("Error navigating: {}", e);
                 }
             }
-            Action::Select => {
+            Action::NavigateRight | Action::Select => {
                 if let Err(e) = self.fs_navigator.borrow_mut().handle_action(FSAction::NavigateToSelected) {
                     eprintln!("Error selecting entry: {}", e);
                 }
             }
-            Action::Back => {
+            Action::NavigateLeft | Action::Back => {
                 if let Err(e) = self.fs_navigator.borrow_mut().handle_action(FSAction::NavigateToParent) {
                     eprintln!("Error navigating to parent: {}", e);
                 }
@@ -112,17 +126,18 @@ impl Component for LibraryBrowser {
 
     fn handle_event(&mut self, event: Event) -> Option<Action> {
         match event {
-            Event::Key(key_event) => match key_event {
+            Event::Key(key_event) if self.focused() => match key_event {
                 KeyEvent::Up => Some(Action::NavigateUp),
                 KeyEvent::Down => Some(Action::NavigateDown),
-                KeyEvent::Enter => Some(Action::Select),
-                KeyEvent::Esc => Some(Action::Back),
+                KeyEvent::Right | KeyEvent::Enter => Some(Action::Select),
+                KeyEvent::Left | KeyEvent::Esc => Some(Action::Back),
                 _ => None,
             },
             Event::Navigation(nav_event) => match nav_event {
                 NavigationEvent::Up => Some(Action::NavigateUp),
                 NavigationEvent::Down => Some(Action::NavigateDown),
-                _ => None,
+                NavigationEvent::Right => Some(Action::NavigateRight),
+                NavigationEvent::Left => Some(Action::NavigateLeft),
             },
             _ => None,
         }
