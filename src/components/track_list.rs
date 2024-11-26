@@ -110,7 +110,7 @@ impl Component for TrackList {
                         Some(Action::Refresh)
                     },
                     KeyEvent::Enter => Some(Action::Select),
-                    KeyEvent::Esc => Some(Action::Back),
+                    KeyEvent::Escape => Some(Action::Back),
                     _ => None,
                 }
             },
