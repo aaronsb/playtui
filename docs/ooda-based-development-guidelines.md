@@ -233,7 +233,7 @@ impl Component for OODAComponent {
    - Split large mod.rs files into dedicated modules
    - Follow the "Rule of Three":
      * When a mod.rs contains more than three major components
-     * When a mod.rs exceeds 100 lines
+     * When a mod.rs exceeds 125 lines
      * When a mod.rs handles multiple distinct responsibilities
    - Maintain clear module boundaries:
      * mod.rs should primarily contain exports and core traits
@@ -243,6 +243,21 @@ impl Component for OODAComponent {
      * Review mod.rs complexity during code reviews
      * Monitor module growth patterns
      * Refactor early when signs of bloat appear
+
+5. General Organization
+   - Keep .rs files focused
+   - Where possible, split .rs files into dedicated modules or purposes
+   - Follow the "Rule of Three":
+     * When a .rs contains more than three major features
+     * When a .rs file exceeds 150 lines
+     * When a .rs handles multiple distinct responsibilities
+     
+6. Stability Hygiene
+   - After completion of modifications or changes
+     * Run cargo test
+     * Follow up with major errors
+     * Understand warnings might be ok
+     * Avoid the temptation to remove unused code - it may be placeholder for future functions
 
 ## 5. Metrics and Monitoring
 

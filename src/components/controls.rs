@@ -7,6 +7,7 @@ use ratatui::{
 use crate::events::{Event, Action, KeyEvent, MouseEvent, PlayerAction};
 use super::{Component, ComponentState};
 use crate::theme::Theme;
+use std::cell::RefCell;
 
 #[derive(Clone)]
 pub struct Controls {
@@ -15,6 +16,15 @@ pub struct Controls {
     is_recording: bool,
     is_seeking_forward: bool,
     is_seeking_backward: bool,
+    focused_button: usize,  // Track which button is focused
+    focused_section: Section, // Track whether controls or volume is focused
+    area: RefCell<Option<Rect>>,    // Store the component's area for mouse hit testing
+}
+
+#[derive(Clone, PartialEq)]
+enum Section {
+    Controls,
+    Volume,
 }
 
 impl Component for Controls {
@@ -25,11 +35,16 @@ impl Component for Controls {
             is_recording: false,
             is_seeking_forward: false,
             is_seeking_backward: false,
+            focused_button: 0,
+            focused_section: Section::Controls,
+            area: RefCell::new(None),
         }
     }
 
     fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
-        // Split into controls (80%) and volume (20%) frames
+        // Store the area for mouse hit testing
+        *self.area.borrow_mut() = Some(area);
+
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
@@ -45,8 +60,12 @@ impl Component for Controls {
         let controls_block = Block::default()
             .title("Controls")
             .borders(Borders::ALL)
-            .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
-            .border_style(if focused {
+            .border_type(if focused && self.focused_section == Section::Controls { 
+                BorderType::Thick 
+            } else { 
+                BorderType::Rounded 
+            })
+            .border_style(if focused && self.focused_section == Section::Controls {
                 theme.get_style("border_focused")
             } else {
                 theme.get_style("border_unfocused")
@@ -67,7 +86,6 @@ impl Component for Controls {
             (false, &theme.controls.previous, "Prev"),
         ];
 
-        // Calculate button width including padding
         let button_width = inner_controls.width / controls.len() as u16;
         let button_padding = 2;
 
@@ -81,8 +99,13 @@ impl Component for Controls {
             let shadow_area = Rect::new(x + 1, button_area.y + 1, button_width - 1, button_area.height - 1);
             frame.render_widget(Block::default().style(shadow_style), shadow_area);
 
-            // Special color for record button when active
-            let button_style = if *active && *label == "Record" {
+            // Determine button style based on state
+            let button_style = if focused && 
+                             self.focused_section == Section::Controls && 
+                             self.focused_button == i {
+                // Button is focused
+                theme.get_style("list_selected")
+            } else if *active && *label == "Record" {
                 theme.get_style("record_button_active")
             } else if *active {
                 theme.get_style("button_active")
@@ -103,8 +126,16 @@ impl Component for Controls {
         let volume_block = Block::default()
             .title("Volume")
             .borders(Borders::ALL)
-            .border_type(BorderType::Rounded)
-            .border_style(theme.get_style("border_unfocused"));
+            .border_type(if focused && self.focused_section == Section::Volume { 
+                BorderType::Thick 
+            } else { 
+                BorderType::Rounded 
+            })
+            .border_style(if focused && self.focused_section == Section::Volume {
+                theme.get_style("border_focused")
+            } else {
+                theme.get_style("border_unfocused")
+            });
 
         let inner_volume = volume_block.inner(volume_area);
         frame.render_widget(volume_block, volume_area);
@@ -113,7 +144,11 @@ impl Component for Controls {
         frame.render_widget(
             Paragraph::new("Volume Slider")
                 .alignment(Alignment::Center)
-                .style(theme.get_style("text_normal")),
+                .style(if focused && self.focused_section == Section::Volume {
+                    theme.get_style("list_selected")
+                } else {
+                    theme.get_style("text_normal")
+                }),
             inner_volume,
         );
     }
@@ -179,6 +214,52 @@ impl Component for Controls {
 impl Controls {
     fn handle_key_event(&mut self, event: KeyEvent) -> Option<Action> {
         match event {
+            KeyEvent::Tab => {
+                if self.focused_section == Section::Controls {
+                    // Move to next button or switch to volume section
+                    self.focused_button = (self.focused_button + 1) % 8;
+                    if self.focused_button == 0 {
+                        self.focused_section = Section::Volume;
+                    }
+                } else {
+                    // Switch back to controls section
+                    self.focused_section = Section::Controls;
+                    self.focused_button = 0;
+                }
+                None
+            }
+            KeyEvent::BackTab => {
+                if self.focused_section == Section::Controls {
+                    // Move to previous button or switch to volume section
+                    if self.focused_button == 0 {
+                        self.focused_section = Section::Volume;
+                    } else {
+                        self.focused_button = (self.focused_button - 1) % 8;
+                    }
+                } else {
+                    // Switch back to controls section
+                    self.focused_section = Section::Controls;
+                    self.focused_button = 7;
+                }
+                None
+            }
+            KeyEvent::Enter => {
+                // Trigger action based on focused button
+                match self.focused_section {
+                    Section::Controls => match self.focused_button {
+                        0 => Some(Action::Player(PlayerAction::Record)),
+                        1 => Some(Action::Player(PlayerAction::Play)),
+                        2 => Some(Action::Player(PlayerAction::Rewind)),
+                        3 => Some(Action::Player(PlayerAction::FastForward)),
+                        4 => Some(Action::Player(PlayerAction::Stop)),
+                        5 => Some(Action::Player(PlayerAction::Pause)),
+                        6 => Some(Action::Player(PlayerAction::LoadTrack(String::new()))), // Next
+                        7 => Some(Action::Player(PlayerAction::LoadTrack(String::new()))), // Previous
+                        _ => None,
+                    },
+                    Section::Volume => None, // TODO: Implement volume control
+                }
+            }
             KeyEvent::Play => Some(Action::Player(PlayerAction::Play)),
             KeyEvent::Pause => Some(Action::Player(PlayerAction::Pause)),
             KeyEvent::Stop => Some(Action::Player(PlayerAction::Stop)),
@@ -196,11 +277,46 @@ impl Controls {
     fn handle_mouse_event(&mut self, event: MouseEvent) -> Option<Action> {
         match event {
             MouseEvent::Click { x, y } => {
-                // Calculate button positions and check if click falls within any button area
-                // TODO: Implement proper click handling for control buttons
-                None
+                // First get and validate the area
+                let area = match *self.area.borrow() {
+                    Some(area) if Self::is_point_in_rect(x, y, area) => area,
+                    _ => return None,
+                };
+
+                // Calculate section and button information
+                let controls_width = (area.width * 8) / 10; // 80% of total width
+                let relative_x = x - area.x;
+
+                // Drop the area borrow before proceeding with state changes
+                drop(self.area.borrow());
+
+                if relative_x <= controls_width {
+                    // Click in controls section
+                    self.focused_section = Section::Controls;
+                    
+                    // Calculate button width and determine which button was clicked
+                    let button_width = controls_width / 8;
+                    let clicked_button = (relative_x / button_width) as usize;
+                    if clicked_button < 8 {
+                        self.focused_button = clicked_button;
+                        // Now safe to call handle_key_event
+                        self.handle_key_event(KeyEvent::Enter)
+                    } else {
+                        None
+                    }
+                } else {
+                    // Click in volume section
+                    self.focused_section = Section::Volume;
+                    // TODO: Implement volume control click handling
+                    None
+                }
             }
             _ => None,
         }
+    }
+
+    fn is_point_in_rect(x: u16, y: u16, rect: Rect) -> bool {
+        x >= rect.x && x < rect.x + rect.width &&
+        y >= rect.y && y < rect.y + rect.height
     }
 }
