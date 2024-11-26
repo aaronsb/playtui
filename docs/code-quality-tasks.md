@@ -2,6 +2,8 @@
 
 > This document focuses on code quality improvements and technical debt management. For feature implementation tasks, see [tasks.md](tasks.md).
 
+:heavy_check_mark: Important! Make sure between each module organization task - the parent module that exceeds our line length limit, that you run tests and commit your changes so that you can revert back to a clean state if needed.
+
 ## High Priority
 
 ### Module Organization
