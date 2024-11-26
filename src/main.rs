@@ -12,7 +12,7 @@ use ratatui::prelude::*;
 use std::io;
 
 use playtui::app::App;
-use playtui::events::{Event, KeyEvent, MouseEvent, Action, UIAction};
+use playtui::events::{Event, KeyEvent, MouseEvent};
 
 fn map_key_event(code: KeyCode, modifiers: KeyModifiers) -> Option<KeyEvent> {
     match (code, modifiers) {
@@ -55,8 +55,23 @@ fn main() -> Result<()> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    // Create app state
-    let mut app = App::new();
+    // Create app state with error handling for theme loading
+    let mut app = match App::new() {
+        Ok(app) => app,
+        Err(e) => {
+            // Clean up terminal before exiting
+            disable_raw_mode()?;
+            execute!(
+                terminal.backend_mut(),
+                LeaveAlternateScreen,
+                DisableMouseCapture
+            )?;
+            terminal.show_cursor()?;
+            
+            // Return the error
+            return Err(e);
+        }
+    };
 
     // Main loop
     loop {
@@ -92,7 +107,7 @@ fn main() -> Result<()> {
                     }
                 }
             }
-            CrosstermEvent::Resize(width, height) => {
+            CrosstermEvent::Resize(_width, _height) => {
                 // Handle resize by updating the UI state
                 if let Err(e) = app.handle_event(Event::Key(KeyEvent::Focus(playtui::events::FocusDirection::Next))) {
                     eprintln!("Error handling resize event: {}", e);

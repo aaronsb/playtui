@@ -1,6 +1,7 @@
 use ratatui::prelude::*;
 use super::{Component, ComponentState, create_block};
 use crate::events::{Event, Action, KeyEvent};
+use crate::theme::Theme;
 
 #[derive(Clone)]
 pub struct PlayPause {
@@ -16,9 +17,9 @@ impl Component for PlayPause {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
         let title = if self.playing { "Pause" } else { "Play" };
-        let block = create_block(title, focused);
+        let block = create_block(title, focused, theme);
         frame.render_widget(block, area);
     }
 

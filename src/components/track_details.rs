@@ -1,6 +1,7 @@
 use ratatui::prelude::*;
 use super::{Component, ComponentState, create_block};
 use crate::events::{Event, Action};
+use crate::theme::Theme;
 
 #[derive(Clone)]
 pub struct TrackDetails {
@@ -14,8 +15,8 @@ impl Component for TrackDetails {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
-        let block = create_block("Track Details", focused);
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
+        let block = create_block("Track Details", focused, theme);
         frame.render_widget(block, area);
     }
 

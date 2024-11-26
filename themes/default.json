@@ -1,0 +1,68 @@
+{
+  "metadata": {
+    "name": "Default",
+    "author": "PlayTUI Team",
+    "version": "1.0"
+  },
+  "colors": {
+    "primary": "#F92672",
+    "secondary": "#A6E22E",
+    "background": "#272822",
+    "foreground": "#F8F8F2",
+    "active": "#FD971F",
+    "inactive": "#75715E",
+    "playing": "#66D9EF",
+    "error": "#F92672"
+  },
+  "styles": {
+    "border_focused": {
+      "fg": "#F92672",
+      "modifiers": ["BOLD"]
+    },
+    "border_unfocused": {
+      "fg": "#A6E22E"
+    },
+    "text_normal": {
+      "fg": "#F8F8F2"
+    },
+    "text_bold": {
+      "fg": "#F8F8F2",
+      "modifiers": ["BOLD"]
+    },
+    "text_dim": {
+      "fg": "#75715E"
+    },
+    "button": {
+      "fg": "#A6E22E",
+      "modifiers": ["BOLD"]
+    },
+    "list_item": {
+      "fg": "#F8F8F2"
+    },
+    "list_selected": {
+      "fg": "#272822",
+      "bg": "#FD971F",
+      "modifiers": ["BOLD"]
+    },
+    "playing_item": {
+      "fg": "#66D9EF",
+      "modifiers": ["BOLD"]
+    },
+    "progress_bar": {
+      "fg": "#FD971F",
+      "bg": "#272822"
+    },
+    "volume_indicator": {
+      "fg": "#66D9EF",
+      "modifiers": ["BOLD"]
+    },
+    "tab_active": {
+      "fg": "#272822",
+      "bg": "#F92672",
+      "modifiers": ["BOLD"]
+    },
+    "tab_inactive": {
+      "fg": "#F92672"
+    }
+  }
+}

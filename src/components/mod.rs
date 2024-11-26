@@ -34,6 +34,7 @@ use ratatui::{
 
 // Re-export everything needed by components
 pub use crate::events::{Event, Action, KeyEvent};
+pub use crate::theme::Theme;
 
 #[derive(Clone, Default)]
 pub struct ComponentState {
@@ -42,21 +43,23 @@ pub struct ComponentState {
 
 pub trait Component: Clone + Send + 'static {
     fn new() -> Self where Self: Sized;
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool);
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme);
     fn update(&mut self, action: Action) -> Option<Action>;
     fn focused(&self) -> bool;
     fn set_focused(&mut self, focused: bool);
     fn handle_event(&mut self, event: Event) -> Option<Action>;
 }
 
-// Helper function to create a styled block based on focus state
-pub fn create_block<'a>(title: &'a str, focused: bool) -> Block<'a> {
+// Helper function to create a styled block based on focus state and theme
+pub fn create_block<'a>(title: &'a str, focused: bool, theme: &Theme) -> Block<'a> {
     Block::default()
         .title(title)
         .borders(Borders::ALL)
-        .border_style(if focused {
-            Style::default().fg(Color::Yellow)
-        } else {
-            Style::default()
-        })
+        .border_style(
+            if focused {
+                theme.get_style("border_focused")
+            } else {
+                theme.get_style("border_unfocused")
+            }
+        )
 }

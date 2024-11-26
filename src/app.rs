@@ -5,9 +5,12 @@ use crate::components::{
 };
 use crate::events::{Event, Action, EventHandler, EventDispatcher, EventResult, EventError};
 use crate::state::{AppState, StateManager};
+use crate::theme::Theme;
+use anyhow::Result;
 
 pub struct App {
     pub state: AppState,
+    pub theme: Theme,
     // Primary Row Components
     pub library_browser: LibraryBrowser,
     pub track_list: TrackList,
@@ -24,9 +27,13 @@ pub struct App {
 }
 
 impl App {
-    pub fn new() -> App {
+    pub fn new() -> Result<App> {
+        // Load the default theme
+        let theme = Theme::load_default()?;
+
         let mut app = App {
             state: AppState::default(),
+            theme,
             // Initialize Primary Row Components
             library_browser: LibraryBrowser::new(),
             track_list: TrackList::new(),
@@ -44,7 +51,12 @@ impl App {
 
         // Register components as event handlers
         app.register_components();
-        app
+        Ok(app)
+    }
+
+    pub fn load_theme(&mut self, path: &str) -> Result<()> {
+        self.theme = Theme::load(path)?;
+        Ok(())
     }
 
     fn register_components(&mut self) {

@@ -1,10 +1,11 @@
 use ratatui::{
     prelude::*,
-    widgets::{List, ListItem, Block, Borders},
+    widgets::{List, ListItem},
 };
 use super::{Component, ComponentState, create_block};
 use crate::events::{Event, Action, KeyEvent};
-use crate::components::filesystem::{FSNavigator, FSAction, FSState};
+use crate::components::filesystem::{FSNavigator, FSAction};
+use crate::theme::Theme;
 use std::path::PathBuf;
 
 #[derive(Clone)]
@@ -30,8 +31,8 @@ impl Component for LibraryBrowser {
         browser
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
-        let block = create_block("Library Browser", focused);
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
+        let block = create_block("Library Browser", focused, theme);
         
         // Create a list of entries
         let fs_state = self.fs_navigator.state();
@@ -42,9 +43,9 @@ impl Component for LibraryBrowser {
             .map(|(i, entry)| {
                 let prefix = if entry.is_dir() { "📁 " } else { "📄 " };
                 let style = if Some(i) == fs_state.selected_index() {
-                    Style::default().fg(Color::Yellow)
+                    theme.get_style("list_selected")
                 } else {
-                    Style::default()
+                    theme.get_style("list_item")
                 };
                 
                 ListItem::new(format!("{}{}", prefix, entry.name()))
@@ -54,11 +55,7 @@ impl Component for LibraryBrowser {
 
         let list = List::new(entries)
             .block(block)
-            .highlight_style(
-                Style::default()
-                    .bg(Color::DarkGray)
-                    .add_modifier(Modifier::BOLD),
-            );
+            .highlight_style(theme.get_style("list_selected"));
 
         frame.render_widget(list, area);
     }

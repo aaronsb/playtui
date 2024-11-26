@@ -1,6 +1,7 @@
 use ratatui::prelude::*;
 use super::{Component, ComponentState, create_block};
 use crate::events::{Event, Action};
+use crate::theme::Theme;
 
 #[derive(Clone)]
 pub struct PlaybackStatus {
@@ -14,8 +15,8 @@ impl Component for PlaybackStatus {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
-        let block = create_block("Playback Status", focused);
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
+        let block = create_block("Playback Status", focused, theme);
         frame.render_widget(block, area);
     }
 

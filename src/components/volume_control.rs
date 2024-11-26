@@ -1,6 +1,7 @@
 use ratatui::prelude::*;
 use super::{Component, ComponentState, create_block};
 use crate::events::{Event, Action, KeyEvent};
+use crate::theme::Theme;
 
 #[derive(Clone)]
 pub struct VolumeControl {
@@ -16,9 +17,9 @@ impl Component for VolumeControl {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
         let title = format!("Volume: {}%", self.volume);
-        let block = create_block(title.as_str(), focused);
+        let block = create_block(title.as_str(), focused, theme);
         frame.render_widget(block, area);
     }
 
