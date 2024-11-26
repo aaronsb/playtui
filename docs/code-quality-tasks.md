@@ -11,6 +11,33 @@
   - [x] Create controls/events.rs for event handling
   - [x] Create controls/actions.rs for action handling
 - [ ] Review and potentially split other modules exceeding 150 lines
+  - Use ```bash``` to find lines exceeding 150 characters: ```find src -type f -name "*.rs" -exec wc -l {} \;```
+  - [ ] Split events/mod.rs (269 lines):
+    - [ ] Create events/error.rs for error handling
+    - [ ] Create events/types.rs for event type definitions
+    - [ ] Create events/actions.rs for action enums
+    - [ ] Create events/handler.rs for event handling
+    - [ ] Create events/filter.rs for event filtering
+  - [ ] Split metadata/formats/vorbis.rs (208 lines):
+    - [ ] Create metadata/formats/vorbis/parser.rs for core parser
+    - [ ] Create metadata/formats/vorbis/tag_extractor.rs for tag handling
+    - [ ] Create metadata/formats/vorbis/audio_properties.rs for audio analysis
+    - [ ] Create metadata/formats/vorbis/tests.rs for tests
+  - [ ] Split components/playlist.rs (200 lines):
+    - [ ] Create components/playlist/mod.rs for core functionality
+    - [ ] Create components/playlist/event_handler.rs for event handling
+    - [ ] Create components/playlist/selection.rs for track selection
+    - [ ] Create components/playlist/renderer.rs for UI rendering
+  - [ ] Split theme.rs (191 lines):
+    - [ ] Create theme/mod.rs for core functionality
+    - [ ] Create theme/types.rs for data structures
+    - [ ] Create theme/color.rs for color management
+    - [ ] Create theme/style.rs for style management
+  - [ ] Split app.rs (166 lines):
+    - [ ] Create app/mod.rs for core functionality
+    - [ ] Create app/components.rs for component management
+    - [ ] Create app/event_handling.rs for event handling
+    - [ ] Create app/focus.rs for focus management
 
 ### Core Audio Implementation
 - [ ] Implement basic audio playback functionality in player.rs
