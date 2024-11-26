@@ -12,12 +12,12 @@
   - [x] Create controls/actions.rs for action handling
 - [ ] Review and potentially split other modules exceeding 150 lines
   - Use ```bash``` to find lines exceeding 150 characters: ```find src -type f -name "*.rs" -exec wc -l {} \;```
-  - [ ] Split events/mod.rs (269 lines):
-    - [ ] Create events/error.rs for error handling
-    - [ ] Create events/types.rs for event type definitions
-    - [ ] Create events/actions.rs for action enums
-    - [ ] Create events/handler.rs for event handling
-    - [ ] Create events/filter.rs for event filtering
+  - [x] Split events/mod.rs (269 lines):
+    - [x] Create events/error.rs for error handling
+    - [x] Create events/types.rs for event type definitions
+    - [x] Create events/actions.rs for action enums
+    - [x] Create events/handler.rs for event handling
+    - [x] Create events/filter.rs for event filtering
   - [ ] Split metadata/formats/vorbis.rs (208 lines):
     - [ ] Create metadata/formats/vorbis/parser.rs for core parser
     - [ ] Create metadata/formats/vorbis/tag_extractor.rs for tag handling
