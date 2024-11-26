@@ -18,11 +18,11 @@
     - [x] Create events/actions.rs for action enums
     - [x] Create events/handler.rs for event handling
     - [x] Create events/filter.rs for event filtering
-  - [ ] Split metadata/formats/vorbis.rs (208 lines):
-    - [ ] Create metadata/formats/vorbis/parser.rs for core parser
-    - [ ] Create metadata/formats/vorbis/tag_extractor.rs for tag handling
-    - [ ] Create metadata/formats/vorbis/audio_properties.rs for audio analysis
-    - [ ] Create metadata/formats/vorbis/tests.rs for tests
+  - [x] Split metadata/formats/vorbis.rs (208 lines):
+    - [x] Create metadata/formats/vorbis/parser.rs for core parser
+    - [x] Create metadata/formats/vorbis/tag_extractor.rs for tag handling
+    - [x] Create metadata/formats/vorbis/audio_properties.rs for audio analysis
+    - [x] Create metadata/formats/vorbis/tests.rs for tests
   - [ ] Split components/playlist.rs (200 lines):
     - [ ] Create components/playlist/mod.rs for core functionality
     - [ ] Create components/playlist/event_handler.rs for event handling

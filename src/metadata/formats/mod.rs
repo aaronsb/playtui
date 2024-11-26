@@ -1,5 +1,5 @@
 mod id3;
-mod vorbis;
+pub mod vorbis;
 mod flac_meta;
 
 pub use self::id3::Id3Parser;
