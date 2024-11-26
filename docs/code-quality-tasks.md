@@ -28,11 +28,11 @@
     - [x] Create components/playlist/event_handler.rs for event handling
     - [x] Create components/playlist/selection.rs for track selection
     - [x] Create components/playlist/renderer.rs for UI rendering
-  - [ ] Split theme.rs (191 lines):
-    - [ ] Create theme/mod.rs for core functionality
-    - [ ] Create theme/types.rs for data structures
-    - [ ] Create theme/color.rs for color management
-    - [ ] Create theme/style.rs for style management
+  - [x] Split theme.rs (191 lines):
+    - [x] Create theme/mod.rs for core functionality
+    - [x] Create theme/types.rs for data structures
+    - [x] Create theme/color.rs for color management
+    - [x] Create theme/style.rs for style management
   - [ ] Split app.rs (166 lines):
     - [ ] Create app/mod.rs for core functionality
     - [ ] Create app/components.rs for component management
@@ -121,4 +121,3 @@
 - Regular reassessment of this list is recommended
 - New tasks should be added as they are identified
 - This list complements the main [tasks.md](tasks.md) which focuses on feature implementation
-
