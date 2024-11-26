@@ -23,18 +23,26 @@ The event system in PlayTUI follows a multi-layered architecture that handles ev
 ### 2. Event Types
 The system uses several event types that represent different stages of event processing:
 
-1. **KeyEvent**: Raw keyboard input
+1. **KeyEvent**: Keyboard input categorized by availability:
    ```rust
    enum KeyEvent {
-       Char(char),
-       Enter,
-       Left,
-       Right,
-       Up,
-       Down,
+       // Global Navigation Events (always available)
        Tab,
        BackTab,
-       // ...
+       
+       // Global Hotkeys (available regardless of focus)
+       Quit,         // 'q'
+       Escape,       // ESC key
+       Space,        // Global pause/play
+       
+       // Frame-Specific Events (require focus)
+       Enter,        // Activate selected item in focused frame
+       Left,         // Navigate within focused frame
+       Right,        // Navigate within focused frame
+       Up,          // Navigate within focused frame
+       Down,        // Navigate within focused frame
+       
+       // Other events...
    }
    ```
 
@@ -59,196 +67,168 @@ The system uses several event types that represent different stages of event pro
    }
    ```
 
-### 3. Event Processing Chain
-
-1. **Event Manager** (`EventManager`)
-   - Receives raw events from the application
-   - Converts events to actions
-   - Example: `KeyEvent::Left` → `Action::NavigateLeft`
-
-2. **Component Manager** (`ComponentManager`)
-   - Receives actions from Event Manager
-   - Converts actions back to events for component processing
-   - Example: `Action::NavigateLeft` → `Event::Navigation(NavigationEvent::Left)`
-   - Distributes events to appropriate components
-
-3. **Component Event Handlers**
-   - Process events specific to their functionality
-   - Update internal state
-   - Return follow-up actions if needed
-
 ## Focus System
 
-### Focus Management
+### Focus Management Rules
 
-The focus system determines which component receives certain events:
+1. **Global Navigation**
+   - Tab/BackTab events are always available globally
+   - Used to change focus between frames
+   - Focus cycles through frames in a predefined order
+   - Visual feedback indicates the currently focused frame
 
-1. **Global Focus** (`FocusManager`)
-   - Manages which component has primary focus
-   - Handles Tab/BackTab navigation between components
-   - Updates UI state to reflect focused component
+2. **Frame-Specific Controls**
+   - Arrow keys and Enter operate only in the focused frame
+   - Each frame type handles these events differently:
+     * Library Browser: Navigate directory structure, Enter to select
+     * Play Controls: Navigate between buttons, Enter to activate
+     * Volume Control: Left/Right arrows adjust volume
 
-2. **Component Focus**
-   - Components can be focused/unfocused
-   - Navigation events work regardless of focus state
-   - Other events (keys, mouse) require focus
+3. **Global Hotkeys**
+   - Available regardless of focus state
+   - Examples:
+     * 'q' for quit
+     * Escape for cancel/back
+     * Space for global pause/play
+     * Direct playback controls (play, stop, next, etc.)
 
-### Focus Navigation Rules
+### Focus Navigation Implementation
 
-1. **Between Components**
-   - Tab/BackTab cycles through focusable components
-   - Focus order is defined in `FocusManager`
-   - Components update their visual state based on focus
+1. **Between Frames**
+   ```rust
+   impl FocusManager {
+       pub fn should_process_event(&self, event: &Event, component_name: &str) -> bool {
+           match event {
+               // Global events always processed
+               Event::Key(KeyEvent::Tab) |
+               Event::Key(KeyEvent::BackTab) => true,
+               
+               // Frame-specific events require focus
+               Event::Key(KeyEvent::Enter) |
+               Event::Key(KeyEvent::Left) |
+               Event::Key(KeyEvent::Right) |
+               Event::Key(KeyEvent::Up) |
+               Event::Key(KeyEvent::Down) => {
+                   component_name == self.current_focus()
+               },
+               // ...
+           }
+       }
+   }
+   ```
 
-2. **Within Components**
-   - Arrow keys navigate within focused component
-   - Navigation works even when component isn't focused
-   - Visual feedback shows current focused element
-
-## State Management
-
-### Component State Sharing
-
-Components use `Rc<RefCell>` for shared state:
-```rust
-pub struct App {
-    pub controls: Rc<RefCell<Controls>>,
-    // ...
-}
-```
-
-This ensures:
-- Multiple managers can access the same component instance
-- State changes are immediately visible across the system
-- Thread-safe state management in a single-threaded context
-
-### State Update Flow
-
-1. Event triggers state change in component
-2. Component updates its internal state
-3. Component returns Action::Refresh if needed
-4. UI automatically reflects state changes through shared references
+2. **Within Frames**
+   - Components handle their own internal navigation
+   - Must check focus state before processing events
+   - Provide visual feedback for navigation
 
 ## Best Practices
 
-### Implementing New Events
+### Event Handler Implementation
 
-1. **Define the Event Type**
+1. **Focus Checking**
    ```rust
-   enum CustomEvent {
-       EventTypeOne,
-       EventTypeTwo(CustomData),
-   }
-   ```
-
-2. **Add to Event Enum**
-   ```rust
-   enum Event {
-       // Existing events...
-       Custom(CustomEvent),
-   }
-   ```
-
-3. **Implement Event Handler**
-   ```rust
-   fn handle_event(&mut self, event: Event) -> Option<Action> {
+   fn can_handle(&self, event: &Event) -> bool {
        match event {
-           Event::Custom(custom_event) => handle_custom_event(custom_event),
+           // Global events
+           Event::Key(KeyEvent::Tab) |
+           Event::Key(KeyEvent::Quit) => true,
+           
+           // Frame-specific events
+           Event::Key(KeyEvent::Enter) |
+           Event::Key(KeyEvent::Left) |
+           Event::Navigation(_) => self.focused(),
+           
+           _ => self.focused()
+       }
+   }
+   ```
+
+2. **Event Processing**
+   ```rust
+   fn handle_event(&mut self, event: &Event) -> EventResult<Option<Action>> {
+       match event {
+           Event::Key(KeyEvent::Enter) if self.focused() => {
+               // Handle activation in focused frame
+           },
+           Event::Key(KeyEvent::Left) if self.focused() => {
+               // Handle left navigation in focused frame
+           },
+           Event::Key(KeyEvent::Tab) => {
+               // Handle global navigation
+           },
            // ...
        }
    }
    ```
 
-### Creating New Components
+### Component Guidelines
 
-1. **Implement Component Trait**
-   ```rust
-   impl Component for NewComponent {
-       fn new() -> Self;
-       fn handle_event(&mut self, event: Event) -> Option<Action>;
-       fn focused(&self) -> bool;
-       fn set_focused(&mut self, focused: bool);
-   }
-   ```
+1. **Focus Management**
+   - Implement clear focus indicators
+   - Handle focus state changes appropriately
+   - Update visual state based on focus
 
-2. **Define State Management**
-   - Use `ComponentState` for focus management
-   - Implement clear state update methods
-   - Consider what state should be shared
+2. **Event Handling**
+   - Respect focus rules for event processing
+   - Handle global events appropriately
+   - Provide clear visual feedback
 
-3. **Handle Navigation**
-   - Allow navigation events regardless of focus
-   - Block other events when not focused
-   - Implement proper focus visualization
-
-### Event Handler Guidelines
-
-1. **Focus Handling**
-   ```rust
-   fn can_handle(&self, event: &Event) -> bool {
-       match event {
-           Event::Navigation(_) => true,  // Always handle navigation
-           _ => self.focused()            // Other events need focus
-       }
-   }
-   ```
-
-2. **State Updates**
-   - Keep state updates atomic
-   - Return Action::Refresh when visual update needed
-   - Use proper error handling for state changes
-
-3. **Event Processing**
-   - Handle one event type per match arm
-   - Consider component state in event handling
-   - Document event handling behavior
+3. **Navigation**
+   - Implement consistent navigation patterns
+   - Use arrow keys for internal navigation
+   - Use Enter for activation/selection
 
 ## Testing
 
-### Event Flow Testing
+### Focus Testing
+```rust
+#[test]
+fn test_event_processing_rules() {
+    let component = MyComponent::new();
+    
+    // Global events should always process
+    assert!(component.can_handle(&Event::Key(KeyEvent::Tab)));
+    
+    // Frame-specific events need focus
+    component.set_focused(false);
+    assert!(!component.can_handle(&Event::Key(KeyEvent::Enter)));
+    
+    component.set_focused(true);
+    assert!(component.can_handle(&Event::Key(KeyEvent::Enter)));
+}
+```
 
-1. **Test Navigation Events**
-   ```rust
-   #[test]
-   fn test_navigation_events_work_regardless_of_focus() {
-       let mut component = Component::new();
-       component.set_focused(false);
-       let result = component.handle_event(Event::Navigation(NavigationEvent::Right));
-       assert_eq!(result, Some(Action::Refresh));
-   }
-   ```
-
-2. **Test Focus Behavior**
-   ```rust
-   #[test]
-   fn test_key_events_blocked_when_not_focused() {
-       let mut component = Component::new();
-       component.set_focused(false);
-       let result = component.handle_event(Event::Key(KeyEvent::Enter));
-       assert_eq!(result, None);
-   }
-   ```
-
-### Component Testing
-
-1. Test state updates
-2. Test focus management
-3. Test event handling
-4. Test visual rendering
+### Navigation Testing
+```rust
+#[test]
+fn test_navigation_behavior() {
+    let mut component = MyComponent::new();
+    component.set_focused(true);
+    
+    // Test internal navigation
+    let result = component.handle_event(&Event::Key(KeyEvent::Right));
+    assert!(result.is_ok());
+    
+    // Test activation
+    let result = component.handle_event(&Event::Key(KeyEvent::Enter));
+    assert!(result.is_ok());
+}
+```
 
 ## Common Issues and Solutions
 
 1. **Events Not Reaching Components**
-   - Verify event mapping in main.rs
-   - Check focus state
-   - Ensure proper event conversion
+   - Verify focus state
+   - Check event routing in FocusManager
+   - Ensure proper event type categorization
 
-2. **State Updates Not Visible**
-   - Verify Rc<RefCell> usage
-   - Check if Action::Refresh is returned
-   - Verify render method updates
+2. **Inconsistent Navigation**
+   - Follow focus rules strictly
+   - Implement clear navigation patterns
+   - Provide proper visual feedback
 
 3. **Focus Issues**
-   - Check FocusManager configuration
    - Verify focus update propagation
+   - Check focus state management
    - Test focus-dependent event handling

@@ -130,7 +130,7 @@ impl Component for LibraryBrowser {
                 KeyEvent::Up => Some(Action::NavigateUp),
                 KeyEvent::Down => Some(Action::NavigateDown),
                 KeyEvent::Right | KeyEvent::Enter => Some(Action::Select),
-                KeyEvent::Left | KeyEvent::Esc => Some(Action::Back),
+                KeyEvent::Left | KeyEvent::Escape => Some(Action::Back),
                 _ => None,
             },
             Event::Navigation(nav_event) => match nav_event {

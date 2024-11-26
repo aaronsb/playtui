@@ -50,6 +50,45 @@ impl FocusManager {
         }
     }
 
+    /// Determines if an event should be processed based on focus rules
+    pub fn should_process_event(&self, event: &Event, component_name: &str) -> bool {
+        match event {
+            // Global Navigation Events - Always Available
+            Event::Key(KeyEvent::Tab) |
+            Event::Key(KeyEvent::BackTab) => true,
+            
+            // Global Hotkeys - Always Available
+            Event::Key(KeyEvent::Quit) |
+            Event::Key(KeyEvent::Escape) |
+            Event::Key(KeyEvent::Space) |
+            Event::Key(KeyEvent::Play) |
+            Event::Key(KeyEvent::Pause) |
+            Event::Key(KeyEvent::Stop) |
+            Event::Key(KeyEvent::Next) |
+            Event::Key(KeyEvent::Previous) |
+            Event::Key(KeyEvent::VolumeUp) |
+            Event::Key(KeyEvent::VolumeDown) => true,
+            
+            // Frame-Specific Events - Only process if component has focus
+            Event::Key(KeyEvent::Enter) |
+            Event::Key(KeyEvent::Left) |
+            Event::Key(KeyEvent::Right) |
+            Event::Key(KeyEvent::Up) |
+            Event::Key(KeyEvent::Down) => {
+                component_name == self.current_focus()
+            },
+            
+            // System events are always processed
+            Event::System(_) => true,
+            
+            // Navigation events are treated like arrow keys - require focus
+            Event::Navigation(_) => component_name == self.current_focus(),
+            
+            // Other events require focus by default
+            _ => component_name == self.current_focus(),
+        }
+    }
+
     /// Updates component focus states based on current focus
     pub fn update_focus_states(
         &self,
@@ -82,9 +121,33 @@ impl FocusManager {
 
 #[cfg(test)]
 mod tests {
-    // TODO: Add tests for focus management
-    // - Test focus navigation
-    // - Test component focus state updates
-    // - Test focus event handling
-    // - Test edge cases (first/last component)
+    use super::*;
+
+    #[test]
+    fn test_global_events_always_processed() {
+        let manager = FocusManager::new();
+        
+        // Test global navigation events
+        assert!(manager.should_process_event(&Event::Key(KeyEvent::Tab), "any_component"));
+        assert!(manager.should_process_event(&Event::Key(KeyEvent::BackTab), "any_component"));
+        
+        // Test global hotkeys
+        assert!(manager.should_process_event(&Event::Key(KeyEvent::Quit), "any_component"));
+        assert!(manager.should_process_event(&Event::Key(KeyEvent::Space), "any_component"));
+    }
+
+    #[test]
+    fn test_frame_specific_events_require_focus() {
+        let manager = FocusManager::new();
+        let focused_component = manager.current_focus();
+        let unfocused_component = "unfocused";
+        
+        // Test arrow keys
+        assert!(manager.should_process_event(&Event::Key(KeyEvent::Left), focused_component));
+        assert!(!manager.should_process_event(&Event::Key(KeyEvent::Left), unfocused_component));
+        
+        // Test enter key
+        assert!(manager.should_process_event(&Event::Key(KeyEvent::Enter), focused_component));
+        assert!(!manager.should_process_event(&Event::Key(KeyEvent::Enter), unfocused_component));
+    }
 }

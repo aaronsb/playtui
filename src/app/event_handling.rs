@@ -34,8 +34,6 @@ impl EventManager {
 
     /// Observe phase: Initial event processing
     fn observe_event(&self, _event: &Event) -> EventResult<()> {
-        // Log or monitor event if needed
-        // In the future, this could include event validation, filtering, etc.
         Ok(())
     }
 
@@ -47,16 +45,39 @@ impl EventManager {
             },
             Event::Key(key_event) => {
                 match key_event {
-                    // Tab navigation between frames
+                    // Global Navigation Events - Always Available
                     KeyEvent::Tab => Ok(Action::UI(UIAction::Focus(FocusDirection::Next))),
                     KeyEvent::BackTab => Ok(Action::UI(UIAction::Focus(FocusDirection::Previous))),
                     KeyEvent::Focus(direction) => Ok(Action::UI(UIAction::Focus(direction))),
                     
-                    // Pass through key events directly
+                    // Global Hotkeys - Always Available
+                    KeyEvent::Quit => Ok(Action::App(AppAction::Quit)),
+                    KeyEvent::Escape => Ok(Action::App(AppAction::Cancel)),
+                    KeyEvent::Space => Ok(Action::Key(KeyEvent::Space)), // Global pause/play
+                    KeyEvent::Play => Ok(Action::Key(KeyEvent::Play)),
+                    KeyEvent::Pause => Ok(Action::Key(KeyEvent::Pause)),
+                    KeyEvent::Stop => Ok(Action::Key(KeyEvent::Stop)),
+                    KeyEvent::Next => Ok(Action::Key(KeyEvent::Next)),
+                    KeyEvent::Previous => Ok(Action::Key(KeyEvent::Previous)),
+                    KeyEvent::VolumeUp => Ok(Action::Key(KeyEvent::VolumeUp)),
+                    KeyEvent::VolumeDown => Ok(Action::Key(KeyEvent::VolumeDown)),
+                    
+                    // Frame-Specific Events - Only pass through if frame has focus
+                    KeyEvent::Enter |
+                    KeyEvent::Left |
+                    KeyEvent::Right |
+                    KeyEvent::Up |
+                    KeyEvent::Down => {
+                        // These events are passed to the focused component only
+                        Ok(Action::Key(key_event))
+                    },
+                    
+                    // Other events pass through normally
                     _ => Ok(Action::Key(key_event)),
                 }
             },
             Event::Navigation(nav_event) => {
+                // Navigation events are converted to key events for the focused frame
                 match nav_event {
                     NavigationEvent::Left => Ok(Action::Key(KeyEvent::Left)),
                     NavigationEvent::Right => Ok(Action::Key(KeyEvent::Right)),
