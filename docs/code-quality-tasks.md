@@ -5,66 +5,75 @@
 ## High Priority
 
 ### Module Organization
-- [x] Split controls.rs into smaller modules:
-  - [x] Create controls/mod.rs for core traits and exports
-  - [x] Create controls/layout.rs for rendering logic
-  - [x] Create controls/events.rs for event handling
-  - [x] Create controls/actions.rs for action handling
-- [ ] Review and potentially split other modules exceeding 150 lines
-  - Use ```bash``` to find lines exceeding 150 characters: ```find src -type f -name "*.rs" -exec wc -l {} \;```
-  - [x] Split events/mod.rs (269 lines):
-    - [x] Create events/error.rs for error handling
-    - [x] Create events/types.rs for event type definitions
-    - [x] Create events/actions.rs for action enums
-    - [x] Create events/handler.rs for event handling
-    - [x] Create events/filter.rs for event filtering
-  - [x] Split metadata/formats/vorbis.rs (208 lines):
-    - [x] Create metadata/formats/vorbis/parser.rs for core parser
-    - [x] Create metadata/formats/vorbis/tag_extractor.rs for tag handling
-    - [x] Create metadata/formats/vorbis/audio_properties.rs for audio analysis
-    - [x] Create metadata/formats/vorbis/tests.rs for tests
-  - [x] Split components/playlist.rs (200 lines):
-    - [x] Create components/playlist/mod.rs for core functionality
-    - [x] Create components/playlist/event_handler.rs for event handling
-    - [x] Create components/playlist/selection.rs for track selection
-    - [x] Create components/playlist/renderer.rs for UI rendering
-  - [x] Split theme.rs (191 lines):
-    - [x] Create theme/mod.rs for core functionality
-    - [x] Create theme/types.rs for data structures
-    - [x] Create theme/color.rs for color management
-    - [x] Create theme/style.rs for style management
-  - [x] Split app.rs (166 lines):
-    - [x] Create app/mod.rs for core functionality
-    - [x] Create app/components.rs for component management
-    - [x] Create app/event_handling.rs for event handling
-    - [x] Create app/focus.rs for focus management
+- [ ] Split app/mod.rs (300 lines):
+  - [ ] Create app/state.rs for application state management
+  - [ ] Create app/initialization.rs for startup logic
+  - [ ] Create app/rendering.rs for main render loop
+  - [ ] Create app/lifecycle.rs for application lifecycle management
 
-### Core Audio Implementation
-- [ ] Implement basic audio playback functionality in player.rs
-- [ ] Complete audio stream handling in stream.rs
-- [ ] Add proper error handling for audio operations
-- [ ] Implement volume control system
+- [ ] Split components/library_browser.rs (251 lines):
+  - [ ] Create components/library_browser/mod.rs for core functionality
+  - [ ] Create components/library_browser/view.rs for view logic
+  - [ ] Create components/library_browser/state.rs for state management
+  - [ ] Create components/library_browser/actions.rs for action handling
 
-### Format Decoders
-- [ ] Complete FLAC decoder implementation:
-  - [ ] Add FLAC-specific decoding state
-  - [ ] Implement FLAC header reading
-  - [ ] Implement actual FLAC decoding
-- [ ] Complete MP3 decoder implementation:
-  - [ ] Add MP3-specific decoding state
-  - [ ] Implement MP3 header reading
-  - [ ] Implement frame header parsing
-- [ ] Complete OGG decoder implementation:
-  - [ ] Add OGG/Vorbis-specific decoding state
-  - [ ] Implement OGG/Vorbis header reading
-  - [ ] Implement page validation
-  - [ ] Implement Vorbis header parsing
-- [ ] Complete WAV decoder implementation:
-  - [ ] Add WAV-specific decoding state
-  - [ ] Implement WAV header reading
-  - [ ] Implement RIFF header validation
-  - [ ] Implement fmt chunk parsing
-  - [ ] Implement data chunk location
+- [ ] Split components/track_list.rs (298 lines):
+  - [ ] Create components/track_list/mod.rs for core functionality
+  - [ ] Create components/track_list/view.rs for view logic
+  - [ ] Create components/track_list/state.rs for state management
+  - [ ] Create components/track_list/actions.rs for action handling
+
+- [ ] Split components/tests.rs (237 lines):
+  - [ ] Create components/tests/mod.rs for test organization
+  - [ ] Create components/tests/library_tests.rs for library component tests
+  - [ ] Create components/tests/track_tests.rs for track-related tests
+  - [ ] Create components/tests/control_tests.rs for control component tests
+
+- [ ] Split components/controls/events.rs (194 lines):
+  - [ ] Create components/controls/events/mod.rs for event handling core
+  - [ ] Create components/controls/events/handlers.rs for specific event handlers
+  - [ ] Create components/controls/events/types.rs for event type definitions
+  - [ ] Create components/controls/events/processing.rs for event processing logic
+
+- [ ] Split components/volume_control/mod.rs (177 lines):
+  - [ ] Create components/volume_control/view.rs for rendering logic
+  - [ ] Create components/volume_control/state.rs for state management
+  - [ ] Create components/volume_control/actions.rs for volume actions
+  - [ ] Create components/volume_control/events.rs for event handling
+
+- [ ] Split app/focus.rs (176 lines):
+  - [ ] Create app/focus/mod.rs for core focus management
+  - [ ] Create app/focus/state.rs for focus state handling
+  - [ ] Create app/focus/navigation.rs for focus navigation logic
+  - [ ] Create app/focus/events.rs for focus-related events
+
+- [ ] Split app/components.rs (200 lines):
+  - [ ] Create app/components/mod.rs for component management core
+  - [ ] Create app/components/registry.rs for component registration
+  - [ ] Create app/components/lifecycle.rs for component lifecycle
+  - [ ] Create app/components/relationships.rs for component relationships
+
+### Module Organization Guidelines
+1. File Size Threshold:
+   - Regular review of files exceeding 150 lines
+   - Split files when they exceed 200 lines
+   - Consider splitting earlier if complexity warrants it
+
+2. Module Structure:
+   - Core functionality in mod.rs
+   - Separate view logic from state management
+   - Isolate event handling
+   - Group related functionality
+
+3. Testing Organization:
+   - Test files should mirror main code structure
+   - Separate integration tests from unit tests
+   - Group related test cases logically
+
+4. Monitoring:
+   - Regular line count checks using: find src -type f -name "*.rs" -exec wc -l {} \;
+   - Review during code reviews
+   - Track module growth over time
 
 ## Medium Priority
 
