@@ -5,25 +5,27 @@ use ratatui::{
 use crate::events::{Event, Action};
 use crate::theme::Theme;
 
-mod current_track_info;
-mod library_browser;
-mod now_playing;
-mod playback_status;
-mod playlist;
-mod track_details;
-mod track_list;
-mod volume_control;
-mod controls;
-mod filesystem;
+pub mod current_track_info;
+pub mod library_browser;
+pub mod now_playing;
+pub mod playback_status;
+pub mod playlist;
+pub mod track_details;
+pub mod track_list;
+pub mod volume_control;
+pub mod controls;
+pub mod filesystem;
+#[cfg(test)]
+mod tests;
 
-pub use current_track_info::*;
-pub use library_browser::*;
-pub use now_playing::*;
-pub use playback_status::*;
+pub use current_track_info::CurrentTrackInfo;
+pub use library_browser::LibraryBrowser;
+pub use now_playing::NowPlaying;
+pub use playback_status::PlaybackStatus;
 pub use playlist::*;
-pub use track_details::*;
-pub use track_list::*;
-pub use volume_control::*;
+pub use track_details::TrackDetails;
+pub use track_list::TrackList;
+pub use volume_control::VolumeControl;
 pub use controls::*;
 pub use filesystem::*;
 

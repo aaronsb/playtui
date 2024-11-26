@@ -1,7 +1,10 @@
 use ratatui::prelude::*;
-use super::{Component, ComponentState, create_block};
+use crate::components::{Component, ComponentState, create_block};
 use crate::events::{Event, Action};
 use crate::theme::Theme;
+
+#[cfg(test)]
+mod tests;
 
 #[derive(Clone)]
 pub struct TrackDetails {
