@@ -9,6 +9,7 @@ Implemented a new control layout with improved organization and visual consisten
 - [x] Added new control buttons (record, rewind, fast forward, stop/eject)
 - [x] Improved visual consistency with standardized icons
 - [x] Added button highlight and shadow effects
+- [x] Standardized border types across all components (rounded by default, thick when focused)
 
 ## Implementation Details
 
@@ -34,6 +35,7 @@ Implemented a new control layout with improved organization and visual consisten
    - Special red highlight for record button
    - Consistent nerdfont icons
    - Improved directional indicators
+   - Standardized border types (rounded by default, thick when focused)
 
 ### Key Features
 1. Component Integration
@@ -41,12 +43,14 @@ Implemented a new control layout with improved organization and visual consisten
    - Theme-aware rendering
    - State management for all buttons
    - Event handling for all controls
+   - Consistent border styling across components
 
 2. Visual Feedback
    - Active state highlighting
    - Button shadows for depth
    - Clear visual indicators
    - Consistent icon styling
+   - Focused state with thick borders
 
 3. State Management
    - Playback state tracking
@@ -59,6 +63,7 @@ Implemented a new control layout with improved organization and visual consisten
 - Theme integration for consistent styling
 - Event system handles all control actions
 - Mouse position tracking for future click handling
+- Border types standardized using ratatui's BorderType enum
 
 ## Next Steps
 1. Control Enhancements

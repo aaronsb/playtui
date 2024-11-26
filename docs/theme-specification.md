@@ -53,9 +53,19 @@ pub struct Styles {
     pub text_dim: Style,
     
     // Interactive element styles
-    pub button: Style,
+    pub button: Style,           // Default button style
+    pub button_active: Style,    // Style for active buttons (e.g. pause when playing)
+    pub button_shadow: Style,    // Shadow effect for buttons
+    pub record_button_active: Style, // Special style for active record button
     pub list_item: Style,
     pub list_selected: Style,
+    
+    // Player-specific styles
+    pub playing_item: Style,     // Currently playing track
+    pub progress_bar: Style,     // Playback progress
+    pub volume_indicator: Style, // Volume level indicator
+    pub tab_active: Style,      // Active tab
+    pub tab_inactive: Style,    // Inactive tab
 }
 ```
 
@@ -106,12 +116,45 @@ Colors can be specified in two formats:
       "fg": "#2E8B57",
       "modifiers": ["BOLD"]
     },
+    "button_active": {
+      "fg": "#98FB98",
+      "modifiers": ["BOLD"]
+    },
+    "button_shadow": {
+      "fg": "#1A1A1A",
+      "bg": "#2E8B57",
+      "modifiers": []
+    },
+    "record_button_active": {
+      "fg": "#FF6347",
+      "modifiers": ["BOLD"]
+    },
     "list_item": {
       "fg": "#F5F5F5"
     },
     "list_selected": {
       "fg": "#98FB98",
       "modifiers": ["BOLD"]
+    },
+    "playing_item": {
+      "fg": "#00FF7F",
+      "modifiers": ["BOLD"]
+    },
+    "progress_bar": {
+      "fg": "#98FB98",
+      "bg": "#1A1A1A"
+    },
+    "volume_indicator": {
+      "fg": "#00FF7F",
+      "modifiers": ["BOLD"]
+    },
+    "tab_active": {
+      "fg": "#1A1A1A",
+      "bg": "#2E8B57",
+      "modifiers": ["BOLD"]
+    },
+    "tab_inactive": {
+      "fg": "#2E8B57"
     }
   }
 }

@@ -36,6 +36,19 @@
       "fg": "#A6E22E",
       "modifiers": ["BOLD"]
     },
+    "button_active": {
+      "fg": "#FD971F",
+      "modifiers": ["BOLD"]
+    },
+    "button_shadow": {
+      "fg": "#272822",
+      "bg": "#75715E",
+      "modifiers": []
+    },
+    "record_button_active": {
+      "fg": "#F92672",
+      "modifiers": ["BOLD"]
+    },
     "list_item": {
       "fg": "#F8F8F2"
     },

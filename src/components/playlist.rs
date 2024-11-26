@@ -1,10 +1,11 @@
 use ratatui::{
     prelude::*,
-    widgets::{Block, Borders, List, ListItem, ListState},
+    widgets::{Block, Borders, BorderType, List, ListItem, ListState},
 };
 
 use crate::events::{Event, Action, MouseEvent, KeyEvent, PlaylistAction};
 use super::{Component, ComponentState};
+use crate::theme::Theme;
 
 #[derive(Clone)]
 pub struct Playlist {
@@ -24,14 +25,15 @@ impl Component for Playlist {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
         let block = Block::default()
             .title("Playlist")
             .borders(Borders::ALL)
+            .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
             .border_style(if focused {
-                Style::default().fg(Color::Yellow)
+                theme.get_style("border_focused")
             } else {
-                Style::default()
+                theme.get_style("border_unfocused")
             });
 
         let items: Vec<ListItem> = self.tracks
@@ -39,9 +41,9 @@ impl Component for Playlist {
             .enumerate()
             .map(|(i, track)| {
                 let style = if Some(i) == self.list_state.selected() {
-                    Style::default().fg(Color::Yellow)
+                    theme.get_style("list_selected")
                 } else {
-                    Style::default()
+                    theme.get_style("list_item")
                 };
                 
                 // Extract filename from path for display
@@ -57,7 +59,7 @@ impl Component for Playlist {
 
         let list = List::new(items)
             .block(block)
-            .highlight_style(Style::default().fg(Color::Yellow))
+            .highlight_style(theme.get_style("list_selected"))
             .highlight_symbol(">");
 
         let mut list_state = self.list_state.clone();

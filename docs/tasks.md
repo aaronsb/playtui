@@ -41,6 +41,7 @@
 - [x] Implement basic frame navigation
 - [x] Add focus system with visual feedback
 - [x] Create component layout structure (60/25/15 split)
+- [x] Standardize border types (rounded by default, thick when focused)
 - [ ] Optimize frame rendering for large playlists
 - [ ] Implement high contrast themes
 - [ ] Add configurable key bindings

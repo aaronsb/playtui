@@ -1,240 +1,93 @@
 {
-  "theme_info": {
+  "metadata": {
     "name": "Copper",
-    "version": "1.0",
-    "author": "Aaron"
+    "author": "Aaron",
+    "version": "1.0"
   },
-  "widgets": {
-    "now_playing": {
-      "name": "Now Playing",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "wheat",
-          "bg": "goldenrod",
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      }
+  "colors": {
+    "primary": "#DAA520",
+    "secondary": "#F5DEB3",
+    "background": "#8B4513",
+    "foreground": "#FFF8DC",
+    "active": "#FFD700",
+    "inactive": "#D2691E",
+    "playing": "#FFE4B5",
+    "error": "#CD853F"
+  },
+  "styles": {
+    "border_focused": {
+      "fg": "#FFF8DC",
+      "bg": "#DAA520",
+      "modifiers": ["BOLD"]
     },
-    "progress_gauge": {
-      "name": "Progress",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "wheat",
-          "bg": "goldenrod",
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "gauge_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      }
+    "border_unfocused": {
+      "fg": "#F5DEB3",
+      "bg": "#DAA520"
     },
-    "progress_text": {
-      "name": "Progress (No Duration)",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "wheat",
-          "bg": "goldenrod",
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      }
+    "text_normal": {
+      "fg": "#FFF8DC",
+      "bg": "#8B4513"
     },
-    "browser": {
-      "name": "Browser",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "wheat",
-            "bg": "goldenrod",
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "cornsilk",
-            "bg": "goldenrod",
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "thick"
-        }
-      },
-      "list_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "cornsilk",
-        "bg": "goldenrod",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "► "
+    "text_bold": {
+      "fg": "#FFF8DC",
+      "bg": "#8B4513",
+      "modifiers": ["BOLD"]
     },
-    "songs": {
-      "name": "Songs",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "wheat",
-            "bg": "goldenrod",
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "cornsilk",
-            "bg": "goldenrod",
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "thick"
-        }
-      },
-      "list_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "cornsilk",
-        "bg": "goldenrod",
-        "modifiers": ["BOLD"]
-      },
-      "playing_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "► "
+    "text_dim": {
+      "fg": "#D2691E",
+      "bg": "#8B4513"
     },
-    "playlist": {
-      "name": "Playlist",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "wheat",
-            "bg": "goldenrod",
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "cornsilk",
-            "bg": "goldenrod",
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "thick"
-        }
-      },
-      "list_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "cornsilk",
-        "bg": "goldenrod",
-        "modifiers": ["BOLD"]
-      },
-      "playing_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "► "
+    "button": {
+      "fg": "#F5DEB3",
+      "bg": "#8B4513",
+      "modifiers": ["BOLD"]
     },
-    "controls": {
-      "name": "Controls",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "wheat",
-          "bg": "goldenrod",
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      },
-      "volume_style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": ["BOLD"]
-      }
+    "button_active": {
+      "fg": "#FFD700",
+      "bg": "#8B4513",
+      "modifiers": ["BOLD"]
     },
-    "menu": {
-      "name": "Menu",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "wheat",
-          "bg": "goldenrod",
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "cornsilk",
-        "bg": "saddlebrown",
-        "modifiers": []
-      },
-      "tabs": {
-        "preferences": {
-          "selected": {
-            "fg": "saddlebrown",
-            "bg": "cornsilk",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "wheat",
-            "bg": "goldenrod",
-            "modifiers": []
-          }
-        },
-        "looks": {
-          "selected": {
-            "fg": "saddlebrown",
-            "bg": "cornsilk",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "wheat",
-            "bg": "goldenrod",
-            "modifiers": []
-          }
-        },
-        "about": {
-          "selected": {
-            "fg": "saddlebrown",
-            "bg": "cornsilk",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "wheat",
-            "bg": "goldenrod",
-            "modifiers": []
-          }
-        }
-      }
+    "button_shadow": {
+      "fg": "#8B4513",
+      "bg": "#DAA520",
+      "modifiers": []
+    },
+    "record_button_active": {
+      "fg": "#CD853F",
+      "bg": "#8B4513",
+      "modifiers": ["BOLD"]
+    },
+    "list_item": {
+      "fg": "#FFF8DC",
+      "bg": "#8B4513"
+    },
+    "list_selected": {
+      "fg": "#FFF8DC",
+      "bg": "#DAA520",
+      "modifiers": ["BOLD"]
+    },
+    "playing_item": {
+      "fg": "#FFE4B5",
+      "bg": "#8B4513",
+      "modifiers": ["BOLD"]
+    },
+    "progress_bar": {
+      "fg": "#FFD700",
+      "bg": "#8B4513"
+    },
+    "volume_indicator": {
+      "fg": "#FFF8DC",
+      "bg": "#8B4513",
+      "modifiers": ["BOLD"]
+    },
+    "tab_active": {
+      "fg": "#8B4513",
+      "bg": "#FFF8DC",
+      "modifiers": ["BOLD"]
+    },
+    "tab_inactive": {
+      "fg": "#F5DEB3",
+      "bg": "#DAA520"
     }
   }
 }

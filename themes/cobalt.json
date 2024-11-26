@@ -1,240 +1,81 @@
 {
-  "theme_info": {
+  "metadata": {
     "name": "Cobalt",
-    "version": "1.0",
-    "author": "Cline"
+    "author": "Cline",
+    "version": "1.0"
   },
-  "widgets": {
-    "now_playing": {
-      "name": "Now Playing",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "RoyalBlue",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "White",
-        "bg": null,
-        "modifiers": ["BOLD"]
-      }
+  "colors": {
+    "primary": "#4169E1",
+    "secondary": "#87CEEB",
+    "background": "#000033",
+    "foreground": "#FFFFFF",
+    "active": "#4876FF",
+    "inactive": "#808080",
+    "playing": "#90EE90",
+    "error": "#FF4040"
+  },
+  "styles": {
+    "border_focused": {
+      "fg": "#FFFFFF",
+      "modifiers": ["BOLD"]
     },
-    "progress_gauge": {
-      "name": "Progress",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "RoyalBlue",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "gauge_style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": []
-      }
+    "border_unfocused": {
+      "fg": "#4169E1"
     },
-    "progress_text": {
-      "name": "Progress (No Duration)",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "RoyalBlue",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": []
-      }
+    "text_normal": {
+      "fg": "#87CEEB"
     },
-    "browser": {
-      "name": "Browser",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "RoyalBlue",
-            "bg": null,
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "White",
-            "bg": null,
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "double"
-        }
-      },
-      "list_style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "White",
-        "bg": "DarkBlue",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "▶ "
+    "text_bold": {
+      "fg": "#FFFFFF",
+      "modifiers": ["BOLD"]
     },
-    "songs": {
-      "name": "Songs",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "RoyalBlue",
-            "bg": null,
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "White",
-            "bg": null,
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "double"
-        }
-      },
-      "list_style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "White",
-        "bg": "DarkBlue",
-        "modifiers": ["BOLD"]
-      },
-      "playing_style": {
-        "fg": "LightGreen",
-        "bg": null,
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "▶ "
+    "text_dim": {
+      "fg": "#808080"
     },
-    "playlist": {
-      "name": "Playlist",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "RoyalBlue",
-            "bg": null,
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "White",
-            "bg": null,
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "double"
-        }
-      },
-      "list_style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "White",
-        "bg": "DarkBlue",
-        "modifiers": ["BOLD"]
-      },
-      "playing_style": {
-        "fg": "LightGreen",
-        "bg": null,
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "▶ "
+    "button": {
+      "fg": "#87CEEB",
+      "modifiers": ["BOLD"]
     },
-    "controls": {
-      "name": "Controls",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "RoyalBlue",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "Gray",
-        "bg": null,
-        "modifiers": []
-      },
-      "volume_style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": ["BOLD"]
-      }
+    "button_active": {
+      "fg": "#4876FF",
+      "modifiers": ["BOLD"]
     },
-    "menu": {
-      "name": "Menu",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "RoyalBlue",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "LightBlue",
-        "bg": null,
-        "modifiers": []
-      },
-      "tabs": {
-        "preferences": {
-          "selected": {
-            "fg": "White",
-            "bg": "DarkBlue",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "LightBlue",
-            "bg": null,
-            "modifiers": []
-          }
-        },
-        "looks": {
-          "selected": {
-            "fg": "White",
-            "bg": "DarkBlue",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "LightBlue",
-            "bg": null,
-            "modifiers": []
-          }
-        },
-        "about": {
-          "selected": {
-            "fg": "White",
-            "bg": "DarkBlue",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "LightBlue",
-            "bg": null,
-            "modifiers": []
-          }
-        }
-      }
+    "button_shadow": {
+      "fg": "#000033",
+      "bg": "#4169E1",
+      "modifiers": []
+    },
+    "record_button_active": {
+      "fg": "#FF4040",
+      "modifiers": ["BOLD"]
+    },
+    "list_item": {
+      "fg": "#87CEEB"
+    },
+    "list_selected": {
+      "fg": "#FFFFFF",
+      "bg": "#00008B",
+      "modifiers": ["BOLD"]
+    },
+    "playing_item": {
+      "fg": "#90EE90",
+      "modifiers": ["BOLD"]
+    },
+    "progress_bar": {
+      "fg": "#4876FF",
+      "bg": "#000033"
+    },
+    "volume_indicator": {
+      "fg": "#87CEEB",
+      "modifiers": ["BOLD"]
+    },
+    "tab_active": {
+      "fg": "#FFFFFF",
+      "bg": "#00008B",
+      "modifiers": ["BOLD"]
+    },
+    "tab_inactive": {
+      "fg": "#87CEEB"
     }
   }
 }

@@ -1,10 +1,11 @@
 use ratatui::{
     prelude::*,
-    widgets::{Block, Borders, Paragraph, Gauge},
+    widgets::{Block, Borders, BorderType, Paragraph, Gauge},
 };
 
 use crate::events::{Event, Action, TrackMetadata};
 use super::{Component, ComponentState};
+use crate::theme::Theme;
 
 #[derive(Clone)]
 pub struct NowPlaying {
@@ -24,14 +25,15 @@ impl Component for NowPlaying {
         }
     }
 
-    fn render(&self, frame: &mut Frame, area: Rect, focused: bool) {
+    fn render(&self, frame: &mut Frame, area: Rect, focused: bool, theme: &Theme) {
         let block = Block::default()
             .title("Now Playing")
             .borders(Borders::ALL)
+            .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
             .border_style(if focused {
-                Style::default().fg(Color::Yellow)
+                theme.get_style("border_focused")
             } else {
-                Style::default()
+                theme.get_style("border_unfocused")
             });
 
         let inner_area = block.inner(area);
@@ -70,7 +72,7 @@ impl Component for NowPlaying {
         let progress_percent = (self.progress * 100.0) as u16;
         frame.render_widget(
             Gauge::default()
-                .gauge_style(Style::default().fg(Color::Yellow))
+                .gauge_style(theme.get_style("playing_item"))
                 .ratio(self.progress)
                 .label(format!("{}%", progress_percent)),
             chunks[1],
@@ -79,7 +81,7 @@ impl Component for NowPlaying {
         // Render volume bar
         frame.render_widget(
             Gauge::default()
-                .gauge_style(Style::default().fg(Color::Green))
+                .gauge_style(theme.get_style("volume_indicator"))
                 .ratio(self.volume as f64 / 100.0)
                 .label(format!("Volume: {}%", self.volume)),
             chunks[2],

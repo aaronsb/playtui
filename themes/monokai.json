@@ -1,240 +1,81 @@
 {
-  "theme_info": {
+  "metadata": {
     "name": "Monokai",
-    "version": "1.0",
-    "author": "Aaron"
+    "author": "Aaron",
+    "version": "1.0"
   },
-  "widgets": {
-    "now_playing": {
-      "name": "Now Playing",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "#A6E22E",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      }
+  "colors": {
+    "primary": "#F92672",
+    "secondary": "#A6E22E",
+    "background": "#272822",
+    "foreground": "#F8F8F2",
+    "active": "#FD971F",
+    "inactive": "#75715E",
+    "playing": "#66D9EF",
+    "error": "#F92672"
+  },
+  "styles": {
+    "border_focused": {
+      "fg": "#F92672",
+      "modifiers": ["BOLD"]
     },
-    "progress_gauge": {
-      "name": "Progress",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "#A6E22E",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "gauge_style": {
-        "fg": "#FD971F",
-        "bg": "#272822",
-        "modifiers": []
-      }
+    "border_unfocused": {
+      "fg": "#A6E22E"
     },
-    "progress_text": {
-      "name": "Progress (No Duration)",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "#A6E22E",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      }
+    "text_normal": {
+      "fg": "#F8F8F2"
     },
-    "browser": {
-      "name": "Browser",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "#A6E22E",
-            "bg": null,
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "#F92672",
-            "bg": null,
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "thick"
-        }
-      },
-      "list_style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "#272822",
-        "bg": "#FD971F",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "► "
+    "text_bold": {
+      "fg": "#F8F8F2",
+      "modifiers": ["BOLD"]
     },
-    "songs": {
-      "name": "Songs",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "#A6E22E",
-            "bg": null,
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "#F92672",
-            "bg": null,
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "thick"
-        }
-      },
-      "list_style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "#272822",
-        "bg": "#FD971F",
-        "modifiers": ["BOLD"]
-      },
-      "playing_style": {
-        "fg": "#66D9EF",
-        "bg": "#272822",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "► "
+    "text_dim": {
+      "fg": "#75715E"
     },
-    "playlist": {
-      "name": "Playlist",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "unfocused": {
-            "fg": "#A6E22E",
-            "bg": null,
-            "modifiers": []
-          },
-          "focused": {
-            "fg": "#F92672",
-            "bg": null,
-            "modifiers": ["BOLD"]
-          },
-          "unfocused_border_type": "rounded",
-          "focused_border_type": "thick"
-        }
-      },
-      "list_style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      },
-      "highlight_style": {
-        "fg": "#272822",
-        "bg": "#FD971F",
-        "modifiers": ["BOLD"]
-      },
-      "playing_style": {
-        "fg": "#66D9EF",
-        "bg": "#272822",
-        "modifiers": ["BOLD"]
-      },
-      "highlight_symbol": "► "
+    "button": {
+      "fg": "#A6E22E",
+      "modifiers": ["BOLD"]
     },
-    "controls": {
-      "name": "Controls",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "#A6E22E",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      },
-      "volume_style": {
-        "fg": "#66D9EF",
-        "bg": "#272822",
-        "modifiers": ["BOLD"]
-      }
+    "button_active": {
+      "fg": "#FD971F",
+      "modifiers": ["BOLD"]
     },
-    "menu": {
-      "name": "Menu",
-      "block": {
-        "borders": true,
-        "border_style": {
-          "fg": "#A6E22E",
-          "bg": null,
-          "modifiers": [],
-          "border_type": "rounded"
-        }
-      },
-      "style": {
-        "fg": "#F8F8F2",
-        "bg": "#272822",
-        "modifiers": []
-      },
-      "tabs": {
-        "preferences": {
-          "selected": {
-            "fg": "#272822",
-            "bg": "#F92672",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "#F92672",
-            "bg": null,
-            "modifiers": []
-          }
-        },
-        "looks": {
-          "selected": {
-            "fg": "#272822",
-            "bg": "#66D9EF",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "#66D9EF",
-            "bg": null,
-            "modifiers": []
-          }
-        },
-        "about": {
-          "selected": {
-            "fg": "#272822",
-            "bg": "#FD971F",
-            "modifiers": ["BOLD"]
-          },
-          "unselected": {
-            "fg": "#FD971F",
-            "bg": null,
-            "modifiers": []
-          }
-        }
-      }
+    "button_shadow": {
+      "fg": "#272822",
+      "bg": "#75715E",
+      "modifiers": []
+    },
+    "record_button_active": {
+      "fg": "#F92672",
+      "modifiers": ["BOLD"]
+    },
+    "list_item": {
+      "fg": "#F8F8F2"
+    },
+    "list_selected": {
+      "fg": "#272822",
+      "bg": "#FD971F",
+      "modifiers": ["BOLD"]
+    },
+    "playing_item": {
+      "fg": "#66D9EF",
+      "modifiers": ["BOLD"]
+    },
+    "progress_bar": {
+      "fg": "#FD971F",
+      "bg": "#272822"
+    },
+    "volume_indicator": {
+      "fg": "#66D9EF",
+      "modifiers": ["BOLD"]
+    },
+    "tab_active": {
+      "fg": "#272822",
+      "bg": "#F92672",
+      "modifiers": ["BOLD"]
+    },
+    "tab_inactive": {
+      "fg": "#F92672"
     }
   }
 }

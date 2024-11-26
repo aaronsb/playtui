@@ -25,7 +25,7 @@ pub use self::volume_control::VolumeControl;
 
 use ratatui::{
     prelude::*,
-    widgets::{Block, Borders},
+    widgets::{Block, Borders, BorderType},
 };
 
 // Re-export everything needed by components
@@ -51,6 +51,7 @@ pub fn create_block<'a>(title: &'a str, focused: bool, theme: &Theme) -> Block<'
     Block::default()
         .title(title)
         .borders(Borders::ALL)
+        .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
         .border_style(
             if focused {
                 theme.get_style("border_focused")

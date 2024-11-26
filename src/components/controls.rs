@@ -1,6 +1,6 @@
 use ratatui::{
     prelude::*,
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, BorderType, Paragraph},
     layout::{Layout, Direction, Constraint},
 };
 
@@ -45,6 +45,7 @@ impl Component for Controls {
         let controls_block = Block::default()
             .title("Controls")
             .borders(Borders::ALL)
+            .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
             .border_style(if focused {
                 theme.get_style("border_focused")
             } else {
@@ -102,6 +103,7 @@ impl Component for Controls {
         let volume_block = Block::default()
             .title("Volume")
             .borders(Borders::ALL)
+            .border_type(BorderType::Rounded)
             .border_style(theme.get_style("border_unfocused"));
 
         let inner_volume = volume_block.inner(volume_area);
