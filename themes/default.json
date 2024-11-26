@@ -26,7 +26,7 @@
   },
   "styles": {
     "border_focused": {
-      "fg": "#F92672",
+      "fg": "#FD971F",
       "modifiers": ["BOLD"]
     },
     "border_unfocused": {

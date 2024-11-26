@@ -10,6 +10,9 @@ use crossterm::{
 };
 use ratatui::prelude::*;
 use std::io;
+use std::fs::{OpenOptions, File};
+use std::io::Write;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use playtui::app::App;
 use playtui::events::{Event, KeyEvent, MouseEvent};
@@ -46,7 +49,34 @@ fn map_mouse_event(mouse_event: CrosstermMouseEvent) -> Option<MouseEvent> {
     }
 }
 
+fn log_raw_event(file: &mut File, event: &CrosstermEvent) -> std::io::Result<()> {
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    
+    let log_entry = format!("[{}] Raw Event: {:?}\n", timestamp, event);
+    file.write_all(log_entry.as_bytes())?;
+    file.flush()?;
+    
+    Ok(())
+}
+
 fn main() -> Result<()> {
+    // Create logs directory if it doesn't exist
+    std::fs::create_dir_all("logs")?;
+
+    // Open raw events log file
+    let timestamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let raw_log_file = format!("logs/raw_events_{}.log", timestamp);
+    let mut raw_logger = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(raw_log_file)?;
+
     // Setup terminal
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -77,13 +107,13 @@ fn main() -> Result<()> {
     loop {
         // Render UI
         terminal.draw(|frame| playtui::ui::render(frame, &app))?;
-        
-        // Update focus states before handling next event
-        app.update_focus_states();
 
         // Handle events
         match event::read()? {
-            CrosstermEvent::Key(key) => {
+            event @ CrosstermEvent::Key(key) => {
+                // Log raw event
+                log_raw_event(&mut raw_logger, &event)?;
+
                 if key.kind == KeyEventKind::Press {
                     // Check for quit condition first
                     if key.code == KeyCode::Char('q') {
@@ -99,7 +129,10 @@ fn main() -> Result<()> {
                     }
                 }
             }
-            CrosstermEvent::Mouse(mouse) => {
+            event @ CrosstermEvent::Mouse(mouse) => {
+                // Log raw event
+                log_raw_event(&mut raw_logger, &event)?;
+
                 if let Some(mouse_event) = map_mouse_event(mouse) {
                     if let Err(e) = app.handle_event(Event::Mouse(mouse_event)) {
                         // Log error but continue running
@@ -107,14 +140,17 @@ fn main() -> Result<()> {
                     }
                 }
             }
-            CrosstermEvent::Resize(_width, _height) => {
-                // Handle resize by updating the UI state
-                if let Err(e) = app.handle_event(Event::Key(KeyEvent::Focus(playtui::events::FocusDirection::Next))) {
-                    eprintln!("Error handling resize event: {}", e);
-                }
+            event @ CrosstermEvent::Resize(_width, _height) => {
+                // Log raw event
+                log_raw_event(&mut raw_logger, &event)?;
+
+                // Handle resize by redrawing the UI
                 terminal.draw(|frame| playtui::ui::render(frame, &app))?;
             }
-            _ => {}
+            event => {
+                // Log any other raw events
+                log_raw_event(&mut raw_logger, &event)?;
+            }
         }
     }
 

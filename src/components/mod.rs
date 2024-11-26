@@ -45,13 +45,16 @@ pub trait Component {
 
 // The block is created with references that live as long as the input references
 pub fn create_block<'a>(title: &'a str, focused: bool, theme: &'a Theme) -> Block<'a> {
+    let border_style = if focused {
+        theme.get_style("border_focused")
+            .add_modifier(Modifier::BOLD)
+    } else {
+        theme.get_style("border_unfocused")
+    };
+
     Block::default()
         .title(title)
         .borders(Borders::ALL)
         .border_type(if focused { BorderType::Thick } else { BorderType::Rounded })
-        .border_style(if focused {
-            theme.get_style("border_focused")
-        } else {
-            theme.get_style("border_unfocused")
-        })
+        .border_style(border_style)
 }

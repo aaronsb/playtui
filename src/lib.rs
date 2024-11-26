@@ -6,6 +6,7 @@ pub mod metadata;
 pub mod state;
 pub mod theme;
 pub mod ui;
+pub mod logger;
 
 use crate::metadata::{MetadataManager, FileMetadataCache};
 use std::time::Duration;

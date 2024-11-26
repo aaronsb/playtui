@@ -1,4 +1,8 @@
-use crate::events::{Event, Action, EventResult, EventError, SystemEvent, KeyEvent, UIAction, AppAction};
+use crate::events::{Event, Action, EventResult, EventError, SystemEvent, KeyEvent, UIAction, AppAction, FocusDirection};
+use crate::components::{
+    LibraryBrowser, TrackList, TrackDetails,
+    CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
+};
 use super::components::ComponentManager;
 
 /// Manages event processing and dispatching
@@ -8,9 +12,9 @@ pub struct EventManager {
 
 impl EventManager {
     /// Creates a new EventManager
-    pub fn new(component_manager: ComponentManager) -> Self {
+    pub fn new() -> Self {
         Self {
-            component_manager,
+            component_manager: ComponentManager::new(),
         }
     }
 
@@ -41,12 +45,14 @@ impl EventManager {
             },
             Event::Key(key_event) => {
                 match key_event {
+                    KeyEvent::Tab => Ok(Action::UI(UIAction::Focus(FocusDirection::Next))),
+                    KeyEvent::BackTab => Ok(Action::UI(UIAction::Focus(FocusDirection::Previous))),
                     KeyEvent::Focus(direction) => Ok(Action::UI(UIAction::Focus(direction))),
                     KeyEvent::Esc => Ok(Action::App(AppAction::Quit)),
-                    _ => Ok(Action::App(AppAction::Quit)), // Default action
+                    _ => Ok(Action::App(AppAction::NoOp)),
                 }
             },
-            _ => Ok(Action::App(AppAction::Quit)), // Default action for other events
+            _ => Ok(Action::App(AppAction::NoOp)),
         }
     }
 
@@ -57,18 +63,24 @@ impl EventManager {
         Ok(())
     }
 
-    /// Updates the internal state of the event manager
-    pub fn update(&mut self, action: Action) -> EventResult<()> {
-        self.component_manager.update_components(action);
-        Ok(())
+    /// Register components with the event manager
+    pub fn register_components(&mut self,
+        library_browser: &LibraryBrowser,
+        track_list: &TrackList,
+        track_details: &TrackDetails,
+        current_track_info: &CurrentTrackInfo,
+        playback_status: &PlaybackStatus,
+        controls: &Controls,
+        volume_control: &VolumeControl,
+    ) {
+        self.component_manager.register_components(
+            library_browser,
+            track_list,
+            track_details,
+            current_track_info,
+            playback_status,
+            controls,
+            volume_control,
+        );
     }
-}
-
-#[cfg(test)]
-mod tests {
-    // TODO: Add tests for event handling lifecycle
-    // - Test event observation
-    // - Test action determination
-    // - Test action execution
-    // - Test error handling
 }

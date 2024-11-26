@@ -67,6 +67,7 @@ pub enum MetadataAction {
 pub enum AppAction {
     Quit,
     Error(String),
+    NoOp,
 }
 
 #[derive(Debug, Clone)]
