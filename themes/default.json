@@ -14,6 +14,16 @@
     "playing": "#66D9EF",
     "error": "#F92672"
   },
+  "controls": {
+    "record": "⏺",
+    "play": "⏵",
+    "rewind": "◀◀",
+    "fast_forward": "⏵⏵",
+    "stop": "⏏",
+    "pause": "⏸",
+    "next": "⬇",
+    "previous": "⬆"
+  },
   "styles": {
     "border_focused": {
       "fg": "#F92672",

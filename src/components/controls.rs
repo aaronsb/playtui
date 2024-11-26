@@ -55,16 +55,16 @@ impl Component for Controls {
         let inner_controls = controls_block.inner(controls_area);
         frame.render_widget(controls_block, controls_area);
 
-        // Create control buttons with nerdfont icons and states
+        // Create control buttons with themed icons and states
         let controls = vec![
-            (self.is_recording, "⏺", "Record"),      // Record (red circle)
-            (!self.is_playing, "⏵", "Play"),         // Play
-            (self.is_seeking_backward, "◀◀", "Rew"),  // Rewind (double left arrow)
-            (self.is_seeking_forward, "⏵⏵", "FF"),    // Fast Forward (double play)
-            (false, "⏏", "Stop/Eject"),             // Stop/Eject
-            (self.is_playing, "⏸", "Pause"),         // Pause
-            (false, "⬇", "Next"),                   // Next Track (down arrow)
-            (false, "⬆", "Prev"),                   // Previous Track (up arrow)
+            (self.is_recording, &theme.controls.record, "Record"),
+            (!self.is_playing, &theme.controls.play, "Play"),
+            (self.is_seeking_backward, &theme.controls.rewind, "Rew"),
+            (self.is_seeking_forward, &theme.controls.fast_forward, "FF"),
+            (false, &theme.controls.stop, "Stop/Eject"),
+            (self.is_playing, &theme.controls.pause, "Pause"),
+            (false, &theme.controls.next, "Next"),
+            (false, &theme.controls.previous, "Prev"),
         ];
 
         // Calculate button width including padding

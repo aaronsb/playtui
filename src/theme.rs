@@ -9,6 +9,7 @@ pub struct Theme {
     pub metadata: ThemeMetadata,
     pub colors: Colors,
     pub styles: Styles,
+    pub controls: Controls,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -28,6 +29,18 @@ pub struct Colors {
     pub inactive: String,
     pub playing: String,
     pub error: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Controls {
+    pub record: String,
+    pub play: String,
+    pub rewind: String,
+    pub fast_forward: String,
+    pub stop: String,
+    pub pause: String,
+    pub next: String,
+    pub previous: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
