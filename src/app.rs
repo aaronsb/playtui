@@ -1,12 +1,25 @@
-use crate::components::{Component, Controls, NowPlaying, Playlist};
+use crate::components::{
+    Component, LibraryBrowser, TrackList, TrackDetails,
+    CurrentTrackInfo, PlaybackStatus, PrevTrack, PlayPause,
+    NextTrack, VolumeControl
+};
 use crate::events::{Event, Action, EventHandler, EventDispatcher, EventResult, EventError};
 use crate::state::{AppState, StateManager};
 
 pub struct App {
     pub state: AppState,
-    pub playlist: Playlist,
-    pub now_playing: NowPlaying,
-    pub controls: Controls,
+    // Primary Row Components
+    pub library_browser: LibraryBrowser,
+    pub track_list: TrackList,
+    pub track_details: TrackDetails,
+    // Secondary Row Components
+    pub current_track_info: CurrentTrackInfo,
+    pub playback_status: PlaybackStatus,
+    // Control Row Components
+    pub prev_track: PrevTrack,
+    pub play_pause: PlayPause,
+    pub next_track: NextTrack,
+    pub volume_control: VolumeControl,
     event_dispatcher: EventDispatcher,
 }
 
@@ -14,9 +27,18 @@ impl App {
     pub fn new() -> App {
         let mut app = App {
             state: AppState::default(),
-            playlist: Playlist::new(),
-            now_playing: NowPlaying::new(),
-            controls: Controls::new(),
+            // Initialize Primary Row Components
+            library_browser: LibraryBrowser::new(),
+            track_list: TrackList::new(),
+            track_details: TrackDetails::new(),
+            // Initialize Secondary Row Components
+            current_track_info: CurrentTrackInfo::new(),
+            playback_status: PlaybackStatus::new(),
+            // Initialize Control Row Components
+            prev_track: PrevTrack::new(),
+            play_pause: PlayPause::new(),
+            next_track: NextTrack::new(),
+            volume_control: VolumeControl::new(),
             event_dispatcher: EventDispatcher::new(),
         };
 
@@ -41,16 +63,23 @@ impl App {
             }
         }
 
-        // Register components with the event dispatcher
-        self.event_dispatcher.register_handler(Box::new(ComponentWrapper {
-            component: self.playlist.clone(),
-        }));
-        self.event_dispatcher.register_handler(Box::new(ComponentWrapper {
-            component: self.now_playing.clone(),
-        }));
-        self.event_dispatcher.register_handler(Box::new(ComponentWrapper {
-            component: self.controls.clone(),
-        }));
+        // Register all components with the event dispatcher
+        let components: Vec<Box<dyn EventHandler>> = vec![
+            Box::new(ComponentWrapper { component: self.library_browser.clone() }),
+            Box::new(ComponentWrapper { component: self.track_list.clone() }),
+            Box::new(ComponentWrapper { component: self.track_details.clone() }),
+            Box::new(ComponentWrapper { component: self.current_track_info.clone() }),
+            Box::new(ComponentWrapper { component: self.playback_status.clone() }),
+            Box::new(ComponentWrapper { component: self.prev_track.clone() }),
+            Box::new(ComponentWrapper { component: self.play_pause.clone() }),
+            Box::new(ComponentWrapper { component: self.next_track.clone() }),
+            Box::new(ComponentWrapper { component: self.volume_control.clone() }),
+        ];
+
+        // Register each component
+        for component in components {
+            self.event_dispatcher.register_handler(component);
+        }
     }
 
     pub fn handle_event(&mut self, event: Event) -> EventResult<()> {
@@ -73,11 +102,16 @@ impl App {
             self.handle_follow_up_action(follow_up_action)?;
         }
 
-        // Update components based on action
-        // Note: We're still cloning here because components need ownership of actions
-        self.playlist.update(action.clone());
-        self.now_playing.update(action.clone());
-        self.controls.update(action);
+        // Update all components based on action
+        self.library_browser.update(action.clone());
+        self.track_list.update(action.clone());
+        self.track_details.update(action.clone());
+        self.current_track_info.update(action.clone());
+        self.playback_status.update(action.clone());
+        self.prev_track.update(action.clone());
+        self.play_pause.update(action.clone());
+        self.next_track.update(action.clone());
+        self.volume_control.update(action);
 
         Ok(())
     }
@@ -88,10 +122,16 @@ impl App {
             self.handle_follow_up_action(next_action)?;
         }
 
-        // Update components with the follow-up action
-        self.playlist.update(action.clone());
-        self.now_playing.update(action.clone());
-        self.controls.update(action);
+        // Update all components with the follow-up action
+        self.library_browser.update(action.clone());
+        self.track_list.update(action.clone());
+        self.track_details.update(action.clone());
+        self.current_track_info.update(action.clone());
+        self.playback_status.update(action.clone());
+        self.prev_track.update(action.clone());
+        self.play_pause.update(action.clone());
+        self.next_track.update(action.clone());
+        self.volume_control.update(action);
 
         Ok(())
     }
@@ -111,9 +151,15 @@ impl App {
     // Update component focus states based on UI state
     pub fn update_focus_states(&mut self) {
         let focused = &self.state.ui.focused_component;
-        self.playlist.set_focused(focused == "playlist");
-        self.now_playing.set_focused(focused == "nowplaying");
-        self.controls.set_focused(focused == "controls");
+        self.library_browser.set_focused(focused == "library_browser");
+        self.track_list.set_focused(focused == "track_list");
+        self.track_details.set_focused(focused == "track_details");
+        self.current_track_info.set_focused(focused == "current_track_info");
+        self.playback_status.set_focused(focused == "playback_status");
+        self.prev_track.set_focused(focused == "prev_track");
+        self.play_pause.set_focused(focused == "play_pause");
+        self.next_track.set_focused(focused == "next_track");
+        self.volume_control.set_focused(focused == "volume_control");
 
         // Re-register components to update their can_handle status
         self.register_components();

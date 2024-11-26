@@ -1,5 +1,6 @@
 use std::fmt;
 use std::error::Error;
+use crossterm::event::KeyCode;
 
 #[derive(Debug)]
 pub enum EventError {
@@ -22,39 +23,59 @@ impl Error for EventError {}
 
 pub type EventResult<T> = Result<T, EventError>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Event {
     Key(KeyEvent),
     Mouse(MouseEvent),
     System(SystemEvent),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum KeyEvent {
-    Play,
-    Pause,
-    Stop,
-    Next,
-    Previous,
-    VolumeUp,
-    VolumeDown,
+    Char(char),
+    Enter,
+    Space,
+    Left,
+    Right,
+    Up,
+    Down,
+    Tab,
+    BackTab,
+    Esc,
     Focus(FocusDirection),
 }
 
-#[derive(Debug, Clone)]
+impl From<KeyCode> for KeyEvent {
+    fn from(code: KeyCode) -> Self {
+        match code {
+            KeyCode::Char(c) => KeyEvent::Char(c),
+            KeyCode::Enter => KeyEvent::Enter,
+            KeyCode::Left => KeyEvent::Left,
+            KeyCode::Right => KeyEvent::Right,
+            KeyCode::Up => KeyEvent::Up,
+            KeyCode::Down => KeyEvent::Down,
+            KeyCode::Tab => KeyEvent::Tab,
+            KeyCode::BackTab => KeyEvent::BackTab,
+            KeyCode::Esc => KeyEvent::Esc,
+            _ => KeyEvent::Char(' '), // Default case
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum MouseEvent {
     Click { x: u16, y: u16 },
     Scroll { delta: i16 },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum SystemEvent {
     TrackEnded,
     TrackLoaded,
     Error(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum FocusDirection {
     Next,
     Previous,
@@ -62,6 +83,17 @@ pub enum FocusDirection {
 
 #[derive(Debug, Clone)]
 pub enum Action {
+    // Playback control actions
+    Play,
+    Pause,
+    Stop,
+    NextTrack,
+    PreviousTrack,
+    VolumeUp,
+    VolumeDown,
+    SetVolume(u8),
+    
+    // Player state actions
     Player(PlayerAction),
     Playlist(PlaylistAction),
     UI(UIAction),
@@ -138,13 +170,11 @@ impl EventDispatcher {
         let mut actions = Vec::new();
         
         for handler in self.handlers.iter_mut() {
-            // Only dispatch to handlers that can handle this event type
             if handler.can_handle(event) {
                 match handler.handle_event(event) {
                     Ok(Some(action)) => actions.push(action),
                     Ok(None) => continue,
                     Err(e) => {
-                        // Log error but continue processing other handlers
                         eprintln!("Handler error: {}", e);
                         continue;
                     }

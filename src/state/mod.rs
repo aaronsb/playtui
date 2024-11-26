@@ -100,8 +100,54 @@ pub trait StateManager {
 impl StateManager for AppState {
     fn update(&mut self, action: Action) -> Option<Action> {
         match action {
+            // Direct playback control actions
+            Action::Play => {
+                self.player.playback_state = PlaybackState::Playing;
+                None
+            }
+            Action::Pause => {
+                self.player.playback_state = PlaybackState::Paused;
+                None
+            }
+            Action::Stop => {
+                self.player.playback_state = PlaybackState::Stopped;
+                self.player.position = Duration::from_secs(0);
+                None
+            }
+            Action::NextTrack => {
+                if let Some(current_index) = self.playlist.selected_index {
+                    let next_index = current_index + 1;
+                    if next_index < self.playlist.tracks.len() {
+                        return Some(Action::Playlist(crate::events::PlaylistAction::SelectTrack(next_index)));
+                    }
+                }
+                None
+            }
+            Action::PreviousTrack => {
+                if let Some(current_index) = self.playlist.selected_index {
+                    if current_index > 0 {
+                        return Some(Action::Playlist(crate::events::PlaylistAction::SelectTrack(current_index - 1)));
+                    }
+                }
+                None
+            }
+            Action::VolumeUp => {
+                let new_volume = (self.player.volume as u16 + 5).min(100) as u8;
+                self.player.volume = new_volume;
+                Some(Action::SetVolume(new_volume))
+            }
+            Action::VolumeDown => {
+                let new_volume = self.player.volume.saturating_sub(5);
+                self.player.volume = new_volume;
+                Some(Action::SetVolume(new_volume))
+            }
+            Action::SetVolume(volume) => {
+                self.player.volume = volume;
+                None
+            }
+
+            // Nested action variants
             Action::Player(player_action) => {
-                // Handle player actions
                 match player_action {
                     crate::events::PlayerAction::Play => {
                         self.player.playback_state = PlaybackState::Playing;
@@ -130,7 +176,6 @@ impl StateManager for AppState {
                 }
             }
             Action::Playlist(playlist_action) => {
-                // Handle playlist actions
                 match playlist_action {
                     crate::events::PlaylistAction::SelectTrack(index) => {
                         self.playlist.selected_index = Some(index);
@@ -149,7 +194,6 @@ impl StateManager for AppState {
                     crate::events::PlaylistAction::RemoveTrack(index) => {
                         if index < self.playlist.tracks.len() {
                             self.playlist.tracks.remove(index);
-                            // Adjust selected index if necessary
                             if let Some(selected) = self.playlist.selected_index {
                                 if selected >= index {
                                     self.playlist.selected_index = if selected > 0 {
@@ -170,18 +214,30 @@ impl StateManager for AppState {
                 }
             }
             Action::UI(ui_action) => {
-                // Handle UI actions
                 match ui_action {
                     crate::events::UIAction::Focus(direction) => {
-                        // Update focused component based on direction
                         self.ui.focused_component = match (self.ui.focused_component.as_str(), direction) {
-                            ("playlist", crate::events::FocusDirection::Next) => "nowplaying",
-                            ("playlist", crate::events::FocusDirection::Previous) => "controls",
-                            ("nowplaying", crate::events::FocusDirection::Next) => "controls",
-                            ("nowplaying", crate::events::FocusDirection::Previous) => "playlist",
-                            ("controls", crate::events::FocusDirection::Next) => "playlist",
-                            ("controls", crate::events::FocusDirection::Previous) => "nowplaying",
-                            _ => "playlist",
+                            ("library_browser", crate::events::FocusDirection::Next) => "track_list",
+                            ("track_list", crate::events::FocusDirection::Next) => "track_details",
+                            ("track_details", crate::events::FocusDirection::Next) => "current_track_info",
+                            ("current_track_info", crate::events::FocusDirection::Next) => "playback_status",
+                            ("playback_status", crate::events::FocusDirection::Next) => "prev_track",
+                            ("prev_track", crate::events::FocusDirection::Next) => "play_pause",
+                            ("play_pause", crate::events::FocusDirection::Next) => "next_track",
+                            ("next_track", crate::events::FocusDirection::Next) => "volume_control",
+                            ("volume_control", crate::events::FocusDirection::Next) => "library_browser",
+                            
+                            ("library_browser", crate::events::FocusDirection::Previous) => "volume_control",
+                            ("track_list", crate::events::FocusDirection::Previous) => "library_browser",
+                            ("track_details", crate::events::FocusDirection::Previous) => "track_list",
+                            ("current_track_info", crate::events::FocusDirection::Previous) => "track_details",
+                            ("playback_status", crate::events::FocusDirection::Previous) => "current_track_info",
+                            ("prev_track", crate::events::FocusDirection::Previous) => "playback_status",
+                            ("play_pause", crate::events::FocusDirection::Previous) => "prev_track",
+                            ("next_track", crate::events::FocusDirection::Previous) => "play_pause",
+                            ("volume_control", crate::events::FocusDirection::Previous) => "next_track",
+                            
+                            _ => "library_browser",
                         }
                         .to_string();
                         None
@@ -197,7 +253,6 @@ impl StateManager for AppState {
                 }
             }
             Action::Metadata(metadata_action) => {
-                // Handle metadata actions
                 match metadata_action {
                     crate::events::MetadataAction::Load(path) => {
                         if let Some(metadata) = self.metadata.metadata_cache.get(&path) {

@@ -1,10 +1,28 @@
-mod playlist;
-mod now_playing;
-mod controls;
+// Primary Row Components
+mod library_browser;
+mod track_list;
+mod track_details;
 
-pub use self::playlist::Playlist;
-pub use self::now_playing::NowPlaying;
-pub use self::controls::Controls;
+// Secondary Row Components
+mod current_track_info;
+mod playback_status;
+
+// Control Row Components
+mod prev_track;
+mod play_pause;
+mod next_track;
+mod volume_control;
+
+// Re-export all components
+pub use self::library_browser::LibraryBrowser;
+pub use self::track_list::TrackList;
+pub use self::track_details::TrackDetails;
+pub use self::current_track_info::CurrentTrackInfo;
+pub use self::playback_status::PlaybackStatus;
+pub use self::prev_track::PrevTrack;
+pub use self::play_pause::PlayPause;
+pub use self::next_track::NextTrack;
+pub use self::volume_control::VolumeControl;
 
 use ratatui::{
     prelude::*,
@@ -12,7 +30,7 @@ use ratatui::{
 };
 
 // Re-export everything needed by components
-pub use crate::events::{Event, Action};
+pub use crate::events::{Event, Action, KeyEvent};
 
 #[derive(Clone, Default)]
 pub struct ComponentState {

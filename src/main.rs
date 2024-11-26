@@ -12,19 +12,24 @@ use ratatui::prelude::*;
 use std::io;
 
 use playtui::app::App;
-use playtui::events::{Event, KeyEvent, MouseEvent, SystemEvent};
-use playtui::ui;
+use playtui::events::{Event, KeyEvent, MouseEvent, Action, UIAction};
 
 fn map_key_event(code: KeyCode, modifiers: KeyModifiers) -> Option<KeyEvent> {
     match (code, modifiers) {
-        (KeyCode::Char(' '), KeyModifiers::NONE) => Some(KeyEvent::Play), // Space for play/pause
-        (KeyCode::Char('s'), KeyModifiers::NONE) => Some(KeyEvent::Stop),
-        (KeyCode::Char('+'), _) => Some(KeyEvent::VolumeUp),
-        (KeyCode::Char('-'), _) => Some(KeyEvent::VolumeDown),
-        (KeyCode::Tab, KeyModifiers::SHIFT) => Some(KeyEvent::Focus(playtui::events::FocusDirection::Previous)),
-        (KeyCode::Tab, KeyModifiers::NONE) => Some(KeyEvent::Focus(playtui::events::FocusDirection::Next)),
-        (KeyCode::Right, KeyModifiers::NONE) => Some(KeyEvent::Next),
-        (KeyCode::Left, KeyModifiers::NONE) => Some(KeyEvent::Previous),
+        // Map space to Enter for play/pause toggle
+        (KeyCode::Char(' '), KeyModifiers::NONE) => Some(KeyEvent::Enter),
+        // Navigation keys
+        (KeyCode::Left, KeyModifiers::NONE) => Some(KeyEvent::Left),
+        (KeyCode::Right, KeyModifiers::NONE) => Some(KeyEvent::Right),
+        (KeyCode::Up, KeyModifiers::NONE) => Some(KeyEvent::Up),
+        (KeyCode::Down, KeyModifiers::NONE) => Some(KeyEvent::Down),
+        // Tab navigation
+        (KeyCode::Tab, KeyModifiers::SHIFT) => Some(KeyEvent::BackTab),
+        (KeyCode::Tab, KeyModifiers::NONE) => Some(KeyEvent::Tab),
+        // Other keys
+        (KeyCode::Enter, KeyModifiers::NONE) => Some(KeyEvent::Enter),
+        (KeyCode::Esc, KeyModifiers::NONE) => Some(KeyEvent::Esc),
+        (KeyCode::Char(c), KeyModifiers::NONE) => Some(KeyEvent::Char(c)),
         _ => None,
     }
 }
@@ -56,7 +61,7 @@ fn main() -> Result<()> {
     // Main loop
     loop {
         // Render UI
-        terminal.draw(|frame| ui::render(frame, &app))?;
+        terminal.draw(|frame| playtui::ui::render(frame, &app))?;
         
         // Update focus states before handling next event
         app.update_focus_states();
@@ -88,8 +93,11 @@ fn main() -> Result<()> {
                 }
             }
             CrosstermEvent::Resize(width, height) => {
-                // Simply notify the app of the new terminal dimensions
-                terminal.draw(|frame| ui::render(frame, &app))?;
+                // Handle resize by updating the UI state
+                if let Err(e) = app.handle_event(Event::Key(KeyEvent::Focus(playtui::events::FocusDirection::Next))) {
+                    eprintln!("Error handling resize event: {}", e);
+                }
+                terminal.draw(|frame| playtui::ui::render(frame, &app))?;
             }
             _ => {}
         }
