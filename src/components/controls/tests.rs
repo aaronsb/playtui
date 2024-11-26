@@ -35,13 +35,13 @@ fn test_key_events_blocked_when_not_focused() {
     controls.set_focused(false);
     assert!(!controls.focused());
     
-    // Key events should return None when not focused
+    // All key events should return None when not focused
     let result = controls.handle_event(Event::Key(KeyEvent::Enter));
     assert_eq!(result, None);
     
-    // But navigation key events should be converted to navigation actions
+    // Navigation via key events should also be blocked when not focused
     let result = controls.handle_event(Event::Key(KeyEvent::Right));
-    assert_eq!(result, Some(Action::NavigateRight));
+    assert_eq!(result, None);
 }
 
 #[test]
