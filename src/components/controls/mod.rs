@@ -4,6 +4,12 @@ use crate::events::{Event, Action};
 use crate::theme::Theme;
 use super::{Component, ComponentState};
 
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub(crate) enum Section {
+    Controls,
+    Volume,
+}
+
 #[derive(Clone)]
 pub struct Controls {
     pub(crate) state: ComponentState,
@@ -14,12 +20,6 @@ pub struct Controls {
     pub(crate) focused_button: usize,
     pub(crate) focused_section: Section,
     pub(crate) area: RefCell<Option<Rect>>,
-}
-
-#[derive(Clone, PartialEq, Debug)]
-pub(crate) enum Section {
-    Controls,
-    Volume,
 }
 
 mod layout;

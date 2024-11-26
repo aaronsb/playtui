@@ -32,11 +32,11 @@
   - [x] Create components/tests/state.rs for component state tests
   - [x] Create components/tests/mod.rs for test organization
 
-- [ ] Split components/controls/events.rs (194 lines):
-  - [ ] Create components/controls/events/mod.rs for event handling core
-  - [ ] Create components/controls/events/handlers.rs for specific event handlers
-  - [ ] Create components/controls/events/types.rs for event type definitions
-  - [ ] Create components/controls/events/processing.rs for event processing logic
+- [x] Split components/controls/events.rs (194 lines):
+  - [x] Create components/controls/events/mod.rs for event handling core
+  - [x] Create components/controls/events/handlers.rs for specific event handlers
+  - [x] Create components/controls/events/types.rs for event type definitions
+  - [x] Create components/controls/events/processing.rs for event processing logic
 
 - [x] Split components/volume_control/mod.rs (177 lines):
   - [x] Create components/volume_control/view.rs for rendering logic
