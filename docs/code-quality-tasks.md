@@ -19,11 +19,11 @@
   - [x] Create components/track_list/state.rs for state management
   - [x] Create components/track_list/actions.rs for action handling
 
-- [ ] Split components/library_browser.rs (251 lines):
-  - [ ] Create components/library_browser/mod.rs for core functionality
-  - [ ] Create components/library_browser/view.rs for view logic
-  - [ ] Create components/library_browser/state.rs for state management
-  - [ ] Create components/library_browser/actions.rs for action handling
+- [x] Split components/library_browser.rs (251 lines):
+  - [x] Create components/library_browser/mod.rs for core functionality
+  - [x] Create components/library_browser/view.rs for view logic
+  - [x] Create components/library_browser/state.rs for state management
+  - [x] Create components/library_browser/events.rs for event handling
 
 - [ ] Split components/tests.rs (237 lines):
   - [ ] Create components/tests/mod.rs for test organization
