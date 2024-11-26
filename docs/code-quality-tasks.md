@@ -69,10 +69,10 @@
 ## Medium Priority
 
 ### Testing Infrastructure
-- [ ] Add unit tests for components module
-- [ ] Add integration tests for audio format decoders
-- [ ] Add playback system tests
-- [ ] Implement test utilities for audio format validation
+- [x] Add unit tests for components module
+- [x] Add integration tests for audio format decoders
+- [x] Add playback system tests
+- [x] Implement test utilities for audio format validation
 
 ### Documentation
 - [ ] Add implementation details to existing TODO comments
