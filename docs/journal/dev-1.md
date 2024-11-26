@@ -40,19 +40,12 @@
 - Component architecture is in place with proper visibility modifiers
 - Frame navigation and focus system working as expected
 
-### Next Steps
-1. Implement specific functionality for each component as per project backlog
-2. Add music library management to Playlist component
-3. Develop playback controls in Controls component
-4. Create now playing view with track information display
-5. Implement actual music playback integration
-
 ### Notes
 - Consider adding error handling for component initialization
 - May need to optimize frame rendering for larger playlists
 - Should document the component trait interface for future contributors
 
-### Open Questions
-- What format should we use for storing music library data?
-- How should we handle playlist persistence?
-- Do we need a configuration file for user preferences?
+### Technical Questions Under Consideration
+- Format for storing music library data
+- Playlist persistence strategy
+- Configuration file structure for user preferences

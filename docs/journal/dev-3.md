@@ -33,32 +33,6 @@
   - NowPlaying: Track info and progress display
   - Controls: Playback control interface
 
-### Resolved Issues
-
-1. Mouse Event Handling:
-- Fixed crossterm mouse event mapping
-- Proper handling of MouseEventKind variants
-- Implemented click and scroll support
-- Added error handling for mouse events
-
-2. Component Implementation:
-- Completed Playlist functionality:
-  - Track selection and management
-  - Scroll navigation
-  - Focus handling
-- Completed NowPlaying display:
-  - Current track info
-  - Progress and volume bars
-- Completed Controls implementation:
-  - Basic playback controls
-  - Keyboard shortcuts
-  - Visual feedback
-
-3. Event Dispatch:
-- Optimized event dispatch to avoid unnecessary cloning
-- Added event filtering at dispatch level
-- Improved error handling and propagation
-
 ### Technical Decisions
 
 1. Event Ownership:
@@ -76,30 +50,9 @@
 - UI state tracks focused component
 - Components check focus before handling events
 
-### Next Steps
-
-1. Implementation Tasks:
-- [x] Fix mouse event handling in main.rs
-- [x] Complete component-specific functionality
-- [x] Add proper error handling for events
-- [ ] Implement actual audio playback integration
-
-2. Testing Requirements:
-- [x] Basic event handling tests
-- [x] Component state management tests
-- [x] Focus system behavior tests
-- [ ] Add comprehensive event dispatch tests
-- [ ] Add component integration tests
-
-3. Documentation Needs:
-- [ ] Document event flow patterns
-- [ ] Add component API documentation
-- [ ] Create event handling guidelines
-- [ ] Update architecture documentation
-
-### Notes
-- All current tests are passing
+### Implementation Notes
 - Event system provides good separation of concerns
 - State management system supports complex state transitions
 - UI layout efficiently utilizes available space (60/20/20 split)
 - Focus system provides clear visual feedback
+- All current tests are passing
