@@ -3,8 +3,6 @@ use crate::components::{
     CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
 };
 use crate::events::{Event, KeyEvent, FocusDirection, EventResult};
-use std::rc::Rc;
-use std::cell::RefCell;
 
 /// Manages focus state and navigation between components
 pub struct FocusManager {
@@ -32,6 +30,13 @@ impl FocusManager {
     /// Returns the currently focused component name
     pub fn current_focus(&self) -> &str {
         &self.component_order[self.current_focus]
+    }
+
+    /// Sets focus to a specific component by name
+    pub fn set_focus(&mut self, component_name: &str) {
+        if let Some(index) = self.component_order.iter().position(|name| name == component_name) {
+            self.current_focus = index;
+        }
     }
 
     /// Moves focus in the specified direction
@@ -83,6 +88,9 @@ impl FocusManager {
             
             // Navigation events are treated like arrow keys - require focus
             Event::Navigation(_) => component_name == self.current_focus(),
+            
+            // Mouse events require focus
+            Event::Mouse(_) => component_name == self.current_focus(),
             
             // Other events require focus by default
             _ => component_name == self.current_focus(),
@@ -149,5 +157,20 @@ mod tests {
         // Test enter key
         assert!(manager.should_process_event(&Event::Key(KeyEvent::Enter), focused_component));
         assert!(!manager.should_process_event(&Event::Key(KeyEvent::Enter), unfocused_component));
+    }
+
+    #[test]
+    fn test_set_focus() {
+        let mut manager = FocusManager::new();
+        let initial_focus = manager.current_focus().to_string();
+        
+        // Set focus to a different component
+        manager.set_focus("track_list");
+        assert_eq!(manager.current_focus(), "track_list");
+        assert_ne!(manager.current_focus(), initial_focus);
+        
+        // Set focus to invalid component should not change focus
+        manager.set_focus("invalid_component");
+        assert_eq!(manager.current_focus(), "track_list");
     }
 }

@@ -2,7 +2,7 @@ use crate::components::{
     Component, LibraryBrowser, TrackList, TrackDetails,
     CurrentTrackInfo, PlaybackStatus, Controls, VolumeControl
 };
-use crate::events::{Event, EventResult, KeyEvent, FocusDirection};
+use crate::events::{Event, EventResult, KeyEvent, FocusDirection, MouseEvent};
 use crate::state::AppState;
 use crate::theme::Theme;
 use crate::logger::Logger;
@@ -14,11 +14,13 @@ use std::cell::RefCell;
 mod components;
 mod event_handling;
 mod focus;
+mod areas;
 
 // Re-export public items
 pub use components::ComponentManager;
 pub use event_handling::EventManager;
 pub use focus::FocusManager;
+pub use areas::AreaManager;
 
 /// Main application struct that coordinates all components and manages the application state
 pub struct App {
@@ -38,6 +40,7 @@ pub struct App {
     component_manager: ComponentManager,
     event_manager: EventManager,
     focus_manager: FocusManager,
+    area_manager: AreaManager,
     logger: Logger,
 }
 
@@ -59,6 +62,7 @@ impl App {
         let mut component_manager = ComponentManager::new();
         let mut event_manager = EventManager::new();
         let focus_manager = FocusManager::new();
+        let area_manager = AreaManager::new();
         let logger = Logger::new()?;
 
         // Register components with both managers using cloned Rc references
@@ -96,6 +100,7 @@ impl App {
             component_manager,
             event_manager,
             focus_manager,
+            area_manager,
             logger,
         };
 
@@ -105,10 +110,9 @@ impl App {
         Ok(app)
     }
 
-    /// Loads a theme from the specified path
-    pub fn load_theme(&mut self, path: &str) -> Result<()> {
-        self.theme = Theme::load(path)?;
-        Ok(())
+    /// Updates the area for a component during rendering
+    pub fn update_component_area(&mut self, component_name: &str, area: ratatui::prelude::Rect) {
+        self.area_manager.update_area(component_name, area);
     }
 
     /// Handles incoming events
@@ -119,6 +123,37 @@ impl App {
         let _ = self.logger.log_debug(&format!("Current focus: {}", self.focus_manager.current_focus()));
 
         match &event {
+            // Mouse Events - Check position and update focus before processing
+            Event::Mouse(mouse_event) => {
+                match mouse_event {
+                    MouseEvent::Click { x, y } => {
+                        // Check if click is in a component area
+                        if let Some(component_name) = self.area_manager.component_at_position(*x, *y) {
+                            // Update focus if clicking unfocused component
+                            if component_name != self.focus_manager.current_focus() {
+                                let _ = self.logger.log_debug(&format!("Focusing component from click: {}", component_name));
+                                self.focus_manager.set_focus(component_name);
+                                self.update_focus_states();
+                            }
+                            
+                            // Now process the click event
+                            if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                                let _ = self.logger.log_debug(&format!("Generated action from click: {:?}", action));
+                                self.component_manager.update_components(action);
+                            }
+                        }
+                    },
+                    MouseEvent::Scroll { .. } => {
+                        // Only process scroll events for the focused component
+                        let focused_component = self.focus_manager.current_focus();
+                        if let Ok(action) = self.event_manager.orient_and_decide(event.clone()) {
+                            let _ = self.logger.log_debug(&format!("Generated action from scroll: {:?}", action));
+                            self.component_manager.update_components(action);
+                        }
+                    }
+                }
+            },
+
             // Global Navigation Events - Always process
             Event::Key(KeyEvent::Tab) => {
                 let _ = self.logger.log_debug("Processing Tab event for global navigation");

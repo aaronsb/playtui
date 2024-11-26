@@ -76,54 +76,53 @@ fn main() -> Result<()> {
     // Main loop
     loop {
         // Render UI
-        terminal.draw(|frame| playtui::ui::render(frame, &app))?;
+        terminal.draw(|frame| playtui::ui::render(frame, &mut app))?;
 
         // Handle events
-        match event::read()? {
-            event @ CrosstermEvent::Key(key) => {
-                // Log raw event first, before any processing
-                if let Err(e) = log_raw_event(&mut raw_logger, &event) {
-                    eprintln!("Error logging event: {}", e);
-                }
+        if event::poll(std::time::Duration::from_millis(50))? {
+            match event::read()? {
+                event @ CrosstermEvent::Key(key) => {
+                    // Log raw event first, before any processing
+                    if let Err(e) = log_raw_event(&mut raw_logger, &event) {
+                        eprintln!("Error logging event: {}", e);
+                    }
 
-                // Check for quit condition first
-                if key.code == KeyCode::Char('q') && key.kind == KeyEventKind::Press {
-                    break;
-                }
+                    // Check for quit condition first
+                    if key.code == KeyCode::Char('q') && key.kind == KeyEventKind::Press {
+                        break;
+                    }
 
-                // Convert key code to our internal KeyEvent type
-                let key_event = KeyEvent::from(key.code);
-                
-                // Handle the event
-                if let Err(e) = app.handle_event(Event::Key(key_event)) {
-                    eprintln!("Error handling key event: {}", e);
-                }
-            }
-            event @ CrosstermEvent::Mouse(mouse) => {
-                // Log raw event first
-                if let Err(e) = log_raw_event(&mut raw_logger, &event) {
-                    eprintln!("Error logging event: {}", e);
-                }
-
-                if let Some(mouse_event) = map_mouse_event(mouse) {
-                    if let Err(e) = app.handle_event(Event::Mouse(mouse_event)) {
-                        eprintln!("Error handling mouse event: {}", e);
+                    // Convert key code to our internal KeyEvent type
+                    let key_event = KeyEvent::from(key.code);
+                    
+                    // Handle the event
+                    if let Err(e) = app.handle_event(Event::Key(key_event)) {
+                        eprintln!("Error handling key event: {}", e);
                     }
                 }
-            }
-            event @ CrosstermEvent::Resize(_width, _height) => {
-                // Log raw event first
-                if let Err(e) = log_raw_event(&mut raw_logger, &event) {
-                    eprintln!("Error logging event: {}", e);
-                }
+                event @ CrosstermEvent::Mouse(mouse) => {
+                    // Log raw event first
+                    if let Err(e) = log_raw_event(&mut raw_logger, &event) {
+                        eprintln!("Error logging event: {}", e);
+                    }
 
-                // Handle resize by redrawing the UI
-                terminal.draw(|frame| playtui::ui::render(frame, &app))?;
-            }
-            event => {
-                // Log any other raw events
-                if let Err(e) = log_raw_event(&mut raw_logger, &event) {
-                    eprintln!("Error logging event: {}", e);
+                    if let Some(mouse_event) = map_mouse_event(mouse) {
+                        if let Err(e) = app.handle_event(Event::Mouse(mouse_event)) {
+                            eprintln!("Error handling mouse event: {}", e);
+                        }
+                    }
+                }
+                event @ CrosstermEvent::Resize(_width, _height) => {
+                    // Log raw event first
+                    if let Err(e) = log_raw_event(&mut raw_logger, &event) {
+                        eprintln!("Error logging event: {}", e);
+                    }
+                }
+                event => {
+                    // Log any other raw events
+                    if let Err(e) = log_raw_event(&mut raw_logger, &event) {
+                        eprintln!("Error logging event: {}", e);
+                    }
                 }
             }
         }
@@ -149,8 +148,8 @@ fn main() -> Result<()> {
 fn map_mouse_event(mouse_event: CrosstermMouseEvent) -> Option<MouseEvent> {
     match mouse_event.kind {
         MouseEventKind::Down(button) if button == MouseButton::Left => Some(MouseEvent::Click {
-            x: mouse_event.column as u16,
-            y: mouse_event.row as u16,
+            x: mouse_event.column,
+            y: mouse_event.row,
         }),
         MouseEventKind::ScrollDown => Some(MouseEvent::Scroll { delta: -1 }),
         MouseEventKind::ScrollUp => Some(MouseEvent::Scroll { delta: 1 }),
