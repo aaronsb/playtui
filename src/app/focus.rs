@@ -4,7 +4,20 @@ use crate::components::{
 };
 use crate::events::{Event, KeyEvent, FocusDirection, EventResult};
 
-/// Manages focus state and navigation between components
+/// Manages focus state and navigation between components.
+/// 
+/// This module is kept as a single file despite being slightly over the typical
+/// line count guideline (150 lines) because:
+/// 1. It maintains high cohesion - all methods directly relate to focus management
+/// 2. The logic is tightly coupled - methods work together as a unified system
+/// 3. It has a single, well-defined responsibility
+/// 4. Splitting would likely increase complexity rather than reduce it
+/// 
+/// The focus system handles:
+/// - Tracking which component currently has focus
+/// - Managing focus navigation between components
+/// - Filtering events based on focus state
+/// - Updating component focus states
 pub struct FocusManager {
     component_order: Vec<String>,
     current_focus: usize,
