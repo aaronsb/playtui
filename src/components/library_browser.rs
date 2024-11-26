@@ -3,7 +3,7 @@ use ratatui::{
     widgets::{List, ListItem, ListState},
 };
 use super::{Component, ComponentState, create_block};
-use crate::events::{Event, Action, KeyEvent, NavigationEvent, EventHandler, EventResult};
+use crate::events::{Event, Action, KeyEvent, NavigationEvent, EventHandler, EventResult, MouseEvent};
 use crate::components::filesystem::{FSNavigator, FSAction};
 use crate::theme::Theme;
 use std::{path::PathBuf, cell::RefCell};
@@ -58,6 +58,52 @@ impl LibraryBrowser {
                 },
                 _ => None,
             },
+            Event::Mouse(mouse_event) => match mouse_event {
+                MouseEvent::Click { x: _, y } => {
+                    // Convert y coordinate to list index, accounting for the border
+                    let clicked_index = *y as usize - 1; // -1 for the border
+                    let navigator = self.fs_navigator.borrow();
+                    let max_index = navigator.state().entries().len().saturating_sub(1);
+                    
+                    // Check if click is within valid range
+                    if clicked_index <= max_index {
+                        drop(navigator); // Drop borrow before mutable borrow
+                        
+                        // First select the clicked item
+                        let mut navigator = self.fs_navigator.borrow_mut();
+                        if let Err(e) = navigator.handle_action(FSAction::Select(clicked_index)) {
+                            eprintln!("Error selecting item: {}", e);
+                            return Some(Action::Refresh);
+                        }
+                        
+                        // If clicking the same item that's already selected, treat as Enter key
+                        if navigator.state().selected_index() == Some(clicked_index) {
+                            if let Err(e) = navigator.handle_action(FSAction::NavigateToSelected) {
+                                eprintln!("Error navigating to selected: {}", e);
+                            }
+                        }
+                    }
+                    Some(Action::Refresh)
+                },
+                MouseEvent::Scroll { delta } => {
+                    let mut navigator = self.fs_navigator.borrow_mut();
+                    let current_index = navigator.state().selected_index().unwrap_or(0);
+                    let max_index = navigator.state().entries().len().saturating_sub(1);
+                    
+                    let new_index = if *delta < 0 {
+                        // Scroll down
+                        if current_index < max_index { current_index + 1 } else { max_index }
+                    } else {
+                        // Scroll up
+                        if current_index > 0 { current_index - 1 } else { 0 }
+                    };
+                    
+                    if let Err(e) = navigator.handle_action(FSAction::Select(new_index)) {
+                        eprintln!("Error navigating: {}", e);
+                    }
+                    Some(Action::Refresh)
+                }
+            },
             Event::Navigation(nav_event) => match nav_event {
                 NavigationEvent::Up => Some(Action::NavigateUp),
                 NavigationEvent::Down => Some(Action::NavigateDown),
@@ -80,6 +126,7 @@ impl EventHandler for LibraryBrowser {
             Event::Key(KeyEvent::Right) |
             Event::Key(KeyEvent::Up) |
             Event::Key(KeyEvent::Down) |
+            Event::Mouse(_) |
             Event::Navigation(_) => self.focused(),
             
             _ => false

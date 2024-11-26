@@ -3,7 +3,7 @@ use ratatui::{
     widgets::{List, ListItem},
 };
 use super::{Component, ComponentState, create_block};
-use crate::events::{Event, Action, KeyEvent};
+use crate::events::{Event, Action, KeyEvent, MouseEvent};
 use crate::theme::Theme;
 
 #[derive(Clone)]
@@ -114,6 +114,47 @@ impl Component for TrackList {
                     _ => None,
                 }
             },
+            Event::Mouse(mouse_event) => {
+                if self.tracks.is_empty() {
+                    return None;
+                }
+
+                match mouse_event {
+                    MouseEvent::Click { x: _, y } => {
+                        // Convert y coordinate to list index, accounting for the border
+                        let clicked_index = (y as usize).saturating_sub(1); // -1 for the border
+                        let max_index = self.tracks.len().saturating_sub(1);
+                        
+                        // Check if click is within valid range
+                        if clicked_index <= max_index {
+                            // If clicking the same item that's already selected, treat as Enter key
+                            if self.selected_index == Some(clicked_index) {
+                                Some(Action::Select)
+                            } else {
+                                self.selected_index = Some(clicked_index);
+                                Some(Action::Refresh)
+                            }
+                        } else {
+                            None
+                        }
+                    },
+                    MouseEvent::Scroll { delta } => {
+                        let max_index = self.tracks.len().saturating_sub(1);
+                        self.selected_index = Some(self.selected_index
+                            .map(|i| {
+                                if delta < 0 {
+                                    // Scroll down
+                                    if i < max_index { i + 1 } else { max_index }
+                                } else {
+                                    // Scroll up
+                                    if i > 0 { i - 1 } else { 0 }
+                                }
+                            })
+                            .unwrap_or(0));
+                        Some(Action::Refresh)
+                    }
+                }
+            },
             _ => None,
         }
     }
@@ -215,5 +256,43 @@ mod tests {
         assert_eq!(track_list.handle_event(Event::Key(KeyEvent::Up)), None);
         assert_eq!(track_list.handle_event(Event::Key(KeyEvent::Down)), None);
         assert_eq!(track_list.selected_index, None);
+    }
+
+    #[test]
+    fn test_mouse_click() {
+        let mut track_list = setup_track_list();
+        track_list.set_focused(true);
+        
+        // Click first item (y=1 due to border)
+        let result = track_list.handle_event(Event::Mouse(MouseEvent::Click { x: 0, y: 1 }));
+        assert_eq!(track_list.selected_index, Some(0));
+        assert_eq!(result, Some(Action::Refresh));
+
+        // Click same item again - should trigger selection
+        let result = track_list.handle_event(Event::Mouse(MouseEvent::Click { x: 0, y: 1 }));
+        assert_eq!(result, Some(Action::Select));
+
+        // Click out of bounds
+        let result = track_list.handle_event(Event::Mouse(MouseEvent::Click { x: 0, y: 10 }));
+        assert_eq!(result, None);
+    }
+
+    #[test]
+    fn test_mouse_scroll() {
+        let mut track_list = setup_track_list();
+        track_list.set_focused(true);
+        
+        // Initial selection
+        track_list.selected_index = Some(1);
+
+        // Scroll up
+        let result = track_list.handle_event(Event::Mouse(MouseEvent::Scroll { delta: 1 }));
+        assert_eq!(track_list.selected_index, Some(0));
+        assert_eq!(result, Some(Action::Refresh));
+
+        // Scroll down
+        let result = track_list.handle_event(Event::Mouse(MouseEvent::Scroll { delta: -1 }));
+        assert_eq!(track_list.selected_index, Some(1));
+        assert_eq!(result, Some(Action::Refresh));
     }
 }
