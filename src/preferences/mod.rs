@@ -269,11 +269,17 @@ mod tests {
     use super::*;
     use std::fs;
     use std::thread;
+    use std::os::unix::fs::PermissionsExt;
 
     fn cleanup_preferences() -> io::Result<()> {
-        if let Some(path) = get_preferences_path() {
-            if path.exists() {
-                fs::remove_file(path)?;
+        if let Some(preferences_path) = get_preferences_path() {
+            if preferences_path.exists() {
+                fs::remove_file(&preferences_path)?;
+            }
+            if let Some(parent) = preferences_path.parent() {
+                if parent.exists() {
+                    let _ = fs::set_permissions(parent, fs::Permissions::from_mode(0o755));
+                }
             }
         }
         Ok(())
@@ -400,6 +406,7 @@ mod tests {
         assert!(!manager.dirty);
         
         // Verify saved state persists
+        drop(manager); // Ensure manager is dropped before creating new one
         let new_manager = PreferencesManager::new().unwrap();
         assert_eq!(new_manager.config().theme, "manager_test_theme");
         assert_eq!(new_manager.config().volume, 75);
@@ -455,6 +462,13 @@ mod tests {
 
         let mut manager = PreferencesManager::new().unwrap();
         
+        // Make the directory read-only to force save failures
+        if let Some(path) = get_preferences_path() {
+            if let Some(parent) = path.parent() {
+                let _ = fs::set_permissions(parent, fs::Permissions::from_mode(0o444));
+            }
+        }
+
         // Force filesystem to be marked unwritable
         for _ in 0..PreferencesManager::MAX_SAVE_FAILURES {
             manager.update_theme("test".to_string());
@@ -474,7 +488,12 @@ mod tests {
         let save_result = manager.save();
         assert!(save_result.is_err()); // Should actually try to save and fail
 
-        // Clean up after test
+        // Restore permissions and clean up
+        if let Some(path) = get_preferences_path() {
+            if let Some(parent) = path.parent() {
+                let _ = fs::set_permissions(parent, fs::Permissions::from_mode(0o755));
+            }
+        }
         cleanup_preferences().unwrap();
     }
 }

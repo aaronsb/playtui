@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_cache_operations() {
-        let mut cache = FileMetadataCache::new(Duration::from_secs(1));
+        let mut cache = FileMetadataCache::new(Duration::from_millis(50));
         let path = Path::new("test.mp3");
         let metadata = Metadata::default();
 
@@ -101,7 +101,7 @@ mod tests {
         assert!(cache.get(path).is_some());
         
         // Test expiration
-        thread::sleep(Duration::from_secs(2));
+        thread::sleep(Duration::from_millis(100));
         assert!(cache.get(path).is_none());
 
         // Test remove
@@ -119,12 +119,12 @@ mod tests {
 
     #[test]
     fn test_cleanup() {
-        let mut cache = FileMetadataCache::new(Duration::from_millis(100));
+        let mut cache = FileMetadataCache::new(Duration::from_millis(10));
         let path1 = Path::new("test1.mp3");
         let path2 = Path::new("test2.mp3");
         
         cache.store(path1, Metadata::default());
-        thread::sleep(Duration::from_millis(200));
+        thread::sleep(Duration::from_millis(20));
         cache.store(path2, Metadata::default());
         
         cache.cleanup();

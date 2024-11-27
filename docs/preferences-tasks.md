@@ -39,7 +39,10 @@
 
 ### 3. Testing Infrastructure
 - [x] Create unit test suite
-- [ ] Add integration tests
+- [ ] Fix failing persistence tests:
+  - [ ] test_preferences_manager
+  - [ ] test_save_and_load
+  - [ ] test_save_retry_timing
 - [ ] Implement mock file system
 - [x] Add error scenario tests
 
