@@ -66,6 +66,70 @@ impl PreferencesConfig {
     }
 }
 
+/// Manager for handling preferences state and persistence
+#[derive(Debug)]
+pub struct PreferencesManager {
+    /// Current preferences configuration
+    config: PreferencesConfig,
+    /// Path to preferences file
+    file_path: PathBuf,
+    /// Whether preferences have been modified since last save
+    dirty: bool,
+}
+
+impl PreferencesManager {
+    /// Creates a new PreferencesManager instance
+    pub fn new() -> io::Result<Self> {
+        let file_path = ensure_preferences_dir()?;
+        let config = PreferencesConfig::load()?;
+        
+        Ok(Self {
+            config,
+            file_path,
+            dirty: false,
+        })
+    }
+    
+    /// Gets a reference to the current preferences configuration
+    pub fn config(&self) -> &PreferencesConfig {
+        &self.config
+    }
+    
+    /// Updates the theme and marks preferences as dirty
+    pub fn update_theme(&mut self, theme: String) {
+        self.config.theme = theme;
+        self.dirty = true;
+    }
+    
+    /// Updates the volume level and marks preferences as dirty
+    pub fn update_volume(&mut self, volume: u8) {
+        self.config.volume = volume;
+        self.dirty = true;
+    }
+    
+    /// Updates the last accessed directory and marks preferences as dirty
+    pub fn update_last_directory(&mut self, path: PathBuf) {
+        self.config.last_directory = path;
+        self.dirty = true;
+    }
+    
+    /// Saves preferences if they have been modified since last save
+    pub fn save_if_dirty(&mut self) -> io::Result<()> {
+        if self.dirty {
+            self.config.save()?;
+            self.dirty = false;
+        }
+        Ok(())
+    }
+    
+    /// Forces a save regardless of dirty state
+    pub fn save(&mut self) -> io::Result<()> {
+        self.config.save()?;
+        self.dirty = false;
+        Ok(())
+    }
+}
+
 /// Get the system-specific path for preferences file
 pub fn get_preferences_path() -> Option<PathBuf> {
     ProjectDirs::from("com", "playtui", "playtui").map(|proj_dirs| {
@@ -97,6 +161,16 @@ pub fn ensure_preferences_dir() -> io::Result<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+
+    fn cleanup_preferences() -> io::Result<()> {
+        if let Some(path) = get_preferences_path() {
+            if path.exists() {
+                fs::remove_file(path)?;
+            }
+        }
+        Ok(())
+    }
 
     #[test]
     fn test_preferences_serialization() {
@@ -163,22 +237,68 @@ mod tests {
 
     #[test]
     fn test_save_and_load() {
+        // Start with a clean state
+        cleanup_preferences().unwrap();
+
         // Create a custom config
         let config = PreferencesConfig {
-            theme: "test_theme".to_string(),
+            theme: "save_load_test_theme".to_string(),
             volume: 75,
             last_directory: PathBuf::from("/test/path"),
         };
         
         // Save it
-        assert!(config.save().is_ok());
+        config.save().unwrap();
         
         // Load it back
         let loaded = PreferencesConfig::load().unwrap();
         
         // Verify contents
-        assert_eq!(loaded.theme, "test_theme");
+        assert_eq!(loaded.theme, "save_load_test_theme");
         assert_eq!(loaded.volume, 75);
         assert_eq!(loaded.last_directory, PathBuf::from("/test/path"));
+
+        // Clean up after test
+        cleanup_preferences().unwrap();
+    }
+
+    #[test]
+    fn test_preferences_manager() {
+        // Start with a clean state
+        cleanup_preferences().unwrap();
+
+        // Create new manager
+        let mut manager = PreferencesManager::new().unwrap();
+        
+        // Test initial state
+        assert!(!manager.dirty);
+        assert_eq!(manager.config().theme, "monokai");
+        
+        // Test update operations
+        manager.update_theme("manager_test_theme".to_string());
+        assert!(manager.dirty);
+        assert_eq!(manager.config().theme, "manager_test_theme");
+        
+        manager.update_volume(75);
+        assert!(manager.dirty);
+        assert_eq!(manager.config().volume, 75);
+        
+        let test_path = PathBuf::from("/test/path");
+        manager.update_last_directory(test_path.clone());
+        assert!(manager.dirty);
+        assert_eq!(manager.config().last_directory, test_path);
+        
+        // Test save operations
+        assert!(manager.save().is_ok());
+        assert!(!manager.dirty);
+        
+        // Verify saved state persists
+        let new_manager = PreferencesManager::new().unwrap();
+        assert_eq!(new_manager.config().theme, "manager_test_theme");
+        assert_eq!(new_manager.config().volume, 75);
+        assert_eq!(new_manager.config().last_directory, test_path);
+
+        // Clean up after test
+        cleanup_preferences().unwrap();
     }
 }
