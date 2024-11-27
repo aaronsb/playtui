@@ -3,6 +3,7 @@ pub mod audio;
 pub mod components;
 pub mod events;
 pub mod metadata;
+pub mod preferences;
 pub mod state;
 pub mod theme;
 pub mod ui;
