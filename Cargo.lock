@@ -408,6 +408,7 @@ dependencies = [
  "directories",
  "id3",
  "lewton",
+ "log",
  "metaflac",
  "ratatui",
  "serde",
