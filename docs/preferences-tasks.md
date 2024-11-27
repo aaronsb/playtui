@@ -33,9 +33,9 @@
 ### 2. Error Handling
 - [x] Implement missing file handling
 - [x] Add corrupt file detection
-- [ ] Create unwritable location handling
-- [ ] Add error logging system
-- [ ] Create user warning system
+- [x] Create unwritable location handling
+- [x] Add error logging system
+- [ ] Create user warning system (moved to Phase 3 UI Integration)
 
 ### 3. Testing Infrastructure
 - [x] Create unit test suite
@@ -68,6 +68,12 @@
 - [ ] Add path validation
 - [ ] Create directory persistence
 - [ ] Add directory tests
+
+### 5. User Interface
+- [ ] Create user warning system
+- [ ] Implement warning display component
+- [ ] Add warning event handlers
+- [ ] Create warning display tests
 
 ## Phase 4: Polish & Documentation
 
