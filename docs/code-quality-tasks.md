@@ -55,17 +55,10 @@
   - [x] Create app/components/lifecycle.rs for component lifecycle
   - [x] Create app/components/relationships.rs for component relationships
 
-- [x] Split preferences/mod.rs (499 lines):
-  - [x] Create preferences/config.rs for configuration structures
-  - [x] Create preferences/manager.rs for preferences management
-  - [x] Create preferences/persistence.rs for save/load functionality
-  - [x] Create preferences/validation.rs for config validation
-
-- [x] Split state/mod.rs (339 lines):
-  - [x] Create state/manager.rs for state management core
-  - [x] Create state/transitions.rs for state transition logic
-  - [x] Create state/history.rs for state history tracking
-  - [x] Create state/validation.rs for state validation
+- [x] Split preferences/manager.rs (299 lines):
+  - [x] Create preferences/manager/mod.rs for core functionality
+  - [x] Create preferences/manager/save_handler.rs for save operations
+  - [x] Create preferences/manager/tests.rs for test organization
 
 - [ ] Review app/event_handling.rs (204 lines):
   - [ ] Evaluate splitting into event processing and dispatch
