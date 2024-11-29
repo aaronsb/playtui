@@ -22,11 +22,13 @@ impl App {
 
     /// Moves focus to the next component
     pub fn next_frame(&mut self) -> EventResult<()> {
+        // Use handle_event to process the focus change
         self.handle_event(Event::Key(KeyEvent::Focus(FocusDirection::Next)))
     }
 
     /// Moves focus to the previous component
     pub fn previous_frame(&mut self) -> EventResult<()> {
+        // Use handle_event to process the focus change
         self.handle_event(Event::Key(KeyEvent::Focus(FocusDirection::Previous)))
     }
 }

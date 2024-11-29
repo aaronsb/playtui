@@ -1,32 +1,37 @@
 use std::fmt;
 use std::error::Error;
-use std::io;
 
 #[derive(Debug)]
 pub enum EventError {
-    InvalidEvent(String),
-    HandlerError(String),
+    /// Error during event dispatch
     DispatchError(String),
-    IoError(io::Error),
+    
+    /// Error during event handling
+    HandlingError(String),
+    
+    /// Error during event processing
+    ProcessingError(String),
+    
+    /// Error during focus management
+    FocusError(String),
+    
+    /// Error during component operations
+    ComponentError(String),
 }
 
 impl fmt::Display for EventError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            EventError::InvalidEvent(msg) => write!(f, "Invalid event: {}", msg),
-            EventError::HandlerError(msg) => write!(f, "Handler error: {}", msg),
-            EventError::DispatchError(msg) => write!(f, "Dispatch error: {}", msg),
-            EventError::IoError(err) => write!(f, "IO error: {}", err),
+            EventError::DispatchError(msg) => write!(f, "Event dispatch error: {}", msg),
+            EventError::HandlingError(msg) => write!(f, "Event handling error: {}", msg),
+            EventError::ProcessingError(msg) => write!(f, "Event processing error: {}", msg),
+            EventError::FocusError(msg) => write!(f, "Focus management error: {}", msg),
+            EventError::ComponentError(msg) => write!(f, "Component error: {}", msg),
         }
     }
 }
 
 impl Error for EventError {}
 
-impl From<io::Error> for EventError {
-    fn from(error: io::Error) -> Self {
-        EventError::IoError(error)
-    }
-}
-
+/// Result type for event operations
 pub type EventResult<T> = Result<T, EventError>;
