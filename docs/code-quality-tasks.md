@@ -54,7 +54,29 @@
   - [x] Create app/components/registry.rs for component registration
   - [x] Create app/components/lifecycle.rs for component lifecycle
   - [x] Create app/components/relationships.rs for component relationships
-  
+
+- [x] Split preferences/mod.rs (499 lines):
+  - [x] Create preferences/config.rs for configuration structures
+  - [x] Create preferences/manager.rs for preferences management
+  - [x] Create preferences/persistence.rs for save/load functionality
+  - [x] Create preferences/validation.rs for config validation
+
+- [ ] Split state/mod.rs (339 lines):
+  - [ ] Create state/manager.rs for state management core
+  - [ ] Create state/transitions.rs for state transition logic
+  - [ ] Create state/history.rs for state history tracking
+  - [ ] Create state/validation.rs for state validation
+
+- [ ] Review app/event_handling.rs (204 lines):
+  - [ ] Evaluate splitting into event processing and dispatch
+  - [ ] Consider creating separate error handling module
+  - [ ] Assess if some functionality belongs in events module
+
+- [ ] Split components/controls/events/handlers.rs (166 lines):
+  - [ ] Create separate files for different event categories
+  - [ ] Extract common handler utilities
+  - [ ] Consider creating handler factory pattern
+
 ### Module Organization Guidelines
 1. File Size Assessment:
    - Base splitting decisions on complexity and cohesion, not just line count
