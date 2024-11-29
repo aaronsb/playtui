@@ -1,6 +1,6 @@
 use crossterm::event::KeyCode;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Event {
     Key(KeyEvent),
     Mouse(MouseEvent),
@@ -8,7 +8,7 @@ pub enum Event {
     Navigation(NavigationEvent),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum KeyEvent {
     // Global Navigation Events (always available)
     Tab,
@@ -53,7 +53,7 @@ pub enum KeyEvent {
     Rewind,       // Direct rewind
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum NavigationEvent {
     Left,
     Right,
@@ -98,17 +98,17 @@ impl From<KeyCode> for KeyEvent {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MouseEvent {
     Click { x: u16, y: u16 },
     Scroll { delta: i16 },
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SystemEvent {
     TrackEnded,
     TrackLoaded,
-    Error(String),
+    Error, // Changed from String to unit variant for Copy
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
