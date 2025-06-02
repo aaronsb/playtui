@@ -271,14 +271,25 @@ where
     let state_clone = Arc::clone(&state);
     let mut sample_buffer: Vec<f32> = Vec::new();
     let mut buffer_pos = 0;
+    let mut samples_since_last_data = 0;
+    let sample_rate = config.sample_rate.0 as usize;
     
     let stream = device.build_output_stream(
         config,
         move |data: &mut [T], _: &cpal::OutputCallbackInfo| {
-            let state = state_clone.lock().unwrap();
-            let volume = state.volume;
-            let is_playing = state.is_playing && !state.is_paused;
-            drop(state);
+            let (volume, is_playing) = {
+                let mut state = state_clone.lock().unwrap();
+                let vol = state.volume;
+                let playing = state.is_playing && !state.is_paused;
+                
+                // Check if we should mark as finished due to no data
+                if playing && samples_since_last_data > sample_rate {
+                    state.is_playing = false;
+                    (vol, false)
+                } else {
+                    (vol, playing)
+                }
+            };
             
             if !is_playing {
                 // Not playing, fill with silence
@@ -297,8 +308,16 @@ where
                     if let Ok(new_samples) = sample_rx.try_recv() {
                         sample_buffer = new_samples;
                         buffer_pos = 0;
+                        samples_since_last_data = 0;
                     } else {
-                        // No samples available, fill rest with silence
+                        // No samples available
+                        // Only mark as truly finished if we haven't received data for a while
+                        samples_since_last_data += data.len() - output_pos;
+                        
+                        // Increment the counter for silence detection
+                        // The state check happens at the beginning of the callback
+                        
+                        // Fill rest with silence
                         for i in output_pos..data.len() {
                             data[i] = T::from_sample(0.0);
                         }
@@ -357,6 +376,7 @@ where
     let mut is_paused = false;
     let mut pause_duration = Duration::from_secs(0);
     let mut pause_start = None;
+    let mut decoding_finished = false;
     
     loop {
         // Check for control commands
@@ -386,7 +406,7 @@ where
             }
         }
         
-        if !is_paused {
+        if !is_paused && !decoding_finished {
             // Update position
             {
                 let mut state = state.lock().unwrap();
@@ -422,10 +442,17 @@ where
                                     Err(std::sync::mpsc::TrySendError::Full(_)) => {
                                         // Buffer full, wait a bit
                                         thread::sleep(Duration::from_millis(5));
+                                        
+                                        // Check for stop command while waiting
+                                        if let Ok(PlayerCommand::Stop) = rx.try_recv() {
+                                            decoding_finished = true;
+                                            break;
+                                        }
                                     }
                                     Err(std::sync::mpsc::TrySendError::Disconnected(_)) => {
-                                        // Channel closed, exit cleanly
-                                        return Ok(());
+                                        // Channel closed, mark as finished
+                                        decoding_finished = true;
+                                        break;
                                     }
                                 }
                             }
@@ -438,20 +465,45 @@ where
                     decoder.reset();
                 }
                 Err(Error::IoError(err)) if err.kind() == std::io::ErrorKind::UnexpectedEof => {
-                    break;
+                    decoding_finished = true;
                 }
                 Err(err) => return Err(err.into()),
             }
+        } else if decoding_finished {
+            // All packets decoded, wait for audio to finish playing
+            // Check if audio is still playing by monitoring the state
+            let is_still_playing = {
+                let state = state.lock().unwrap();
+                state.is_playing && !state.is_paused
+            };
+            
+            if !is_still_playing {
+                break;
+            }
+            
+            // Also check for stop command
+            if let Ok(PlayerCommand::Stop) = rx.try_recv() {
+                break;
+            }
+            
+            thread::sleep(Duration::from_millis(50));
         } else {
             thread::sleep(Duration::from_millis(10));
         }
     }
     
-    // Mark as finished
+    // Wait a bit for any remaining buffered audio to play
+    thread::sleep(Duration::from_millis(500));
+    
+    // Ensure the state is marked as not playing
     {
         let mut state = state.lock().unwrap();
         state.is_playing = false;
     }
+    
+    // Keep the stream alive until this function returns
+    // The stream will be dropped here, stopping playback
+    drop(stream);
     
     Ok(())
 }
