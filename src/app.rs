@@ -1,6 +1,7 @@
 use crossterm::event::KeyCode;
 use std::path::PathBuf;
 use crate::audio::AudioPlayer;
+use crate::theme::Theme;
 
 pub struct App {
     pub focused_pane: FocusedPane,
@@ -8,6 +9,8 @@ pub struct App {
     pub playlist: Playlist,
     pub player_state: PlayerState,
     audio_player: Option<AudioPlayer>,
+    pub theme: Theme,
+    pub current_theme_name: String,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -56,6 +59,16 @@ impl App {
             }
         };
 
+        // Load default theme
+        let (theme, theme_name) = match crate::theme::load_theme("monokai") {
+            Ok(theme) => (theme, "monokai".to_string()),
+            Err(_) => {
+                // Fallback to a basic theme if loading fails
+                eprintln!("Failed to load monokai theme, using fallback");
+                (Self::create_fallback_theme(), "fallback".to_string())
+            }
+        };
+
         Self {
             focused_pane: FocusedPane::Files,
             file_list,
@@ -71,6 +84,8 @@ impl App {
                 total_duration: Duration::from_secs(0),
             },
             audio_player,
+            theme,
+            current_theme_name: theme_name,
         }
     }
 
@@ -95,6 +110,10 @@ impl App {
             }
             KeyCode::BackTab => {
                 self.prev_focus();
+                return;
+            }
+            KeyCode::Char('t') | KeyCode::Char('T') => {
+                self.cycle_theme();
                 return;
             }
             KeyCode::Left => {
@@ -252,6 +271,54 @@ impl App {
                 self.playlist.selected = current - 1;
                 self.play_selected();
             }
+        }
+    }
+
+    pub fn switch_theme(&mut self, theme_name: &str) {
+        match crate::theme::load_theme(theme_name) {
+            Ok(theme) => {
+                self.theme = theme;
+                self.current_theme_name = theme_name.to_string();
+            }
+            Err(e) => {
+                eprintln!("Failed to load theme '{}': {}", theme_name, e);
+            }
+        }
+    }
+
+    pub fn cycle_theme(&mut self) {
+        let themes = crate::theme::list_available_themes();
+        if themes.is_empty() {
+            return;
+        }
+
+        let current_index = themes.iter().position(|t| t == &self.current_theme_name).unwrap_or(0);
+        let next_index = (current_index + 1) % themes.len();
+        self.switch_theme(&themes[next_index]);
+    }
+
+    fn create_fallback_theme() -> Theme {
+        use crate::theme::{Theme, ThemeMetadata, ThemeColors, ThemeControls};
+        use std::collections::HashMap;
+
+        Theme {
+            metadata: ThemeMetadata {
+                name: "Fallback".to_string(),
+                author: "PlayTUI".to_string(),
+                version: "1.0".to_string(),
+            },
+            colors: ThemeColors {
+                primary: "#00FFFF".to_string(),
+                secondary: "#00FF00".to_string(),
+                background: "#000000".to_string(),
+                foreground: "#FFFFFF".to_string(),
+                active: "#FFFF00".to_string(),
+                inactive: "#808080".to_string(),
+                playing: "#00FFFF".to_string(),
+                error: "#FF0000".to_string(),
+            },
+            controls: ThemeControls::default(),
+            styles: HashMap::new(),
         }
     }
 

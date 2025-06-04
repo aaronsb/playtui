@@ -9,6 +9,7 @@ use std::{error::Error, io, time::Duration};
 mod app;
 mod audio;
 mod ui;
+mod theme;
 
 use app::App;
 

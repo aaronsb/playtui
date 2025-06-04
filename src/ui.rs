@@ -5,6 +5,12 @@ use ratatui::{
 use crate::app::{App, FocusedPane};
 
 pub fn draw(f: &mut Frame, app: &App) {
+    // Clear the entire terminal with theme background
+    f.render_widget(
+        Block::default().style(Style::default().bg(app.theme.get_color("background"))),
+        f.size()
+    );
+
     // Main layout: 2 vertical sections (no more controls bar)
     let main_chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -49,6 +55,7 @@ fn draw_file_browser(f: &mut Frame, app: &App, area: Rect) {
             
             let prefix = if path.is_dir() { "📁 " } else if is_audio_file(path) { "🎵 " } else { "   " };
             ListItem::new(format!("{}{}", prefix, name))
+                .style(app.theme.get_style("list_item"))
         })
         .collect();
 
@@ -57,9 +64,10 @@ fn draw_file_browser(f: &mut Frame, app: &App, area: Rect) {
             Block::default()
                 .borders(Borders::ALL)
                 .title("Library")
-                .border_style(get_border_style(app.focused_pane == FocusedPane::Files))
+                .border_style(get_border_style(app, app.focused_pane == FocusedPane::Files))
+                .style(Style::default().bg(app.theme.get_color("background")))
         )
-        .highlight_style(Style::default().bg(Color::DarkGray))
+        .highlight_style(app.theme.get_style("list_selected"))
         .highlight_symbol("▶ ");
 
     let mut state = ListState::default();
@@ -96,7 +104,8 @@ fn draw_now_playing(f: &mut Frame, app: &App, area: Rect) {
 fn draw_cassette(f: &mut Frame, app: &App, area: Rect) {
     let block = Block::default()
         .borders(Borders::ALL)
-        .title("Now Playing");
+        .title("Now Playing")
+        .style(Style::default().bg(app.theme.get_color("background")));
     
     let inner_area = block.inner(area);
     f.render_widget(block, area);
@@ -124,6 +133,7 @@ fn draw_cassette(f: &mut Frame, app: &App, area: Rect) {
     
     let cassette = create_compact_cassette(&tracks, app.player_state.is_playing);
     let paragraph = Paragraph::new(cassette)
+        .style(app.theme.get_style("text_normal"))
         .alignment(Alignment::Center);
     
     f.render_widget(paragraph, inner_area);
@@ -178,7 +188,10 @@ fn draw_progress(f: &mut Frame, app: &App, area: Rect) {
     // Time elapsed
     let elapsed = format_duration(app.player_state.current_position);
     let elapsed_widget = Paragraph::new(elapsed)
-        .block(Block::default().borders(Borders::TOP | Borders::BOTTOM | Borders::LEFT))
+        .block(Block::default()
+            .borders(Borders::TOP | Borders::BOTTOM | Borders::LEFT)
+            .style(Style::default().bg(app.theme.get_color("background"))))
+        .style(app.theme.get_style("text_normal"))
         .alignment(Alignment::Center);
     f.render_widget(elapsed_widget, chunks[0]);
 
@@ -192,15 +205,20 @@ fn draw_progress(f: &mut Frame, app: &App, area: Rect) {
     };
     
     let progress_bar = Gauge::default()
-        .block(Block::default().borders(Borders::TOP | Borders::BOTTOM))
-        .gauge_style(Style::default().fg(Color::Cyan))
+        .block(Block::default()
+            .borders(Borders::TOP | Borders::BOTTOM)
+            .style(Style::default().bg(app.theme.get_color("background"))))
+        .gauge_style(app.theme.get_style("progress_bar"))
         .percent(progress.min(100));
     f.render_widget(progress_bar, chunks[1]);
 
     // Total time
     let total = format_duration(app.player_state.total_duration);
     let total_widget = Paragraph::new(total)
-        .block(Block::default().borders(Borders::TOP | Borders::BOTTOM | Borders::RIGHT))
+        .block(Block::default()
+            .borders(Borders::TOP | Borders::BOTTOM | Borders::RIGHT)
+            .style(Style::default().bg(app.theme.get_color("background"))))
+        .style(app.theme.get_style("text_normal"))
         .alignment(Alignment::Center);
     f.render_widget(total_widget, chunks[2]);
 }
@@ -221,7 +239,10 @@ fn draw_track_info(f: &mut Frame, app: &App, area: Rect) {
     };
 
     let paragraph = Paragraph::new(info)
-        .block(Block::default().borders(Borders::ALL))
+        .block(Block::default()
+            .borders(Borders::ALL)
+            .style(Style::default().bg(app.theme.get_color("background"))))
+        .style(app.theme.get_style("text_normal"))
         .alignment(Alignment::Center);
 
     f.render_widget(paragraph, area);
@@ -243,7 +264,12 @@ fn draw_playlist(f: &mut Frame, app: &App, area: Rect) {
                 "  "
             };
             
-            ListItem::new(format!("{}{}", prefix, name))
+            let item = ListItem::new(format!("{}{}", prefix, name));
+            if Some(i) == app.playlist.current_track {
+                item.style(app.theme.get_style("playing_item"))
+            } else {
+                item
+            }
         })
         .collect();
 
@@ -252,9 +278,10 @@ fn draw_playlist(f: &mut Frame, app: &App, area: Rect) {
             Block::default()
                 .borders(Borders::ALL)
                 .title(format!("Playlist ({} tracks)", app.playlist.tracks.len()))
-                .border_style(get_border_style(app.focused_pane == FocusedPane::Playlist))
+                .border_style(get_border_style(app, app.focused_pane == FocusedPane::Playlist))
+                .style(Style::default().bg(app.theme.get_color("background")))
         )
-        .highlight_style(Style::default().bg(Color::DarkGray))
+        .highlight_style(app.theme.get_style("list_selected"))
         .highlight_symbol("▶ ");
 
     let mut state = ListState::default();
@@ -266,8 +293,11 @@ fn draw_playlist(f: &mut Frame, app: &App, area: Rect) {
 
 fn draw_volume(f: &mut Frame, app: &App, area: Rect) {
     let volume_bar = Gauge::default()
-        .block(Block::default().borders(Borders::ALL).title("Volume"))
-        .gauge_style(Style::default().fg(Color::Green))
+        .block(Block::default()
+            .borders(Borders::ALL)
+            .title("Volume")
+            .style(Style::default().bg(app.theme.get_color("background"))))
+        .gauge_style(app.theme.get_style("volume_indicator"))
         .percent(app.player_state.volume as u16)
         .label(format!("{}%", app.player_state.volume));
 
@@ -276,22 +306,23 @@ fn draw_volume(f: &mut Frame, app: &App, area: Rect) {
 
 fn draw_status_bar(f: &mut Frame, app: &App, area: Rect) {
     let help = match app.focused_pane {
-        FocusedPane::Files => "Enter: Add to playlist | Tab: Switch | +/-: Volume | q: Quit",
-        FocusedPane::Playlist => "Enter: Play | d: Remove | c: Clear | Tab: Switch | q: Quit",
-        _ => "SPC: Play/Pause | Tab: Switch | +/-: Volume | ←/→: Prev/Next | q: Quit",
+        FocusedPane::Files => "Enter: Add to playlist | Tab: Switch | +/-: Volume | t: Theme | q: Quit",
+        FocusedPane::Playlist => "Enter: Play | d: Remove | c: Clear | Tab: Switch | t: Theme | q: Quit",
+        _ => "SPC: Play/Pause | Tab: Switch | +/-: Volume | ←/→: Prev/Next | t: Theme | q: Quit",
     };
     
-    let paragraph = Paragraph::new(help)
-        .style(Style::default().fg(Color::DarkGray));
+    let status = format!("{} [Theme: {}]", help, app.current_theme_name);
+    let paragraph = Paragraph::new(status)
+        .style(app.theme.get_style("text_dim").bg(app.theme.get_color("background")));
     
     f.render_widget(paragraph, area);
 }
 
-fn get_border_style(focused: bool) -> Style {
+fn get_border_style(app: &App, focused: bool) -> Style {
     if focused {
-        Style::default().fg(Color::Cyan)
+        app.theme.get_style("border_focused")
     } else {
-        Style::default().fg(Color::DarkGray)
+        app.theme.get_style("border_unfocused")
     }
 }
 
